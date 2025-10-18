@@ -1,6 +1,9 @@
 {
   "name": "localeops",
-  "module": "index.ts",
+  "module": "src/server.ts",
+  "scripts": {
+    "dev": "bun run src/server.ts"
+  },
   "type": "module",
   "private": true,
   "devDependencies": {
