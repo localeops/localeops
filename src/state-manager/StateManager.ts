@@ -43,7 +43,9 @@ export class StateManager {
 	 */
 	diff(oldDoc: unknown, newDoc: unknown): DiffChange[] {
 		if (!isPlainObject(oldDoc) || !isPlainObject(newDoc)) {
-			throw new TypeError("StateManager.diff expects both oldDoc and newDoc to be plain objects (root directory states)");
+			throw new TypeError(
+				"StateManager.diff expects both oldDoc and newDoc to be plain objects (root directory states)",
+			);
 		}
 		return StateManager.diffAny(oldDoc, newDoc, []);
 	}
@@ -51,7 +53,7 @@ export class StateManager {
 	private static diffAny(
 		oldValue: unknown,
 		newValue: unknown,
-		currentPath: Array<string | number>
+		currentPath: Array<string | number>,
 	): DiffChange[] {
 		// If both are plain objects, descend key-by-key
 		if (isPlainObject(oldValue) && isPlainObject(newValue)) {
@@ -78,15 +80,15 @@ export class StateManager {
 				leafPath,
 				key,
 				oldValue,
-				newValue
-			}
+				newValue,
+			},
 		];
 	}
 
 	private static diffObjects(
 		oldObj: Record<string, unknown>,
 		newObj: Record<string, unknown>,
-		currentPath: Array<string | number>
+		currentPath: Array<string | number>,
 	): DiffChange[] {
 		const changes: DiffChange[] = [];
 		const oldKeys = new Set(Object.keys(oldObj));
@@ -97,7 +99,7 @@ export class StateManager {
 			if (!oldKeys.has(key)) {
 				const newValue = newObj[key];
 				const nextPath = [...currentPath, key];
-				
+
 				// If the added value is an object or array, decompose it into primitive changes
 				if (isPlainObject(newValue)) {
 					changes.push(...StateManager.diffObjects({}, newValue, nextPath));
@@ -109,7 +111,7 @@ export class StateManager {
 						path: nextPath,
 						leafPath: [...currentPath],
 						key,
-						value: newValue
+						value: newValue,
 					});
 				}
 			}
@@ -120,10 +122,16 @@ export class StateManager {
 			if (!newKeys.has(key)) {
 				const oldValue = oldObj[key];
 				const nextPath = [...currentPath, key];
-				
+
 				// If the removed value is an object or array, decompose it into primitive removed changes
 				if (isPlainObject(oldValue)) {
-					changes.push(...StateManager.diffObjects(oldValue as Record<string, unknown>, {}, nextPath));
+					changes.push(
+						...StateManager.diffObjects(
+							oldValue as Record<string, unknown>,
+							{},
+							nextPath,
+						),
+					);
 				} else if (Array.isArray(oldValue)) {
 					changes.push(...StateManager.diffArrays(oldValue, [], nextPath));
 				} else {
@@ -131,7 +139,7 @@ export class StateManager {
 						type: "removed",
 						path: nextPath,
 						leafPath: [...currentPath],
-						key
+						key,
 					});
 				}
 			}
@@ -171,7 +179,7 @@ export class StateManager {
 						path: nextPath,
 						leafPath: [...currentPath],
 						key,
-						value: b
+						value: b,
 					});
 				} else if (Array.isArray(a)) {
 					// Array changed to primitive: decompose the old array into removed changes
@@ -182,7 +190,7 @@ export class StateManager {
 						path: nextPath,
 						leafPath: [...currentPath],
 						key,
-						value: b
+						value: b,
 					});
 				} else {
 					// Both are primitives: report as changed
@@ -192,7 +200,7 @@ export class StateManager {
 						leafPath: [...currentPath],
 						key,
 						oldValue: a,
-						newValue: b
+						newValue: b,
 					});
 				}
 			}
@@ -204,7 +212,7 @@ export class StateManager {
 	private static diffArrays(
 		oldArr: unknown[],
 		newArr: unknown[],
-		currentPath: Array<string | number>
+		currentPath: Array<string | number>,
 	): DiffChange[] {
 		const changes: DiffChange[] = [];
 		const maxLen = Math.max(oldArr.length, newArr.length);
@@ -216,10 +224,16 @@ export class StateManager {
 			if (inOld && !inNew) {
 				const oldValue = oldArr[index];
 				const nextPath = [...currentPath, index];
-				
+
 				// If the removed value is an object or array, decompose it into primitive removed changes
 				if (isPlainObject(oldValue)) {
-					changes.push(...StateManager.diffObjects(oldValue as Record<string, unknown>, {}, nextPath));
+					changes.push(
+						...StateManager.diffObjects(
+							oldValue as Record<string, unknown>,
+							{},
+							nextPath,
+						),
+					);
 				} else if (Array.isArray(oldValue)) {
 					changes.push(...StateManager.diffArrays(oldValue, [], nextPath));
 				} else {
@@ -227,7 +241,7 @@ export class StateManager {
 						type: "removed",
 						path: nextPath,
 						leafPath: [...currentPath],
-						key: index
+						key: index,
 					});
 				}
 				continue;
@@ -236,10 +250,16 @@ export class StateManager {
 			if (!inOld && inNew) {
 				const newValue = newArr[index];
 				const nextPath = [...currentPath, index];
-				
+
 				// If the added value is an object or array, decompose it into primitive changes
 				if (isPlainObject(newValue)) {
-					changes.push(...StateManager.diffObjects({}, newValue as Record<string, unknown>, nextPath));
+					changes.push(
+						...StateManager.diffObjects(
+							{},
+							newValue as Record<string, unknown>,
+							nextPath,
+						),
+					);
 				} else if (Array.isArray(newValue)) {
 					changes.push(...StateManager.diffArrays([], newValue, nextPath));
 				} else {
@@ -248,7 +268,7 @@ export class StateManager {
 						path: nextPath,
 						leafPath: [...currentPath],
 						key: index,
-						value: newValue
+						value: newValue,
 					});
 				}
 				continue;
@@ -276,7 +296,7 @@ export class StateManager {
 					leafPath: [...currentPath],
 					key: index,
 					oldValue: a,
-					newValue: b
+					newValue: b,
 				});
 			}
 		}
