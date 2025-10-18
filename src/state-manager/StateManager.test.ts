@@ -1,5 +1,5 @@
-import { expect, test, describe } from "bun:test";
-import { StateManager, type DiffChange } from "./StateManager";
+import { describe, expect, test } from "bun:test";
+import { type DiffChange, StateManager } from "./StateManager";
 
 describe("StateManager.diff", () => {
 	test("returns empty list when documents are identical", () => {
@@ -26,7 +26,13 @@ describe("StateManager.diff", () => {
 		const received = s.diff(oldState, newState);
 
 		const expected: DiffChange[] = [
-			{ type: "added", leafPath: ["a"], path: ["a", "a1"], key: "a1", value: "A" },
+			{
+				type: "added",
+				leafPath: ["a"],
+				path: ["a", "a1"],
+				key: "a1",
+				value: "A",
+			},
 		];
 
 		expect(received).toEqual(expect.arrayContaining(expected));
@@ -39,7 +45,13 @@ describe("StateManager.diff", () => {
 		const received = s.diff(oldState, newState);
 
 		const expected: DiffChange[] = [
-			{ type: "added", leafPath: ["a", 0, "a1", 0], path: ["a", 0, "a1", 0, "a12"], key: "a12", value: "B" },
+			{
+				type: "added",
+				leafPath: ["a", 0, "a1", 0],
+				path: ["a", 0, "a1", 0, "a12"],
+				key: "a12",
+				value: "B",
+			},
 		];
 
 		expect(received).toEqual(expect.arrayContaining(expected));
@@ -52,8 +64,20 @@ describe("StateManager.diff", () => {
 		const received = s.diff(oldState, newState);
 
 		const expected: DiffChange[] = [
-			{ type: "added", leafPath: ["a", "a2", 0], path: ["a", "a2", 0, "a21"], key: "a21", value: "B" },
-			{ type: "added", leafPath: ["a", "a2", 0], path: ["a", "a2", 0, "a22"], key: "a22", value: "C" },
+			{
+				type: "added",
+				leafPath: ["a", "a2", 0],
+				path: ["a", "a2", 0, "a21"],
+				key: "a21",
+				value: "B",
+			},
+			{
+				type: "added",
+				leafPath: ["a", "a2", 0],
+				path: ["a", "a2", 0, "a22"],
+				key: "a22",
+				value: "C",
+			},
 		];
 
 		expect(received).toEqual(expect.arrayContaining(expected));
@@ -66,7 +90,14 @@ describe("StateManager.diff", () => {
 		const received = s.diff(oldState, newState);
 
 		const expected: DiffChange[] = [
-			{ type: "changed", leafPath: ["a", "a1"], path: ["a", "a1", 0], key: 0, oldValue: "A", newValue: "B" },
+			{
+				type: "changed",
+				leafPath: ["a", "a1"],
+				path: ["a", "a1", 0],
+				key: 0,
+				oldValue: "A",
+				newValue: "B",
+			},
 		];
 
 		expect(received).toEqual(expect.arrayContaining(expected));
@@ -79,8 +110,20 @@ describe("StateManager.diff", () => {
 		const received = s.diff(oldState, newState);
 
 		const expected: DiffChange[] = [
-			{ type: "added", leafPath: ["a", "a1", "a11"], path: ["a", "a1", "a11", 0], key: 0, value: "B" },
-			{ type: "added", leafPath: ["a", "a1", "a12"], path: ["a", "a1", "a12", "a121"], key: "a121", value: "C" },
+			{
+				type: "added",
+				leafPath: ["a", "a1", "a11"],
+				path: ["a", "a1", "a11", 0],
+				key: 0,
+				value: "B",
+			},
+			{
+				type: "added",
+				leafPath: ["a", "a1", "a12"],
+				path: ["a", "a1", "a12", "a121"],
+				key: "a121",
+				value: "C",
+			},
 		];
 
 		expect(received).toEqual(expect.arrayContaining(expected));
@@ -88,13 +131,22 @@ describe("StateManager.diff", () => {
 
 	test("removed field with primitive value", () => {
 		const s = new StateManager();
-		const oldState = { a: "A", b: ["B1"], c: { c1: { c11: "C11", c12: "C12" } }};
+		const oldState = {
+			a: "A",
+			b: ["B1"],
+			c: { c1: { c11: "C11", c12: "C12" } },
+		};
 		const newState = { a: "A", c: { c1: { c11: "C11" } } };
 		const received = s.diff(oldState, newState);
 
 		const expected: DiffChange[] = [
 			{ type: "removed", leafPath: ["b"], path: ["b", 0], key: 0 },
-			{ type: "removed", leafPath: ["c", "c1"], path: ["c", "c1", "c12"], key: "c12" },
+			{
+				type: "removed",
+				leafPath: ["c", "c1"],
+				path: ["c", "c1", "c12"],
+				key: "c12",
+			},
 		];
 
 		expect(received).toHaveLength(expected.length);
@@ -103,7 +155,7 @@ describe("StateManager.diff", () => {
 
 	test("removed field with object value", () => {
 		const s = new StateManager();
-		const oldState = { a: "A", b: [{ b1: "B1", b2: "B2"}], };
+		const oldState = { a: "A", b: [{ b1: "B1", b2: "B2" }] };
 		const newState = { a: "A" };
 		const received = s.diff(oldState, newState);
 
@@ -133,13 +185,27 @@ describe("StateManager.diff", () => {
 
 	test("change element in array field", () => {
 		const s = new StateManager();
-		const oldState = {a: ["A", "B", "C"]};
-		const newState = {a: ["A", "X", "B", "C"]};
+		const oldState = { a: ["A", "B", "C"] };
+		const newState = { a: ["A", "X", "B", "C"] };
 		const received = s.diff(oldState, newState);
 
 		const expected: DiffChange[] = [
-			{ type: "changed", leafPath: ["a"], path: ["a", 1], key: 1, oldValue: "B", newValue: "X" },
-			{ type: "changed", leafPath: ["a"], path: ["a", 2], key: 2, oldValue: "C", newValue: "B" },
+			{
+				type: "changed",
+				leafPath: ["a"],
+				path: ["a", 1],
+				key: 1,
+				oldValue: "B",
+				newValue: "X",
+			},
+			{
+				type: "changed",
+				leafPath: ["a"],
+				path: ["a", 2],
+				key: 2,
+				oldValue: "C",
+				newValue: "B",
+			},
 			{ type: "added", leafPath: ["a"], path: ["a", 3], key: 3, value: "C" },
 		];
 
