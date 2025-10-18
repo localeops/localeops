@@ -1,15 +1,17 @@
 {
-  "name": "localeops",
-  "module": "src/server.ts",
-  "scripts": {
-    "dev": "bun run src/server.ts"
-  },
-  "type": "module",
-  "private": true,
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  }
+	"name": "localeops",
+	"module": "src/server.ts",
+	"scripts": {
+		"dev": "bun run src/server.ts"
+	},
+	"type": "module",
+	"private": true,
+	"devDependencies": {
+		"@biomejs/biome": "2.2.6",
+		"@types/bun": "latest",
+		"lefthook": "^1.13.6"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	}
 }
