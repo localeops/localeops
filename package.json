@@ -2,16 +2,24 @@
 	"name": "localeops",
 	"module": "src/server.ts",
 	"scripts": {
-		"dev": "bun run src/server.ts"
+		"dev": "bun run src/server.ts",
+		"commit": "cz"
 	},
 	"type": "module",
 	"private": true,
 	"devDependencies": {
 		"@biomejs/biome": "2.2.6",
 		"@types/bun": "latest",
+		"commitizen": "^4.3.1",
+		"cz-conventional-changelog": "^3.3.0",
 		"lefthook": "^1.13.6"
 	},
 	"peerDependencies": {
 		"typescript": "^5"
+	},
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-conventional-changelog"
+		}
 	}
 }
