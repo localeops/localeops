@@ -1,52 +1,24 @@
-export type ChangeType = "added" | "removed" | "changed";
+import type { Delta } from "./state-manager.types";
 
-export interface BaseChange {
-	// Full path from root to the changed key (includes the key itself)
-	path: Array<string | number>;
-	// Path to the leaf object that owns the changed key (parent of the key)
-	leafPath: Array<string | number>;
-	// The key (or array index) within the leaf object where the change happened
-	key: string | number;
-}
-
-export interface AddedChange extends BaseChange {
-	type: "added";
-	value: unknown;
-}
-
-export interface RemovedChange extends BaseChange {
-	type: "removed";
-}
-
-export interface ChangedChange extends BaseChange {
-	type: "changed";
-	oldValue: unknown;
-	newValue: unknown;
-}
-
-export type DiffChange = AddedChange | RemovedChange | ChangedChange;
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-	return (
-		value !== null &&
-		typeof value === "object" &&
-		!Array.isArray(value) &&
-		Object.getPrototypeOf(value) === Object.prototype
-	);
-}
-
+// TODO:
+// Improve logic for diff function (remove diffAny)
+// When more than 1 argument in the func, use objects
+// if func name diffObjects, params can be new and old
 export class StateManager {
 	/**
 	 * Compute a structured diff between two nested JSON-compatible values.
 	 * - Identifies adds/removes/changes
 	 * - Reports the owning leaf object for each change
 	 */
-	diff(oldDoc: unknown, newDoc: unknown): DiffChange[] {
-		if (!isPlainObject(oldDoc) || !isPlainObject(newDoc)) {
-			throw new TypeError(
-				"StateManager.diff expects both oldDoc and newDoc to be plain objects (root directory states)",
-			);
+	diff(oldDoc: unknown, newDoc: unknown): Delta[] {
+		const notPlainObject =
+			!StateManager.isPlainObject(oldDoc) ||
+			!StateManager.isPlainObject(newDoc);
+
+		if (notPlainObject) {
+			throw new TypeError("Expects both oldDoc and newDoc to be plain objects");
 		}
+
 		return StateManager.diffAny(oldDoc, newDoc, []);
 	}
 
@@ -54,9 +26,11 @@ export class StateManager {
 		oldValue: unknown,
 		newValue: unknown,
 		currentPath: Array<string | number>,
-	): DiffChange[] {
-		// If both are plain objects, descend key-by-key
-		if (isPlainObject(oldValue) && isPlainObject(newValue)) {
+	): Delta[] {
+		if (
+			StateManager.isPlainObject(oldValue) &&
+			StateManager.isPlainObject(newValue)
+		) {
 			return StateManager.diffObjects(oldValue, newValue, currentPath);
 		}
 
@@ -66,6 +40,7 @@ export class StateManager {
 		}
 
 		// If types differ or at least one is primitive or non-plain object, treat as changed at this path
+		// TODO: Think about this one
 		if (oldValue === newValue) {
 			return [];
 		}
@@ -89,8 +64,8 @@ export class StateManager {
 		oldObj: Record<string, unknown>,
 		newObj: Record<string, unknown>,
 		currentPath: Array<string | number>,
-	): DiffChange[] {
-		const changes: DiffChange[] = [];
+	): Delta[] {
+		const changes: Delta[] = [];
 		const oldKeys = new Set(Object.keys(oldObj));
 		const newKeys = new Set(Object.keys(newObj));
 
@@ -101,7 +76,7 @@ export class StateManager {
 				const nextPath = [...currentPath, key];
 
 				// If the added value is an object or array, decompose it into primitive changes
-				if (isPlainObject(newValue)) {
+				if (StateManager.isPlainObject(newValue)) {
 					changes.push(...StateManager.diffObjects({}, newValue, nextPath));
 				} else if (Array.isArray(newValue)) {
 					changes.push(...StateManager.diffArrays([], newValue, nextPath));
@@ -124,7 +99,7 @@ export class StateManager {
 				const nextPath = [...currentPath, key];
 
 				// If the removed value is an object or array, decompose it into primitive removed changes
-				if (isPlainObject(oldValue)) {
+				if (StateManager.isPlainObject(oldValue)) {
 					changes.push(
 						...StateManager.diffObjects(
 							oldValue as Record<string, unknown>,
@@ -149,10 +124,10 @@ export class StateManager {
 		for (const key of newKeys) {
 			if (!oldKeys.has(key)) continue; // already handled as added
 			const nextPath = [...currentPath, key];
-			const a = oldObj[key];
+			const a = oldObj[key]; // FIXME: we need to rename a and b to be better names
 			const b = newObj[key];
 
-			if (isPlainObject(a) && isPlainObject(b)) {
+			if (StateManager.isPlainObject(a) && StateManager.isPlainObject(b)) {
 				changes.push(...StateManager.diffObjects(a, b, nextPath));
 				continue;
 			}
@@ -164,13 +139,13 @@ export class StateManager {
 
 			// Handle type changes by decomposing complex values
 			if (a !== b) {
-				if (isPlainObject(b)) {
+				if (StateManager.isPlainObject(b)) {
 					// Changed to object: decompose the object into primitive changes
 					changes.push(...StateManager.diffObjects({}, b, nextPath));
 				} else if (Array.isArray(b)) {
 					// Changed to array: decompose the array into primitive changes
 					changes.push(...StateManager.diffArrays([], b, nextPath));
-				} else if (isPlainObject(a)) {
+				} else if (StateManager.isPlainObject(a)) {
 					// Object changed to primitive: decompose the old object into removed changes
 					changes.push(...StateManager.diffObjects(a, {}, nextPath));
 					// Then add the new primitive value
@@ -213,8 +188,8 @@ export class StateManager {
 		oldArr: unknown[],
 		newArr: unknown[],
 		currentPath: Array<string | number>,
-	): DiffChange[] {
-		const changes: DiffChange[] = [];
+	): Delta[] {
+		const changes: Delta[] = [];
 		const maxLen = Math.max(oldArr.length, newArr.length);
 
 		for (let index = 0; index < maxLen; index++) {
@@ -226,7 +201,7 @@ export class StateManager {
 				const nextPath = [...currentPath, index];
 
 				// If the removed value is an object or array, decompose it into primitive removed changes
-				if (isPlainObject(oldValue)) {
+				if (StateManager.isPlainObject(oldValue)) {
 					changes.push(
 						...StateManager.diffObjects(
 							oldValue as Record<string, unknown>,
@@ -252,7 +227,7 @@ export class StateManager {
 				const nextPath = [...currentPath, index];
 
 				// If the added value is an object or array, decompose it into primitive changes
-				if (isPlainObject(newValue)) {
+				if (StateManager.isPlainObject(newValue)) {
 					changes.push(
 						...StateManager.diffObjects(
 							{},
@@ -279,7 +254,7 @@ export class StateManager {
 			const b = newArr[index];
 			const nextPath = [...currentPath, index];
 
-			if (isPlainObject(a) && isPlainObject(b)) {
+			if (StateManager.isPlainObject(a) && StateManager.isPlainObject(b)) {
 				changes.push(...StateManager.diffObjects(a, b, nextPath));
 				continue;
 			}
@@ -302,5 +277,22 @@ export class StateManager {
 		}
 
 		return changes;
+	}
+
+	/**
+	 * Checks if a value is a plain object.
+	 * A plain object is a simple key-value object literal (e.g., {key: value})
+	 * created directly from Object.prototype, not an instance of a class,
+	 * array, or other special object type like Date, Map, Set, etc.
+	 */
+	private static isPlainObject(
+		value: unknown,
+	): value is Record<string, unknown> {
+		return (
+			value !== null &&
+			typeof value === "object" &&
+			!Array.isArray(value) &&
+			Object.getPrototypeOf(value) === Object.prototype
+		);
 	}
 }
