@@ -1,70 +1,34 @@
-import type { Delta } from "./state-manager.types";
+import { Value } from "@sinclair/typebox/value";
+import { i18nResource } from "./i18n.schema";
+import type { Delta, I18nArray, I18nObject } from "./state-manager.types";
 
-// TODO:
-// Improve logic for diff function (remove diffAny)
-// When more than 1 argument in the func, use objects
-// if func name diffObjects, params can be new and old
 export class StateManager {
-	/**
-	 * Compute a structured diff between two nested JSON-compatible values.
-	 * - Identifies adds/removes/changes
-	 * - Reports the owning leaf object for each change
-	 */
-	diff(oldDoc: unknown, newDoc: unknown): Delta[] {
-		const notPlainObject =
-			!StateManager.isPlainObject(oldDoc) ||
-			!StateManager.isPlainObject(newDoc);
+	diffI18nResources({
+		oldObj,
+		newObj,
+	}: {
+		oldObj: unknown;
+		newObj: unknown;
+	}): Delta[] {
+		const oldObjIsValid = StateManager.isI18NResource(oldObj);
+		const newObjIsValid = StateManager.isI18NResource(newObj);
 
-		if (notPlainObject) {
-			throw new TypeError("Expects both oldDoc and newDoc to be plain objects");
+		if (!oldObjIsValid || !newObjIsValid) {
+			throw new TypeError("Expects both oldObj and newObj to be I18nResource");
 		}
 
-		return StateManager.diffAny(oldDoc, newDoc, []);
+		return StateManager.diffObjects({ oldObj, newObj, path: [] });
 	}
 
-	private static diffAny(
-		oldValue: unknown,
-		newValue: unknown,
-		currentPath: Array<string | number>,
-	): Delta[] {
-		if (
-			StateManager.isPlainObject(oldValue) &&
-			StateManager.isPlainObject(newValue)
-		) {
-			return StateManager.diffObjects(oldValue, newValue, currentPath);
-		}
-
-		// If both are arrays, compare by index
-		if (Array.isArray(oldValue) && Array.isArray(newValue)) {
-			return StateManager.diffArrays(oldValue, newValue, currentPath);
-		}
-
-		// If types differ or at least one is primitive or non-plain object, treat as changed at this path
-		// TODO: Think about this one
-		if (oldValue === newValue) {
-			return [];
-		}
-
-		// Changing the value at the current path (leaf is the parent of the last segment)
-		const leafPath = currentPath.slice(0, -1);
-		const key = currentPath[currentPath.length - 1] ?? "";
-		return [
-			{
-				type: "changed",
-				path: currentPath,
-				leafPath,
-				key,
-				oldValue,
-				newValue,
-			},
-		];
-	}
-
-	private static diffObjects(
-		oldObj: Record<string, unknown>,
-		newObj: Record<string, unknown>,
-		currentPath: Array<string | number>,
-	): Delta[] {
+	private static diffObjects({
+		oldObj,
+		newObj,
+		path,
+	}: {
+		oldObj: I18nObject;
+		newObj: I18nObject;
+		path: Array<string | number>;
+	}): Delta[] {
 		const changes: Delta[] = [];
 		const oldKeys = new Set(Object.keys(oldObj));
 		const newKeys = new Set(Object.keys(newObj));
@@ -72,22 +36,34 @@ export class StateManager {
 		// Added keys
 		for (const key of newKeys) {
 			if (!oldKeys.has(key)) {
-				const newValue = newObj[key];
-				const nextPath = [...currentPath, key];
-
-				// If the added value is an object or array, decompose it into primitive changes
-				if (StateManager.isPlainObject(newValue)) {
-					changes.push(...StateManager.diffObjects({}, newValue, nextPath));
-				} else if (Array.isArray(newValue)) {
-					changes.push(...StateManager.diffArrays([], newValue, nextPath));
-				} else {
-					changes.push({
-						type: "added",
-						path: nextPath,
-						leafPath: [...currentPath],
-						key,
-						value: newValue,
-					});
+				if (newObj[key]) {
+					const newValue = newObj[key];
+					const nextPath = [...path, key];
+					if (typeof newValue === "string") {
+						changes.push({
+							type: "added",
+							path: nextPath,
+							leafPath: [...path],
+							key,
+							value: newValue,
+						});
+					} else if (Array.isArray(newValue)) {
+						changes.push(
+							...StateManager.diffArrays({
+								oldArr: [],
+								newArr: newValue,
+								path: nextPath,
+							}),
+						);
+					} else {
+						changes.push(
+							...StateManager.diffObjects({
+								oldObj: {},
+								newObj: newValue,
+								path: nextPath,
+							}),
+						);
+					}
 				}
 			}
 		}
@@ -95,88 +71,135 @@ export class StateManager {
 		// Removed keys
 		for (const key of oldKeys) {
 			if (!newKeys.has(key)) {
-				const oldValue = oldObj[key];
-				const nextPath = [...currentPath, key];
+				if (oldObj[key]) {
+					const oldValue = oldObj[key];
+					const nextPath = [...path, key];
 
-				// If the removed value is an object or array, decompose it into primitive removed changes
-				if (StateManager.isPlainObject(oldValue)) {
-					changes.push(
-						...StateManager.diffObjects(
-							oldValue as Record<string, unknown>,
-							{},
-							nextPath,
-						),
-					);
-				} else if (Array.isArray(oldValue)) {
-					changes.push(...StateManager.diffArrays(oldValue, [], nextPath));
-				} else {
-					changes.push({
-						type: "removed",
-						path: nextPath,
-						leafPath: [...currentPath],
-						key,
-					});
+					if (typeof oldValue === "string") {
+						changes.push({
+							type: "removed",
+							path: nextPath,
+							leafPath: [...path],
+							key,
+						});
+					} else if (Array.isArray(oldValue)) {
+						changes.push(
+							...StateManager.diffArrays({
+								oldArr: oldValue,
+								newArr: [],
+								path: nextPath,
+							}),
+						);
+					} else {
+						changes.push(
+							...StateManager.diffObjects({
+								oldObj: oldValue,
+								newObj: {},
+								path: nextPath,
+							}),
+						);
+					}
 				}
 			}
 		}
 
 		// Present in both: dive or compare
 		for (const key of newKeys) {
-			if (!oldKeys.has(key)) continue; // already handled as added
-			const nextPath = [...currentPath, key];
-			const a = oldObj[key]; // FIXME: we need to rename a and b to be better names
-			const b = newObj[key];
+			const nextPath = [...path, key];
+			const oldValue = oldObj[key];
+			const newValue = newObj[key];
 
-			if (StateManager.isPlainObject(a) && StateManager.isPlainObject(b)) {
-				changes.push(...StateManager.diffObjects(a, b, nextPath));
-				continue;
-			}
-
-			if (Array.isArray(a) && Array.isArray(b)) {
-				changes.push(...StateManager.diffArrays(a, b, nextPath));
-				continue;
-			}
-
-			// Handle type changes by decomposing complex values
-			if (a !== b) {
-				if (StateManager.isPlainObject(b)) {
-					// Changed to object: decompose the object into primitive changes
-					changes.push(...StateManager.diffObjects({}, b, nextPath));
-				} else if (Array.isArray(b)) {
-					// Changed to array: decompose the array into primitive changes
-					changes.push(...StateManager.diffArrays([], b, nextPath));
-				} else if (StateManager.isPlainObject(a)) {
-					// Object changed to primitive: decompose the old object into removed changes
-					changes.push(...StateManager.diffObjects(a, {}, nextPath));
-					// Then add the new primitive value
-					changes.push({
-						type: "added",
-						path: nextPath,
-						leafPath: [...currentPath],
-						key,
-						value: b,
-					});
-				} else if (Array.isArray(a)) {
-					// Array changed to primitive: decompose the old array into removed changes
-					changes.push(...StateManager.diffArrays(a, [], nextPath));
-					// Then add the new primitive value
-					changes.push({
-						type: "added",
-						path: nextPath,
-						leafPath: [...currentPath],
-						key,
-						value: b,
-					});
+			if (oldValue && newValue) {
+				if (typeof newValue === "string") {
+					if (typeof oldValue === "string") {
+						if (newValue !== oldValue) {
+							changes.push({
+								type: "changed",
+								path: nextPath,
+								leafPath: [...path],
+								key,
+								oldValue: oldValue,
+								newValue: newValue,
+							});
+						}
+					} else if (Array.isArray(oldValue)) {
+						changes.push({
+							type: "changed",
+							path: nextPath,
+							leafPath: [...path],
+							key,
+							oldValue: "",
+							newValue: newValue,
+						});
+					} else {
+						changes.push(
+							...StateManager.diffObjects({
+								newObj: {},
+								oldObj: oldValue,
+								path: nextPath,
+							}),
+						);
+						changes.push({
+							type: "changed",
+							path: nextPath,
+							leafPath: [...path],
+							key,
+							oldValue: "",
+							newValue: newValue,
+						});
+					}
+				} else if (Array.isArray(newValue)) {
+					if (typeof oldValue === "string") {
+						changes.push(
+							...StateManager.diffArrays({
+								oldArr: [],
+								newArr: newValue,
+								path: nextPath,
+							}),
+						);
+					} else if (Array.isArray(oldValue)) {
+						changes.push(
+							...StateManager.diffArrays({
+								oldArr: oldValue,
+								newArr: newValue,
+								path: nextPath,
+							}),
+						);
+					} else {
+						changes.push(
+							...StateManager.diffArrays({
+								oldArr: [],
+								newArr: newValue,
+								path: nextPath,
+							}),
+						);
+					}
 				} else {
-					// Both are primitives: report as changed
-					changes.push({
-						type: "changed",
-						path: nextPath,
-						leafPath: [...currentPath],
-						key,
-						oldValue: a,
-						newValue: b,
-					});
+					if (typeof oldValue === "string") {
+						changes.push(
+							...StateManager.diffObjects({
+								oldObj: {},
+								newObj: newValue,
+								path: nextPath,
+							}),
+						);
+					} else if (Array.isArray(oldValue)) {
+						changes.push(
+							...StateManager.diffObjects({
+								oldObj: {},
+								newObj: newValue,
+								path: nextPath,
+							}),
+						);
+					} else {
+						changes.push(
+							...StateManager.diffObjects({
+								oldObj: oldValue,
+								newObj: newValue,
+								path: nextPath,
+							}),
+						);
+					}
 				}
 			}
 		}
@@ -184,115 +207,179 @@ export class StateManager {
 		return changes;
 	}
 
-	private static diffArrays(
-		oldArr: unknown[],
-		newArr: unknown[],
-		currentPath: Array<string | number>,
-	): Delta[] {
+	private static diffArrays({
+		oldArr,
+		newArr,
+		path,
+	}: {
+		oldArr: I18nArray;
+		newArr: I18nArray;
+		path: Array<string | number>;
+	}): Delta[] {
 		const changes: Delta[] = [];
 		const maxLen = Math.max(oldArr.length, newArr.length);
 
 		for (let index = 0; index < maxLen; index++) {
+			const nextPath = [...path, index];
+
 			const inOld = index < oldArr.length;
 			const inNew = index < newArr.length;
 
-			if (inOld && !inNew) {
-				const oldValue = oldArr[index];
-				const nextPath = [...currentPath, index];
+			const oldValue = oldArr[index];
+			const newValue = newArr[index];
 
-				// If the removed value is an object or array, decompose it into primitive removed changes
-				if (StateManager.isPlainObject(oldValue)) {
-					changes.push(
-						...StateManager.diffObjects(
-							oldValue as Record<string, unknown>,
-							{},
-							nextPath,
-						),
-					);
-				} else if (Array.isArray(oldValue)) {
-					changes.push(...StateManager.diffArrays(oldValue, [], nextPath));
-				} else {
+			if (inOld && !inNew && oldValue) {
+				if (typeof oldValue === "string") {
 					changes.push({
 						type: "removed",
 						path: nextPath,
-						leafPath: [...currentPath],
+						leafPath: [...path],
 						key: index,
 					});
+				} else if (Array.isArray(oldValue)) {
+					changes.push(
+						...StateManager.diffArrays({
+							oldArr: oldValue,
+							newArr: [],
+							path: nextPath,
+						}),
+					);
+				} else {
+					changes.push(
+						...StateManager.diffObjects({
+							newObj: {},
+							oldObj: oldValue,
+							path: nextPath,
+						}),
+					);
 				}
+
 				continue;
 			}
 
-			if (!inOld && inNew) {
-				const newValue = newArr[index];
-				const nextPath = [...currentPath, index];
-
-				// If the added value is an object or array, decompose it into primitive changes
-				if (StateManager.isPlainObject(newValue)) {
-					changes.push(
-						...StateManager.diffObjects(
-							{},
-							newValue as Record<string, unknown>,
-							nextPath,
-						),
-					);
-				} else if (Array.isArray(newValue)) {
-					changes.push(...StateManager.diffArrays([], newValue, nextPath));
-				} else {
+			if (!inOld && inNew && newValue) {
+				if (typeof newValue === "string") {
 					changes.push({
 						type: "added",
 						path: nextPath,
-						leafPath: [...currentPath],
+						leafPath: [...path],
 						key: index,
 						value: newValue,
 					});
+				} else if (Array.isArray(newValue)) {
+					changes.push(
+						...StateManager.diffArrays({
+							oldArr: [],
+							newArr: newValue,
+							path: nextPath,
+						}),
+					);
+				} else {
+					changes.push(
+						...StateManager.diffObjects({
+							newObj: newValue,
+							oldObj: {},
+							path: nextPath,
+						}),
+					);
 				}
+
 				continue;
 			}
 
-			// Both present
-			const a = oldArr[index];
-			const b = newArr[index];
-			const nextPath = [...currentPath, index];
-
-			if (StateManager.isPlainObject(a) && StateManager.isPlainObject(b)) {
-				changes.push(...StateManager.diffObjects(a, b, nextPath));
-				continue;
-			}
-
-			if (Array.isArray(a) && Array.isArray(b)) {
-				changes.push(...StateManager.diffArrays(a, b, nextPath));
-				continue;
-			}
-
-			if (a !== b) {
-				changes.push({
-					type: "changed",
-					path: nextPath,
-					leafPath: [...currentPath],
-					key: index,
-					oldValue: a,
-					newValue: b,
-				});
+			// Present in both: dive or compare
+			if (oldValue && newValue) {
+				if (typeof newValue === "string") {
+					if (typeof oldValue === "string") {
+						if (newValue !== oldValue) {
+							changes.push({
+								type: "changed",
+								path: nextPath,
+								leafPath: [...path],
+								key: index,
+								oldValue: oldValue,
+								newValue: newValue,
+							});
+						}
+					} else if (Array.isArray(oldValue)) {
+						changes.push({
+							type: "changed",
+							path: nextPath,
+							leafPath: [...path],
+							key: index,
+							oldValue: "",
+							newValue: newValue,
+						});
+					} else {
+						changes.push({
+							type: "changed",
+							path: nextPath,
+							leafPath: [...path],
+							key: index,
+							oldValue: "",
+							newValue: newValue,
+						});
+					}
+				} else if (Array.isArray(newValue)) {
+					if (typeof oldValue === "string") {
+						changes.push(
+							...StateManager.diffArrays({
+								oldArr: [],
+								newArr: newValue,
+								path: nextPath,
+							}),
+						);
+					} else if (Array.isArray(oldValue)) {
+						changes.push(
+							...StateManager.diffArrays({
+								oldArr: oldValue,
+								newArr: newValue,
+								path: nextPath,
+							}),
+						);
+					} else {
+						changes.push(
+							...StateManager.diffArrays({
+								oldArr: [],
+								newArr: newValue,
+								path: nextPath,
+							}),
+						);
+					}
+				} else {
+					if (typeof oldValue === "string") {
+						changes.push(
+							...StateManager.diffObjects({
+								oldObj: {},
+								newObj: newValue,
+								path: nextPath,
+							}),
+						);
+					} else if (Array.isArray(oldValue)) {
+						changes.push(
+							...StateManager.diffObjects({
+								oldObj: {},
+								newObj: newValue,
+								path: nextPath,
+							}),
+						);
+					} else {
+						changes.push(
+							...StateManager.diffObjects({
+								oldObj: oldValue,
+								newObj: newValue,
+								path: nextPath,
+							}),
+						);
+					}
+				}
 			}
 		}
 
 		return changes;
 	}
 
-	/**
-	 * Checks if a value is a plain object.
-	 * A plain object is a simple key-value object literal (e.g., {key: value})
-	 * created directly from Object.prototype, not an instance of a class,
-	 * array, or other special object type like Date, Map, Set, etc.
-	 */
-	private static isPlainObject(
-		value: unknown,
-	): value is Record<string, unknown> {
-		return (
-			value !== null &&
-			typeof value === "object" &&
-			!Array.isArray(value) &&
-			Object.getPrototypeOf(value) === Object.prototype
-		);
+	private static isI18NResource(value: unknown) {
+		return Value.Check(i18nResource, value);
 	}
 }

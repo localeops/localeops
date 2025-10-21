@@ -11,7 +11,7 @@ type BaseDelta = {
 /** Delta representing a newly added value */
 type AddedDelta = BaseDelta & {
 	type: "added";
-	value: unknown;
+	value: string;
 };
 
 /** Delta representing a removed value */
@@ -22,9 +22,20 @@ type RemovedDelta = BaseDelta & {
 /** Delta representing a changed value */
 type ChangedDelta = BaseDelta & {
 	type: "changed";
-	oldValue: unknown;
-	newValue: unknown;
+	oldValue: string;
+	newValue: string;
 };
 
 /** Represents any kind of diff change (added, removed, or changed) */
 export type Delta = AddedDelta | RemovedDelta | ChangedDelta;
+
+export interface I18nObject {
+	[k: string]: I18nValue;
+}
+
+export interface I18nArray extends Array<I18nValue> {}
+
+/** Represents i18n values */
+export type I18nValue = string | I18nObject | I18nArray;
+/** Represents i18n file format */
+export type I18nResource = Record<string, I18nValue>;

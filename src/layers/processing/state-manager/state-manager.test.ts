@@ -2,55 +2,52 @@ import { describe, expect, test } from "bun:test";
 import { StateManager } from "./state-manager";
 import type { Delta } from "./state-manager.types";
 
-describe("StateManager.diff", () => {
+describe("StateManager.diffI18nResources", () => {
 	test("returns empty list when documents are identical", () => {
 		const s = new StateManager();
-		const doc = { a: 1, b: { c: 2 }, d: [1, 2, 3] };
-		const received = s.diff(doc, JSON.parse(JSON.stringify(doc)));
-		// No changes should be reported when objects are deeply equal
+		const doc = { a: "1", b: { c: "2" }, d: ["1", "2", "3"] };
+		const received = s.diffI18nResources({
+			oldObj: doc,
+			newObj: JSON.parse(JSON.stringify(doc)),
+		});
+
 		expect(received).toHaveLength(0);
 	});
 
 	test("throws when roots are not plain objects", () => {
 		const s = new StateManager();
-		// Root-level inputs must be plain objects
-		expect(() => s.diff(null as unknown as object, {})).toThrow(TypeError);
-		expect(() => s.diff({}, null as unknown as object)).toThrow(TypeError);
-		expect(() => s.diff([], {})).toThrow(TypeError);
-		expect(() => s.diff({}, [])).toThrow(TypeError);
+		expect(() => s.diffI18nResources({ oldObj: null, newObj: {} })).toThrow(
+			TypeError,
+		);
+		expect(() => s.diffI18nResources({ oldObj: {}, newObj: null })).toThrow(
+			TypeError,
+		);
+		expect(() => s.diffI18nResources({ oldObj: [], newObj: {} })).toThrow(
+			TypeError,
+		);
+		expect(() => s.diffI18nResources({ oldObj: {}, newObj: [] })).toThrow(
+			TypeError,
+		);
 	});
 
-	test("added new field to empty object", () => {
+	// Object
+
+	test("object: add primitive", () => {
 		const s = new StateManager();
-		const oldState = {};
-		const newState = { a: { a1: "A" } };
-		const received = s.diff(oldState, newState);
+		const oldState = { a: "A" };
+		const newState = { a: "A", b: "B" };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
 
 		const expected: Delta[] = [
 			{
 				type: "added",
-				leafPath: ["a"],
-				path: ["a", "a1"],
-				key: "a1",
-				value: "A",
-			},
-		];
-
-		expect(received).toEqual(expect.arrayContaining(expected));
-	});
-
-	test("added new field with primitive value", () => {
-		const s = new StateManager();
-		const oldState = { a: [{ a1: [{ a11: "A" }] }] };
-		const newState = { a: [{ a1: [{ a11: "A", a12: "B" }] }] };
-		const received = s.diff(oldState, newState);
-
-		const expected: Delta[] = [
-			{
-				type: "added",
-				leafPath: ["a", 0, "a1", 0],
-				path: ["a", 0, "a1", 0, "a12"],
-				key: "a12",
+				leafPath: [],
+				path: ["b"],
+				key: "b",
 				value: "B",
 			},
 		];
@@ -58,159 +55,714 @@ describe("StateManager.diff", () => {
 		expect(received).toEqual(expect.arrayContaining(expected));
 	});
 
-	test("added new field with object value", () => {
+	test("object: add array", () => {
 		const s = new StateManager();
-		const oldState = { a: { a1: "A" } };
-		const newState = { a: { a1: "A", a2: [{ a21: "B", a22: "C" }] } };
-		const received = s.diff(oldState, newState);
+		const oldState = { a: "A" };
+		const newState = { a: "A", b: ["B0", "B1"] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
 
 		const expected: Delta[] = [
 			{
 				type: "added",
-				leafPath: ["a", "a2", 0],
-				path: ["a", "a2", 0, "a21"],
-				key: "a21",
-				value: "B",
-			},
-			{
-				type: "added",
-				leafPath: ["a", "a2", 0],
-				path: ["a", "a2", 0, "a22"],
-				key: "a22",
-				value: "C",
-			},
-		];
-
-		expect(received).toEqual(expect.arrayContaining(expected));
-	});
-
-	test("changed a field to primitive value", () => {
-		const s = new StateManager();
-		const oldState = { a: { a1: ["A", "C"] } };
-		const newState = { a: { a1: ["B", "C"] } };
-		const received = s.diff(oldState, newState);
-
-		const expected: Delta[] = [
-			{
-				type: "changed",
-				leafPath: ["a", "a1"],
-				path: ["a", "a1", 0],
+				leafPath: ["b"],
+				path: ["b", 0],
 				key: 0,
-				oldValue: "A",
-				newValue: "B",
+				value: "B0",
+			},
+			{
+				type: "added",
+				leafPath: ["b"],
+				path: ["b", 1],
+				key: 1,
+				value: "B1",
 			},
 		];
 
 		expect(received).toEqual(expect.arrayContaining(expected));
 	});
 
-	test("changed a field to object value", () => {
+	test("object: add object", () => {
 		const s = new StateManager();
-		const oldState = { a: { a1: "A" } };
-		const newState = { a: { a1: { a11: ["B"], a12: { a121: "C" } } } };
-		const received = s.diff(oldState, newState);
+		const oldState = { a: "A" };
+		const newState = { a: "A", b: { b1: "B1", b2: "B2" } };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
 
 		const expected: Delta[] = [
 			{
 				type: "added",
-				leafPath: ["a", "a1", "a11"],
-				path: ["a", "a1", "a11", 0],
-				key: 0,
-				value: "B",
+				leafPath: ["b"],
+				path: ["b", "b1"],
+				key: "b1",
+				value: "B1",
 			},
 			{
 				type: "added",
-				leafPath: ["a", "a1", "a12"],
-				path: ["a", "a1", "a12", "a121"],
-				key: "a121",
-				value: "C",
+				leafPath: ["b"],
+				path: ["b", "b2"],
+				key: "b2",
+				value: "B2",
 			},
 		];
 
 		expect(received).toEqual(expect.arrayContaining(expected));
 	});
 
-	test("removed field with primitive value", () => {
+	test("object: remove primitive", () => {
 		const s = new StateManager();
-		const oldState = {
-			a: "A",
-			b: ["B1"],
-			c: { c1: { c11: "C11", c12: "C12" } },
-		};
-		const newState = { a: "A", c: { c1: { c11: "C11" } } };
-		const received = s.diff(oldState, newState);
+		const oldState = { a: "A", b: "B" };
+		const newState = { a: "A" };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
 
 		const expected: Delta[] = [
-			{ type: "removed", leafPath: ["b"], path: ["b", 0], key: 0 },
 			{
 				type: "removed",
-				leafPath: ["c", "c1"],
-				path: ["c", "c1", "c12"],
-				key: "c12",
+				leafPath: [],
+				path: ["b"],
+				key: "b",
 			},
 		];
 
-		expect(received).toHaveLength(expected.length);
 		expect(received).toEqual(expect.arrayContaining(expected));
 	});
 
-	test("removed field with object value", () => {
+	test("object: remove array", () => {
 		const s = new StateManager();
-		const oldState = { a: "A", b: [{ b1: "B1", b2: "B2" }] };
+		const oldState = { a: "A", b: ["B0", "B1"] };
 		const newState = { a: "A" };
-		const received = s.diff(oldState, newState);
 
-		const expected: Delta[] = [
-			{ type: "removed", leafPath: ["b", 0], path: ["b", 0, "b1"], key: "b1" },
-			{ type: "removed", leafPath: ["b", 0], path: ["b", 0, "b2"], key: "b2" },
-		];
-
-		expect(received).toHaveLength(expected.length);
-		expect(received).toEqual(expect.arrayContaining(expected));
-	});
-
-	test("changed field from object to primitive", () => {
-		const s = new StateManager();
-		const oldState = { node: { x: 1 } };
-		const newState = { node: 42 };
-		const received = s.diff(oldState, newState);
-
-		const expected: Delta[] = [
-			{ type: "removed", path: ["node", "x"], leafPath: ["node"], key: "x" },
-			{ type: "added", path: ["node"], leafPath: [], key: "node", value: 42 },
-		];
-
-		expect(received).toHaveLength(2);
-		expect(received).toEqual(expect.arrayContaining(expected));
-	});
-
-	test("change element in array field", () => {
-		const s = new StateManager();
-		const oldState = { a: ["A", "B", "C"] };
-		const newState = { a: ["A", "X", "B", "C"] };
-		const received = s.diff(oldState, newState);
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
 
 		const expected: Delta[] = [
 			{
-				type: "changed",
-				leafPath: ["a"],
-				path: ["a", 1],
-				key: 1,
-				oldValue: "B",
-				newValue: "X",
+				type: "removed",
+				leafPath: ["b"],
+				path: ["b", 0],
+				key: 0,
 			},
 			{
+				type: "removed",
+				leafPath: ["b"],
+				path: ["b", 1],
+				key: 1,
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("object: remove object", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: { b1: "B1", b2: "B2" } };
+		const newState = { a: "A" };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "removed",
+				leafPath: ["b"],
+				path: ["b", "b1"],
+				key: "b1",
+			},
+			{
+				type: "removed",
+				leafPath: ["b"],
+				path: ["b", "b2"],
+				key: "b2",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("object: primitive -> primitive", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: "B" };
+		const newState = { a: "A", b: "B_M" };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
 				type: "changed",
-				leafPath: ["a"],
-				path: ["a", 2],
-				key: 2,
-				oldValue: "C",
+				leafPath: [],
+				path: ["b"],
+				key: "b",
+				oldValue: "B",
+				newValue: "B_M",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("object: primitive -> array", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: "B" };
+		const newState = { a: "A", b: ["B0", "B1"] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "added",
+				leafPath: ["b"],
+				path: ["b", 0],
+				key: 0,
+				value: "B0",
+			},
+			{
+				type: "added",
+				leafPath: ["b"],
+				path: ["b", 1],
+				key: 1,
+				value: "B1",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("object: primitive -> object", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: "B" };
+		const newState = { a: "A", b: { b1: "B1", b2: "B2" } };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "added",
+				leafPath: ["b"],
+				path: ["b", "b1"],
+				key: "b1",
+				value: "B1",
+			},
+			{
+				type: "added",
+				leafPath: ["b"],
+				path: ["b", "b2"],
+				key: "b2",
+				value: "B2",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("object: array -> primitive", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["B0", "B1"] };
+		const newState = { a: "A", b: "B" };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "changed",
+				leafPath: [],
+				path: ["b"],
+				key: "b",
+				oldValue: "",
 				newValue: "B",
 			},
-			{ type: "added", leafPath: ["a"], path: ["a", 3], key: 3, value: "C" },
 		];
 
-		expect(received).toHaveLength(expected.length);
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("object: array -> array", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["B0", "B1"] };
+		const newState = { a: "A", b: ["B0", "B1", "B2"] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "added",
+				leafPath: ["b"],
+				path: ["b", 2],
+				key: 2,
+				value: "B2",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("object: object -> primitive", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: { b1: "B1", b2: "B2" } };
+		const newState = { a: "A", b: "B" };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "removed",
+				leafPath: ["b"],
+				path: ["b", "b1"],
+				key: "b1",
+			},
+			{
+				type: "removed",
+				leafPath: ["b"],
+				path: ["b", "b2"],
+				key: "b2",
+			},
+			{
+				type: "changed",
+				leafPath: [],
+				path: ["b"],
+				key: "b",
+				oldValue: "",
+				newValue: "B",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("object: object -> array", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: { b1: "B1", b2: "B2" } };
+		const newState = { a: "A", b: ["B0", "B1"] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "added",
+				leafPath: ["b"],
+				path: ["b", 0],
+				key: 0,
+				value: "B0",
+			},
+			{
+				type: "added",
+				leafPath: ["b"],
+				path: ["b", 1],
+				key: 1,
+				value: "B1",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("object: object -> object", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: { b1: "B1", b2: "B2" } };
+		const newState = { a: "A", b: { b1: "B1", b2: "B2", b3: "B3" } };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "added",
+				leafPath: ["b"],
+				path: ["b", "b3"],
+				key: "b3",
+				value: "B3",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	// Array
+
+	test("array: add primitive", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["B0"] };
+		const newState = { a: "A", b: ["B0", "B1"] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "added",
+				leafPath: ["b"],
+				path: ["b", 1],
+				key: 1,
+				value: "B1",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("array: add array", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["B0"] };
+		const newState = { a: "A", b: ["B0", ["C"]] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "added",
+				leafPath: ["b", 1],
+				path: ["b", 1, 0],
+				key: 0,
+				value: "C",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("array: add object", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["B0"] };
+		const newState = { a: "A", b: ["B0", { c: "C" }] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "added",
+				leafPath: ["b", 1],
+				path: ["b", 1, "c"],
+				key: "c",
+				value: "C",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("array: remove primitive", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["B0", "B1"] };
+		const newState = { a: "A", b: ["B0"] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "removed",
+				leafPath: ["b"],
+				path: ["b", 1],
+				key: 1,
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("array: remove array", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["B0", ["C1", "C2"]] };
+		const newState = { a: "A", b: ["B0"] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "removed",
+				leafPath: ["b", 1],
+				path: ["b", 1, 0],
+				key: 0,
+			},
+			{
+				type: "removed",
+				leafPath: ["b", 1],
+				path: ["b", 1, 1],
+				key: 1,
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("array: remove object", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["B0", { c: "C" }] };
+		const newState = { a: "A", b: ["B0"] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "removed",
+				leafPath: ["b", 1],
+				path: ["b", 1, "c"],
+				key: "c",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("array: primitive -> primitive", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["B0"] };
+		const newState = { a: "A", b: ["B0_M"] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "changed",
+				leafPath: ["b"],
+				path: ["b", 0],
+				key: 0,
+				oldValue: "B0",
+				newValue: "B0_M",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("array: primitive -> array", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["B0", "B1"] };
+		const newState = { a: "A", b: ["B0", ["C0", "C1"]] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "added",
+				leafPath: ["b", 1],
+				path: ["b", 1, 0],
+				key: 0,
+				value: "C0",
+			},
+			{
+				type: "added",
+				leafPath: ["b", 1],
+				path: ["b", 1, 1],
+				key: 1,
+				value: "C1",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("array: primitive -> object", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["B0", "B1"] };
+		const newState = { a: "A", b: ["B0", { c: "C" }] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "added",
+				leafPath: ["b", 1],
+				path: ["b", 1, "c"],
+				key: "c",
+				value: "C",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("array: array -> primitive", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["B0", "B1"] };
+		const newState = { a: "A", b: "B" };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "changed",
+				leafPath: [],
+				path: ["b"],
+				key: "b",
+				oldValue: "",
+				newValue: "B",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("array: array -> array", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["C", "D"] };
+		const newState = { a: "A", b: ["D", "C"] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "changed",
+				leafPath: ["b"],
+				path: ["b", 0],
+				key: 0,
+				oldValue: "C",
+				newValue: "D",
+			},
+			{
+				type: "changed",
+				leafPath: ["b"],
+				path: ["b", 1],
+				key: 1,
+				oldValue: "D",
+				newValue: "C",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("array: object -> primitive", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["B0", { c: "C" }] };
+		const newState = { a: "A", b: ["B0", "B1"] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "changed",
+				leafPath: ["b"],
+				path: ["b", 1],
+				key: 1,
+				oldValue: "",
+				newValue: "B1",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("array: object -> array", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["B0", { c: "C" }] };
+		const newState = { a: "A", b: ["B0", ["C0", "C1"]] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "added",
+				leafPath: ["b", 1],
+				path: ["b", 1, 0],
+				key: 0,
+				value: "C0",
+			},
+			{
+				type: "added",
+				leafPath: ["b", 1],
+				path: ["b", 1, 1],
+				key: 1,
+				value: "C1",
+			},
+		];
+
+		expect(received).toEqual(expect.arrayContaining(expected));
+	});
+
+	test("array: object -> object", () => {
+		const s = new StateManager();
+		const oldState = { a: "A", b: ["B0", { c: "C" }] };
+		const newState = { a: "A", b: ["B0", { c: "C", d: "D" }] };
+
+		const received = s.diffI18nResources({
+			oldObj: oldState,
+			newObj: newState,
+		});
+
+		const expected: Delta[] = [
+			{
+				type: "added",
+				leafPath: ["b", 1],
+				path: ["b", 1, "d"],
+				key: "d",
+				value: "D",
+			},
+		];
+
 		expect(received).toEqual(expect.arrayContaining(expected));
 	});
 });
