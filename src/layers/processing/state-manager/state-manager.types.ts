@@ -39,3 +39,8 @@ export interface I18nArray extends Array<I18nValue> {}
 export type I18nValue = string | I18nObject | I18nArray;
 /** Represents i18n file format */
 export type I18nResource = Record<string, I18nValue>;
+
+export type Translation = {
+	value: string;
+	path: Array<string | number>;
+};

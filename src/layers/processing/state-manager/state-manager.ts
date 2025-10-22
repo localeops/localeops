@@ -1,6 +1,12 @@
 import { Value } from "@sinclair/typebox/value";
+import { get, set } from "lodash";
 import { i18nResource } from "./i18n.schema";
-import type { Delta, I18nArray, I18nObject } from "./state-manager.types";
+import type {
+	Delta,
+	I18nArray,
+	I18nObject,
+	Translation,
+} from "./state-manager.types";
 
 export class StateManager {
 	diffI18nResources({
@@ -18,6 +24,42 @@ export class StateManager {
 		}
 
 		return StateManager.diffObjects({ oldObj, newObj, path: [] });
+	}
+
+	// TODO: implement removing by path
+	// TODO: handle new element in array at +2 and more from last index
+	updateI18nResources({
+		state,
+		translatations,
+	}: {
+		state: I18nObject;
+		translatations: Translation[];
+	}): I18nObject {
+		for (const translation of translatations) {
+			const path = translation.path;
+			const value = translation.value;
+
+			for (let i = 0; i < path.length; i++) {
+				const key = path[i];
+				const prevKey = path[i];
+				if (key === undefined) throw new Error();
+				if (prevKey === undefined) throw new Error();
+				if (typeof key !== "number") continue;
+
+				const prevPath = path.slice(0, i);
+				if (!Array.isArray(get(state, prevPath))) {
+					set(state, prevPath, []);
+				}
+			}
+
+			set(state, path, value);
+		}
+
+		if (!Value.Check(i18nResource, state)) {
+			throw TypeError("Unexpected error");
+		}
+
+		return state;
 	}
 
 	private static diffObjects({
