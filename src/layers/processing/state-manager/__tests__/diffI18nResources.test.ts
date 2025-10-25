@@ -150,15 +150,9 @@ describe("StateManager.diffI18nResources", () => {
 		const expected: Delta[] = [
 			{
 				type: "removed",
-				leafPath: ["b"],
-				path: ["b", 0],
-				key: 0,
-			},
-			{
-				type: "removed",
-				leafPath: ["b"],
-				path: ["b", 1],
-				key: 1,
+				leafPath: [],
+				path: ["b"],
+				key: "b",
 			},
 		];
 
@@ -178,15 +172,9 @@ describe("StateManager.diffI18nResources", () => {
 		const expected: Delta[] = [
 			{
 				type: "removed",
-				leafPath: ["b"],
-				path: ["b", "b1"],
-				key: "b1",
-			},
-			{
-				type: "removed",
-				leafPath: ["b"],
-				path: ["b", "b2"],
-				key: "b2",
+				leafPath: [],
+				path: ["b"],
+				key: "b",
 			},
 		];
 
@@ -519,14 +507,8 @@ describe("StateManager.diffI18nResources", () => {
 		const expected: Delta[] = [
 			{
 				type: "removed",
-				leafPath: ["b", 1],
-				path: ["b", 1, 0],
-				key: 0,
-			},
-			{
-				type: "removed",
-				leafPath: ["b", 1],
-				path: ["b", 1, 1],
+				leafPath: ["b"],
+				path: ["b", 1],
 				key: 1,
 			},
 		];
@@ -547,9 +529,9 @@ describe("StateManager.diffI18nResources", () => {
 		const expected: Delta[] = [
 			{
 				type: "removed",
-				leafPath: ["b", 1],
-				path: ["b", 1, "c"],
-				key: "c",
+				leafPath: ["b"],
+				path: ["b", 1],
+				key: 1,
 			},
 		];
 

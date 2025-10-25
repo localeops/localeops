@@ -1,10 +1,11 @@
 import { Value } from "@sinclair/typebox/value";
-import { get, set } from "lodash";
+import { get, pullAt, set, unset } from "lodash";
 import { i18nResource } from "./i18n.schema";
 import type {
 	Delta,
 	I18nArray,
 	I18nObject,
+	RemovedDelta,
 	Translation,
 } from "./state-manager.types";
 
@@ -26,8 +27,6 @@ export class StateManager {
 		return StateManager.diffObjects({ oldObj, newObj, path: [] });
 	}
 
-	// TODO: implement removing by path
-	// TODO: handle new element in array at +2 and more from last index
 	updateI18nResources({
 		state,
 		translations,
@@ -62,6 +61,40 @@ export class StateManager {
 
 		if (!Value.Check(i18nResource, state)) {
 			throw new TypeError("i18n resource validation failed after update");
+		}
+
+		return state;
+	}
+
+	removeKeys({
+		state,
+		deltas,
+	}: {
+		state: I18nObject;
+		deltas: RemovedDelta[];
+	}): I18nObject {
+		const modifiedArrays = new Map<string, number[]>();
+
+		for (const { leafPath, key, path } of deltas) {
+			if (typeof key === "number") {
+				const leafPathKey = leafPath.join(".");
+				if (!modifiedArrays.has(leafPathKey)) {
+					modifiedArrays.set(leafPathKey, []);
+				}
+				modifiedArrays.get(leafPathKey)?.push(key);
+			} else {
+				unset(state, path);
+			}
+		}
+
+		for (const [leafPath, keys] of modifiedArrays) {
+			const leaf = get(state, leafPath);
+			if (!Array.isArray(leaf)) throw new Error("digit key inside object");
+			pullAt(leaf, keys);
+		}
+
+		if (!Value.Check(i18nResource, state)) {
+			throw new TypeError("i18n resource validation failed after key removal");
 		}
 
 		return state;
@@ -119,33 +152,13 @@ export class StateManager {
 		for (const key of oldKeys) {
 			if (!newKeys.has(key)) {
 				if (oldObj[key]) {
-					const oldValue = oldObj[key];
 					const nextPath = [...path, key];
-
-					if (typeof oldValue === "string") {
-						changes.push({
-							type: "removed",
-							path: nextPath,
-							leafPath: [...path],
-							key,
-						});
-					} else if (Array.isArray(oldValue)) {
-						changes.push(
-							...StateManager.diffArrays({
-								oldArr: oldValue,
-								newArr: [],
-								path: nextPath,
-							}),
-						);
-					} else {
-						changes.push(
-							...StateManager.diffObjects({
-								oldObj: oldValue,
-								newObj: {},
-								path: nextPath,
-							}),
-						);
-					}
+					changes.push({
+						type: "removed",
+						path: nextPath,
+						leafPath: [...path],
+						key,
+					});
 				}
 			}
 		}
@@ -276,30 +289,12 @@ export class StateManager {
 			const newValue = newArr[index];
 
 			if (inOld && !inNew && oldValue) {
-				if (typeof oldValue === "string") {
-					changes.push({
-						type: "removed",
-						path: nextPath,
-						leafPath: [...path],
-						key: index,
-					});
-				} else if (Array.isArray(oldValue)) {
-					changes.push(
-						...StateManager.diffArrays({
-							oldArr: oldValue,
-							newArr: [],
-							path: nextPath,
-						}),
-					);
-				} else {
-					changes.push(
-						...StateManager.diffObjects({
-							newObj: {},
-							oldObj: oldValue,
-							path: nextPath,
-						}),
-					);
-				}
+				changes.push({
+					type: "removed",
+					path: nextPath,
+					leafPath: [...path],
+					key: index,
+				});
 
 				continue;
 			}

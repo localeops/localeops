@@ -1,11 +1,14 @@
+type Key = string | number;
+type Path = Array<Key>;
+
 /** Base structure for all delta types with path information */
 type BaseDelta = {
 	/** The specific key or array index that changed */
-	key: string | number;
+	key: Key;
 	/** Full path from root to the changed key */
-	path: Array<string | number>;
+	path: Path;
 	/** Path to parent object (excludes the key itself) */
-	leafPath: Array<string | number>;
+	leafPath: Path;
 };
 
 /** Delta representing a newly added value */
@@ -15,7 +18,7 @@ type AddedDelta = BaseDelta & {
 };
 
 /** Delta representing a removed value */
-type RemovedDelta = BaseDelta & {
+export type RemovedDelta = BaseDelta & {
 	type: "removed";
 };
 
@@ -42,5 +45,5 @@ export type I18nResource = Record<string, I18nValue>;
 
 export type Translation = {
 	value: string;
-	path: Array<string | number>;
+	path: Path;
 };
