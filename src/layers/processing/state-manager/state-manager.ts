@@ -10,32 +10,15 @@ import type {
 } from "./state-manager.types";
 
 export class StateManager {
-	diffI18nResources({
-		oldObj,
-		newObj,
-	}: {
-		oldObj: unknown;
-		newObj: unknown;
-	}): Delta[] {
-		const oldObjIsValid = StateManager.isI18NResource(oldObj);
-		const newObjIsValid = StateManager.isI18NResource(newObj);
+	convertedPaths = new Set<string>();
 
-		if (!oldObjIsValid || !newObjIsValid) {
-			throw new TypeError("Expects both oldObj and newObj to be I18nResource");
-		}
-
-		return StateManager.diffObjects({ oldObj, newObj, path: [] });
-	}
-
-	updateI18nResources({
+	update({
 		state,
 		translations,
 	}: {
 		state: I18nObject;
 		translations: Translation[];
 	}): I18nObject {
-		const convertedPaths = new Set<string>();
-
 		for (const translation of translations) {
 			const { path, value } = translation;
 			const currentPath: (string | number)[] = [];
@@ -47,10 +30,10 @@ export class StateManager {
 
 				if (typeof path[i + 1] === "number") {
 					const pathKey = currentPath.join(".");
-					if (!convertedPaths.has(pathKey)) {
+					if (!this.convertedPaths.has(pathKey)) {
 						if (!Array.isArray(get(state, currentPath))) {
 							set(state, currentPath, []);
-							convertedPaths.add(pathKey);
+							this.convertedPaths.add(pathKey);
 						}
 					}
 				}
@@ -59,14 +42,14 @@ export class StateManager {
 			set(state, path, value);
 		}
 
-		if (!Value.Check(i18nResource, state)) {
+		if (!StateManager.isI18NResource(state)) {
 			throw new TypeError("i18n resource validation failed after update");
 		}
 
 		return state;
 	}
 
-	removeKeys({
+	static removeKeys({
 		state,
 		deltas,
 	}: {
@@ -100,14 +83,14 @@ export class StateManager {
 		return state;
 	}
 
-	private static diffObjects({
+	static diffObjects({
 		oldObj,
 		newObj,
-		path,
+		path = [],
 	}: {
 		oldObj: I18nObject;
 		newObj: I18nObject;
-		path: Array<string | number>;
+		path?: Array<string | number>;
 	}): Delta[] {
 		const changes: Delta[] = [];
 		const oldKeys = new Set(Object.keys(oldObj));
@@ -421,7 +404,7 @@ export class StateManager {
 		return changes;
 	}
 
-	private static isI18NResource(value: unknown) {
+	static isI18NResource(value: unknown) {
 		return Value.Check(i18nResource, value);
 	}
 }

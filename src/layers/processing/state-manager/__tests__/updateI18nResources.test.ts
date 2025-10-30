@@ -1,16 +1,17 @@
 import { describe, expect, test } from "bun:test";
 import { StateManager } from "../state-manager";
 
-describe("StateManager.updateI18nResources", () => {
+describe("StateManager.update", () => {
+	const locale = "ru";
 	// Object
 
 	test("object: new primitive", () => {
 		const s = new StateManager();
 		const state = { a: "A" };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
-			translations: [{ path: ["b"], value: "B" }],
+			translations: [{ path: ["b"], value: "B", locale }],
 		});
 
 		const expected = { a: "A", b: "B" };
@@ -22,11 +23,11 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: "A" };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
 			translations: [
-				{ path: ["b", 0], value: "B0" },
-				{ path: ["b", 1], value: "B1" },
+				{ path: ["b", 0], value: "B0", locale },
+				{ path: ["b", 1], value: "B1", locale },
 			],
 		});
 
@@ -39,11 +40,11 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: "A" };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
 			translations: [
-				{ path: ["b", "b1"], value: "B1" },
-				{ path: ["b", "b2"], value: "B2" },
+				{ path: ["b", "b1"], value: "B1", locale },
+				{ path: ["b", "b2"], value: "B2", locale },
 			],
 		});
 
@@ -56,9 +57,9 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: "A" };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
-			translations: [{ path: ["a"], value: "A_M" }],
+			translations: [{ path: ["a"], value: "A_M", locale }],
 		});
 
 		const expected = { a: "A_M" };
@@ -70,11 +71,11 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: "A" };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
 			translations: [
-				{ path: ["a", 0], value: "A0" },
-				{ path: ["a", 1], value: "A1" },
+				{ path: ["a", 0], value: "A0", locale },
+				{ path: ["a", 1], value: "A1", locale },
 			],
 		});
 
@@ -87,11 +88,11 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: "A" };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
 			translations: [
-				{ path: ["a", "a1"], value: "A1" },
-				{ path: ["a", "a2"], value: "A2" },
+				{ path: ["a", "a1"], value: "A1", locale },
+				{ path: ["a", "a2"], value: "A2", locale },
 			],
 		});
 
@@ -104,9 +105,9 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: ["A0", "A1"] };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
-			translations: [{ path: ["a"], value: "A" }],
+			translations: [{ path: ["a"], value: "A", locale }],
 		});
 
 		const expected = { a: "A" };
@@ -118,9 +119,9 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: ["A0", "A1"] };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
-			translations: [{ path: ["a", 0], value: "A0_M" }],
+			translations: [{ path: ["a", 0], value: "A0_M", locale }],
 		});
 
 		const expected = { a: ["A0_M", "A1"] };
@@ -132,9 +133,9 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: { a1: "A1", a2: "A2" } };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
-			translations: [{ path: ["a"], value: "A" }],
+			translations: [{ path: ["a"], value: "A", locale }],
 		});
 
 		const expected = { a: "A" };
@@ -146,11 +147,11 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: { a1: "A1", a2: "A2" } };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
 			translations: [
-				{ path: ["a", 0], value: "A0" },
-				{ path: ["a", 1], value: "A1" },
+				{ path: ["a", 0], value: "A0", locale },
+				{ path: ["a", 1], value: "A1", locale },
 			],
 		});
 
@@ -163,12 +164,12 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: { a1: "A1", a2: "A2" } };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
 			translations: [
-				{ path: ["a", 1], value: "A1" },
-				{ path: ["a", 0, 0], value: "A00" },
-				{ path: ["a", 0, 1], value: "A01" },
+				{ path: ["a", 1], value: "A1", locale },
+				{ path: ["a", 0, 0], value: "A00", locale },
+				{ path: ["a", 0, 1], value: "A01", locale },
 			],
 		});
 
@@ -183,9 +184,9 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: [["A0", "A1"]] };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
-			translations: [{ path: ["a", 0, 2], value: "A2" }],
+			translations: [{ path: ["a", 0, 2], value: "A2", locale }],
 		});
 
 		const expected = { a: [["A0", "A1", "A2"]] };
@@ -197,11 +198,11 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: [["A0", "A1"]] };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
 			translations: [
-				{ path: ["a", 0, 2, 0], value: "A20" },
-				{ path: ["a", 0, 2, 1], value: "A21" },
+				{ path: ["a", 0, 2, 0], value: "A20", locale },
+				{ path: ["a", 0, 2, 1], value: "A21", locale },
 			],
 		});
 
@@ -214,11 +215,11 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: [["A0", "A1"]] };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
 			translations: [
-				{ path: ["a", 0, 2, "b"], value: "B" },
-				{ path: ["a", 0, 2, "c"], value: "C" },
+				{ path: ["a", 0, 2, "b"], value: "B", locale },
+				{ path: ["a", 0, 2, "c"], value: "C", locale },
 			],
 		});
 
@@ -231,11 +232,11 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: [["A0", "A1"]] };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
 			translations: [
-				{ path: ["a", 0, 0], value: "A0_M" },
-				{ path: ["a", 0, 1], value: "A1_M" },
+				{ path: ["a", 0, 0], value: "A0_M", locale },
+				{ path: ["a", 0, 1], value: "A1_M", locale },
 			],
 		});
 
@@ -248,11 +249,11 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: [["A0", "A1"]] };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
 			translations: [
-				{ path: ["a", 0, 1, 0], value: "A10" },
-				{ path: ["a", 0, 1, 1], value: "A11" },
+				{ path: ["a", 0, 1, 0], value: "A10", locale },
+				{ path: ["a", 0, 1, 1], value: "A11", locale },
 			],
 		});
 
@@ -265,11 +266,11 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: [["A0", "A1"]] };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
 			translations: [
-				{ path: ["a", 0, 1, "b"], value: "B" },
-				{ path: ["a", 0, 1, "c"], value: "C" },
+				{ path: ["a", 0, 1, "b"], value: "B", locale },
+				{ path: ["a", 0, 1, "c"], value: "C", locale },
 			],
 		});
 
@@ -282,9 +283,9 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: [["A0", ["A10", "A11"]]] };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
-			translations: [{ path: ["a", 0, 1], value: "A1" }],
+			translations: [{ path: ["a", 0, 1], value: "A1", locale }],
 		});
 
 		const expected = { a: [["A0", "A1"]] };
@@ -296,9 +297,9 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: [["A0", { b: "B" }]] };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
-			translations: [{ path: ["a", 0, 1], value: "A1" }],
+			translations: [{ path: ["a", 0, 1], value: "A1", locale }],
 		});
 
 		const expected = { a: [["A0", "A1"]] };
@@ -310,11 +311,11 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: [["A0", { b: "B" }]] };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
 			translations: [
-				{ path: ["a", 0, 1, 0], value: "B" },
-				{ path: ["a", 0, 1, 1], value: "C" },
+				{ path: ["a", 0, 1, 0], value: "B", locale },
+				{ path: ["a", 0, 1, 1], value: "C", locale },
 			],
 		});
 
@@ -327,11 +328,11 @@ describe("StateManager.updateI18nResources", () => {
 		const s = new StateManager();
 		const state = { a: [["A0", { b: "B" }]] };
 
-		const received = s.updateI18nResources({
+		const received = s.update({
 			state,
 			translations: [
-				{ path: ["a", 0, 1, "b"], value: "B_M" },
-				{ path: ["a", 0, 1, "c"], value: "C" },
+				{ path: ["a", 0, 1, "b"], value: "B_M", locale },
+				{ path: ["a", 0, 1, "c"], value: "C", locale },
 			],
 		});
 
