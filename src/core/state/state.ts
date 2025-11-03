@@ -1,33 +1,96 @@
 import { Value } from "@sinclair/typebox/value";
-import { i18nResource } from "./i18n.schema";
-import type { Delta, I18nArray, I18nObject } from "./state-manager.types";
+import { get, pullAt, set, unset } from "lodash";
+import { i18nResource } from "./state.schema";
+import type {
+	Delta,
+	I18nArray,
+	I18nObject,
+	RemovedDelta,
+	Translation,
+} from "./state.types";
 
-export class StateManager {
-	diffI18nResources({
-		oldObj,
-		newObj,
+export class State {
+	convertedPaths = new Set<string>();
+
+	update({
+		state,
+		translations,
 	}: {
-		oldObj: unknown;
-		newObj: unknown;
-	}): Delta[] {
-		const oldObjIsValid = StateManager.isI18NResource(oldObj);
-		const newObjIsValid = StateManager.isI18NResource(newObj);
+		state: I18nObject;
+		translations: Translation[];
+	}): I18nObject {
+		for (const translation of translations) {
+			const { path, value } = translation;
+			const currentPath: (string | number)[] = [];
 
-		if (!oldObjIsValid || !newObjIsValid) {
-			throw new TypeError("Expects both oldObj and newObj to be I18nResource");
+			for (let i = 0; i < path.length; i++) {
+				const key = path[i];
+				if (key === undefined) throw new Error("Invalid path key");
+				currentPath.push(key);
+
+				if (typeof path[i + 1] === "number") {
+					const pathKey = currentPath.join(".");
+					if (!this.convertedPaths.has(pathKey)) {
+						if (!Array.isArray(get(state, currentPath))) {
+							set(state, currentPath, []);
+							this.convertedPaths.add(pathKey);
+						}
+					}
+				}
+			}
+
+			set(state, path, value);
 		}
 
-		return StateManager.diffObjects({ oldObj, newObj, path: [] });
+		if (!State.isI18NResource(state)) {
+			throw new TypeError("i18n resource validation failed after update");
+		}
+
+		return state;
 	}
 
-	private static diffObjects({
+	static removeKeys({
+		state,
+		deltas,
+	}: {
+		state: I18nObject;
+		deltas: RemovedDelta[];
+	}): I18nObject {
+		const modifiedArrays = new Map<string, number[]>();
+
+		for (const { leafPath, key, path } of deltas) {
+			if (typeof key === "number") {
+				const leafPathKey = leafPath.join(".");
+				if (!modifiedArrays.has(leafPathKey)) {
+					modifiedArrays.set(leafPathKey, []);
+				}
+				modifiedArrays.get(leafPathKey)?.push(key);
+			} else {
+				unset(state, path);
+			}
+		}
+
+		for (const [leafPath, keys] of modifiedArrays) {
+			const leaf = get(state, leafPath);
+			if (!Array.isArray(leaf)) throw new Error("digit key inside object");
+			pullAt(leaf, keys);
+		}
+
+		if (!Value.Check(i18nResource, state)) {
+			throw new TypeError("i18n resource validation failed after key removal");
+		}
+
+		return state;
+	}
+
+	static diffObjects({
 		oldObj,
 		newObj,
-		path,
+		path = [],
 	}: {
 		oldObj: I18nObject;
 		newObj: I18nObject;
-		path: Array<string | number>;
+		path?: Array<string | number>;
 	}): Delta[] {
 		const changes: Delta[] = [];
 		const oldKeys = new Set(Object.keys(oldObj));
@@ -49,7 +112,7 @@ export class StateManager {
 						});
 					} else if (Array.isArray(newValue)) {
 						changes.push(
-							...StateManager.diffArrays({
+							...State.diffArrays({
 								oldArr: [],
 								newArr: newValue,
 								path: nextPath,
@@ -57,7 +120,7 @@ export class StateManager {
 						);
 					} else {
 						changes.push(
-							...StateManager.diffObjects({
+							...State.diffObjects({
 								oldObj: {},
 								newObj: newValue,
 								path: nextPath,
@@ -72,33 +135,13 @@ export class StateManager {
 		for (const key of oldKeys) {
 			if (!newKeys.has(key)) {
 				if (oldObj[key]) {
-					const oldValue = oldObj[key];
 					const nextPath = [...path, key];
-
-					if (typeof oldValue === "string") {
-						changes.push({
-							type: "removed",
-							path: nextPath,
-							leafPath: [...path],
-							key,
-						});
-					} else if (Array.isArray(oldValue)) {
-						changes.push(
-							...StateManager.diffArrays({
-								oldArr: oldValue,
-								newArr: [],
-								path: nextPath,
-							}),
-						);
-					} else {
-						changes.push(
-							...StateManager.diffObjects({
-								oldObj: oldValue,
-								newObj: {},
-								path: nextPath,
-							}),
-						);
-					}
+					changes.push({
+						type: "removed",
+						path: nextPath,
+						leafPath: [...path],
+						key,
+					});
 				}
 			}
 		}
@@ -133,7 +176,7 @@ export class StateManager {
 						});
 					} else {
 						changes.push(
-							...StateManager.diffObjects({
+							...State.diffObjects({
 								newObj: {},
 								oldObj: oldValue,
 								path: nextPath,
@@ -151,7 +194,7 @@ export class StateManager {
 				} else if (Array.isArray(newValue)) {
 					if (typeof oldValue === "string") {
 						changes.push(
-							...StateManager.diffArrays({
+							...State.diffArrays({
 								oldArr: [],
 								newArr: newValue,
 								path: nextPath,
@@ -159,7 +202,7 @@ export class StateManager {
 						);
 					} else if (Array.isArray(oldValue)) {
 						changes.push(
-							...StateManager.diffArrays({
+							...State.diffArrays({
 								oldArr: oldValue,
 								newArr: newValue,
 								path: nextPath,
@@ -167,7 +210,7 @@ export class StateManager {
 						);
 					} else {
 						changes.push(
-							...StateManager.diffArrays({
+							...State.diffArrays({
 								oldArr: [],
 								newArr: newValue,
 								path: nextPath,
@@ -177,7 +220,7 @@ export class StateManager {
 				} else {
 					if (typeof oldValue === "string") {
 						changes.push(
-							...StateManager.diffObjects({
+							...State.diffObjects({
 								oldObj: {},
 								newObj: newValue,
 								path: nextPath,
@@ -185,7 +228,7 @@ export class StateManager {
 						);
 					} else if (Array.isArray(oldValue)) {
 						changes.push(
-							...StateManager.diffObjects({
+							...State.diffObjects({
 								oldObj: {},
 								newObj: newValue,
 								path: nextPath,
@@ -193,7 +236,7 @@ export class StateManager {
 						);
 					} else {
 						changes.push(
-							...StateManager.diffObjects({
+							...State.diffObjects({
 								oldObj: oldValue,
 								newObj: newValue,
 								path: nextPath,
@@ -229,30 +272,12 @@ export class StateManager {
 			const newValue = newArr[index];
 
 			if (inOld && !inNew && oldValue) {
-				if (typeof oldValue === "string") {
-					changes.push({
-						type: "removed",
-						path: nextPath,
-						leafPath: [...path],
-						key: index,
-					});
-				} else if (Array.isArray(oldValue)) {
-					changes.push(
-						...StateManager.diffArrays({
-							oldArr: oldValue,
-							newArr: [],
-							path: nextPath,
-						}),
-					);
-				} else {
-					changes.push(
-						...StateManager.diffObjects({
-							newObj: {},
-							oldObj: oldValue,
-							path: nextPath,
-						}),
-					);
-				}
+				changes.push({
+					type: "removed",
+					path: nextPath,
+					leafPath: [...path],
+					key: index,
+				});
 
 				continue;
 			}
@@ -268,7 +293,7 @@ export class StateManager {
 					});
 				} else if (Array.isArray(newValue)) {
 					changes.push(
-						...StateManager.diffArrays({
+						...State.diffArrays({
 							oldArr: [],
 							newArr: newValue,
 							path: nextPath,
@@ -276,7 +301,7 @@ export class StateManager {
 					);
 				} else {
 					changes.push(
-						...StateManager.diffObjects({
+						...State.diffObjects({
 							newObj: newValue,
 							oldObj: {},
 							path: nextPath,
@@ -323,7 +348,7 @@ export class StateManager {
 				} else if (Array.isArray(newValue)) {
 					if (typeof oldValue === "string") {
 						changes.push(
-							...StateManager.diffArrays({
+							...State.diffArrays({
 								oldArr: [],
 								newArr: newValue,
 								path: nextPath,
@@ -331,7 +356,7 @@ export class StateManager {
 						);
 					} else if (Array.isArray(oldValue)) {
 						changes.push(
-							...StateManager.diffArrays({
+							...State.diffArrays({
 								oldArr: oldValue,
 								newArr: newValue,
 								path: nextPath,
@@ -339,7 +364,7 @@ export class StateManager {
 						);
 					} else {
 						changes.push(
-							...StateManager.diffArrays({
+							...State.diffArrays({
 								oldArr: [],
 								newArr: newValue,
 								path: nextPath,
@@ -349,7 +374,7 @@ export class StateManager {
 				} else {
 					if (typeof oldValue === "string") {
 						changes.push(
-							...StateManager.diffObjects({
+							...State.diffObjects({
 								oldObj: {},
 								newObj: newValue,
 								path: nextPath,
@@ -357,7 +382,7 @@ export class StateManager {
 						);
 					} else if (Array.isArray(oldValue)) {
 						changes.push(
-							...StateManager.diffObjects({
+							...State.diffObjects({
 								oldObj: {},
 								newObj: newValue,
 								path: nextPath,
@@ -365,7 +390,7 @@ export class StateManager {
 						);
 					} else {
 						changes.push(
-							...StateManager.diffObjects({
+							...State.diffObjects({
 								oldObj: oldValue,
 								newObj: newValue,
 								path: nextPath,
@@ -379,7 +404,7 @@ export class StateManager {
 		return changes;
 	}
 
-	private static isI18NResource(value: unknown) {
+	static isI18NResource(value: unknown) {
 		return Value.Check(i18nResource, value);
 	}
 }

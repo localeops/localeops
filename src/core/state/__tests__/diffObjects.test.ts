@@ -1,12 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { StateManager } from "./state-manager";
-import type { Delta } from "./state-manager.types";
+import { State } from "../state";
+import type { Delta } from "../state.types";
 
-describe("StateManager.diffI18nResources", () => {
+describe("State.diffObjects", () => {
 	test("returns empty list when documents are identical", () => {
-		const s = new StateManager();
 		const doc = { a: "1", b: { c: "2" }, d: ["1", "2", "3"] };
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: doc,
 			newObj: JSON.parse(JSON.stringify(doc)),
 		});
@@ -14,30 +13,13 @@ describe("StateManager.diffI18nResources", () => {
 		expect(received).toHaveLength(0);
 	});
 
-	test("throws when roots are not plain objects", () => {
-		const s = new StateManager();
-		expect(() => s.diffI18nResources({ oldObj: null, newObj: {} })).toThrow(
-			TypeError,
-		);
-		expect(() => s.diffI18nResources({ oldObj: {}, newObj: null })).toThrow(
-			TypeError,
-		);
-		expect(() => s.diffI18nResources({ oldObj: [], newObj: {} })).toThrow(
-			TypeError,
-		);
-		expect(() => s.diffI18nResources({ oldObj: {}, newObj: [] })).toThrow(
-			TypeError,
-		);
-	});
-
 	// Object
 
 	test("object: add primitive", () => {
-		const s = new StateManager();
 		const oldState = { a: "A" };
 		const newState = { a: "A", b: "B" };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -56,11 +38,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("object: add array", () => {
-		const s = new StateManager();
 		const oldState = { a: "A" };
 		const newState = { a: "A", b: ["B0", "B1"] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -86,11 +67,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("object: add object", () => {
-		const s = new StateManager();
 		const oldState = { a: "A" };
 		const newState = { a: "A", b: { b1: "B1", b2: "B2" } };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -116,11 +96,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("object: remove primitive", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: "B" };
 		const newState = { a: "A" };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -138,11 +117,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("object: remove array", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0", "B1"] };
 		const newState = { a: "A" };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -150,15 +128,9 @@ describe("StateManager.diffI18nResources", () => {
 		const expected: Delta[] = [
 			{
 				type: "removed",
-				leafPath: ["b"],
-				path: ["b", 0],
-				key: 0,
-			},
-			{
-				type: "removed",
-				leafPath: ["b"],
-				path: ["b", 1],
-				key: 1,
+				leafPath: [],
+				path: ["b"],
+				key: "b",
 			},
 		];
 
@@ -166,11 +138,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("object: remove object", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: { b1: "B1", b2: "B2" } };
 		const newState = { a: "A" };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -178,15 +149,9 @@ describe("StateManager.diffI18nResources", () => {
 		const expected: Delta[] = [
 			{
 				type: "removed",
-				leafPath: ["b"],
-				path: ["b", "b1"],
-				key: "b1",
-			},
-			{
-				type: "removed",
-				leafPath: ["b"],
-				path: ["b", "b2"],
-				key: "b2",
+				leafPath: [],
+				path: ["b"],
+				key: "b",
 			},
 		];
 
@@ -194,11 +159,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("object: primitive -> primitive", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: "B" };
 		const newState = { a: "A", b: "B_M" };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -218,11 +182,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("object: primitive -> array", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: "B" };
 		const newState = { a: "A", b: ["B0", "B1"] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -248,11 +211,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("object: primitive -> object", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: "B" };
 		const newState = { a: "A", b: { b1: "B1", b2: "B2" } };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -278,11 +240,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("object: array -> primitive", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0", "B1"] };
 		const newState = { a: "A", b: "B" };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -302,11 +263,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("object: array -> array", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0", "B1"] };
 		const newState = { a: "A", b: ["B0", "B1", "B2"] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -325,11 +285,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("object: object -> primitive", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: { b1: "B1", b2: "B2" } };
 		const newState = { a: "A", b: "B" };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -361,11 +320,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("object: object -> array", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: { b1: "B1", b2: "B2" } };
 		const newState = { a: "A", b: ["B0", "B1"] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -391,11 +349,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("object: object -> object", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: { b1: "B1", b2: "B2" } };
 		const newState = { a: "A", b: { b1: "B1", b2: "B2", b3: "B3" } };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -416,11 +373,10 @@ describe("StateManager.diffI18nResources", () => {
 	// Array
 
 	test("array: add primitive", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0"] };
 		const newState = { a: "A", b: ["B0", "B1"] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -439,11 +395,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("array: add array", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0"] };
 		const newState = { a: "A", b: ["B0", ["C"]] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -462,11 +417,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("array: add object", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0"] };
 		const newState = { a: "A", b: ["B0", { c: "C" }] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -485,11 +439,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("array: remove primitive", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0", "B1"] };
 		const newState = { a: "A", b: ["B0"] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -507,11 +460,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("array: remove array", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0", ["C1", "C2"]] };
 		const newState = { a: "A", b: ["B0"] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -519,14 +471,8 @@ describe("StateManager.diffI18nResources", () => {
 		const expected: Delta[] = [
 			{
 				type: "removed",
-				leafPath: ["b", 1],
-				path: ["b", 1, 0],
-				key: 0,
-			},
-			{
-				type: "removed",
-				leafPath: ["b", 1],
-				path: ["b", 1, 1],
+				leafPath: ["b"],
+				path: ["b", 1],
 				key: 1,
 			},
 		];
@@ -535,11 +481,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("array: remove object", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0", { c: "C" }] };
 		const newState = { a: "A", b: ["B0"] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -547,9 +492,9 @@ describe("StateManager.diffI18nResources", () => {
 		const expected: Delta[] = [
 			{
 				type: "removed",
-				leafPath: ["b", 1],
-				path: ["b", 1, "c"],
-				key: "c",
+				leafPath: ["b"],
+				path: ["b", 1],
+				key: 1,
 			},
 		];
 
@@ -557,11 +502,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("array: primitive -> primitive", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0"] };
 		const newState = { a: "A", b: ["B0_M"] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -581,11 +525,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("array: primitive -> array", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0", "B1"] };
 		const newState = { a: "A", b: ["B0", ["C0", "C1"]] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -611,11 +554,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("array: primitive -> object", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0", "B1"] };
 		const newState = { a: "A", b: ["B0", { c: "C" }] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -634,11 +576,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("array: array -> primitive", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0", "B1"] };
 		const newState = { a: "A", b: "B" };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -658,11 +599,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("array: array -> array", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["C", "D"] };
 		const newState = { a: "A", b: ["D", "C"] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -690,11 +630,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("array: object -> primitive", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0", { c: "C" }] };
 		const newState = { a: "A", b: ["B0", "B1"] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -714,11 +653,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("array: object -> array", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0", { c: "C" }] };
 		const newState = { a: "A", b: ["B0", ["C0", "C1"]] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});
@@ -744,11 +682,10 @@ describe("StateManager.diffI18nResources", () => {
 	});
 
 	test("array: object -> object", () => {
-		const s = new StateManager();
 		const oldState = { a: "A", b: ["B0", { c: "C" }] };
 		const newState = { a: "A", b: ["B0", { c: "C", d: "D" }] };
 
-		const received = s.diffI18nResources({
+		const received = State.diffObjects({
 			oldObj: oldState,
 			newObj: newState,
 		});

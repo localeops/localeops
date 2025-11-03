@@ -1,3 +1,6 @@
+import type { Static } from "@sinclair/typebox";
+import type { TranslationSchema } from "./state.schema";
+
 /** Base structure for all delta types with path information */
 type BaseDelta = {
 	/** The specific key or array index that changed */
@@ -15,7 +18,7 @@ type AddedDelta = BaseDelta & {
 };
 
 /** Delta representing a removed value */
-type RemovedDelta = BaseDelta & {
+export type RemovedDelta = BaseDelta & {
 	type: "removed";
 };
 
@@ -39,3 +42,5 @@ export interface I18nArray extends Array<I18nValue> {}
 export type I18nValue = string | I18nObject | I18nArray;
 /** Represents i18n file format */
 export type I18nResource = Record<string, I18nValue>;
+
+export type Translation = Static<typeof TranslationSchema>;
