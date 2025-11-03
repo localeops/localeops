@@ -9,3 +9,8 @@ export const i18nValue = Type.Recursive((This) =>
 );
 
 export const i18nResource = Type.Record(Type.String(), i18nValue);
+
+export const TranslationSchema = Type.Object({
+	value: Type.String(),
+	path: Type.Array(Type.Union([Type.Number(), Type.String()])),
+});

@@ -2,7 +2,7 @@
 	"name": "localeops",
 	"module": "src/server/index.ts",
 	"scripts": {
-		"dev": "bun run src/server/index.ts",
+		"dev": "bun run --watch src/server/index.ts",
 		"commit": "cz"
 	},
 	"type": "module",
