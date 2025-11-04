@@ -1,4 +1,4 @@
-import { Type } from "@sinclair/typebox";
+import { Type } from "@sinclair/typebox/type";
 
 export const i18nValue = Type.Recursive((This) =>
 	Type.Union([

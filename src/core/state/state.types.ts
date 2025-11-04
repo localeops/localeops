@@ -1,4 +1,4 @@
-import type { Static } from "@sinclair/typebox";
+import type { Static } from "@sinclair/typebox/type";
 import type { TranslationSchema } from "./state.schema";
 
 /** Base structure for all delta types with path information */

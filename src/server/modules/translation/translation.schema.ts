@@ -1,4 +1,4 @@
-import { Type } from "@sinclair/typebox";
+import { Type } from "@sinclair/typebox/type";
 import { TranslationSchema } from "../../../core/state/state.schema";
 
 export const PostTranslationSchema = Type.Intersect([
