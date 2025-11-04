@@ -1,5 +1,8 @@
 import { Value } from "@sinclair/typebox/value";
-import { get, pullAt, set, unset } from "lodash";
+import get from "lodash/get";
+import pullAt from "lodash/pullAt";
+import set from "lodash/set";
+import unset from "lodash/unset";
 import { i18nResource } from "./state.schema";
 import type {
 	Delta,

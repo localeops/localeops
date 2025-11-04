@@ -1,7 +1,7 @@
 import { Value } from "@sinclair/typebox/value";
-
+import { AppError, ERROR_TYPES } from "../../utils/errors";
 import { PostTranslationsDto } from "./translation.schema";
-import { getUntranslated, postTranslations } from "./translation.service";
+import { TranslationService } from "./translation.service";
 
 export const postTranslationsHandler = async (
 	req: Request,
@@ -14,7 +14,24 @@ export const postTranslationsHandler = async (
 
 	const { locale, translations } = body;
 
-	await postTranslations({ locale, translations });
+	try {
+		const translationService = new TranslationService(locale);
+		await translationService.postTranslations(translations);
+	} catch (error) {
+		if (error instanceof Error) {
+			if (error instanceof AppError) {
+				if (error.type === ERROR_TYPES.STALE_TRANSLATION) {
+					return new Response(error.message, {
+						status: 400,
+					});
+				}
+			}
+
+			return new Response(error.message, { status: 500 });
+		}
+
+		return new Response("Internal Server Error", { status: 500 });
+	}
 
 	return new Response("OK");
 };
@@ -28,7 +45,8 @@ export const getUntranslatedHandler = async (
 
 	if (!locale) return new Response("Missing locale param", { status: 400 });
 
-	const diff = await getUntranslated(locale);
+	const translationService = new TranslationService(locale);
+	const diff = await translationService.getUntranslated();
 
 	return new Response(JSON.stringify(diff));
 };

@@ -1,8 +1,8 @@
 import { Octokit } from "@octokit/rest";
-import { OWNER, REPO } from "../../config";
+import config from "../../config";
 
 const octokit = new Octokit({
-	auth: process.env.GITHUB_TOKEN,
+	auth: config.GITHUB_TOKEN,
 });
 
 const upsertBranch = async (locale: string) => {
@@ -11,21 +11,21 @@ const upsertBranch = async (locale: string) => {
 	try {
 		await octokit.rest.repos.getBranch({
 			branch,
-			repo: REPO,
-			owner: OWNER,
+			owner: config.GITHUB_OWNER,
+			repo: config.GITHUB_REPO,
 		});
 	} catch {
 		const res = await octokit.rest.repos.getBranch({
 			branch: "main",
-			repo: REPO,
-			owner: OWNER,
+			owner: config.GITHUB_OWNER,
+			repo: config.GITHUB_REPO,
 		});
 
 		await octokit.rest.git.createRef({
 			sha: res.data.commit.sha,
 			ref: `refs/heads/${branch}`,
-			repo: REPO,
-			owner: OWNER,
+			owner: config.GITHUB_OWNER,
+			repo: config.GITHUB_REPO,
 		});
 	}
 
@@ -36,8 +36,8 @@ const readFile = async ({ path, ref }: { path: string; ref: string }) => {
 	const { data } = await octokit.rest.repos.getContent({
 		ref,
 		path,
-		repo: REPO,
-		owner: OWNER,
+		owner: config.GITHUB_OWNER,
+		repo: config.GITHUB_REPO,
 	});
 
 	if (Array.isArray(data) || data.type !== "file" || !data.content) {
@@ -68,8 +68,8 @@ const updateFile = async ({
 		message,
 		content: Buffer.from(content).toString("base64"),
 		branch,
-		repo: REPO,
-		owner: OWNER,
+		owner: config.GITHUB_OWNER,
+		repo: config.GITHUB_REPO,
 		sha, // Include SHA if updating existing file
 	});
 };
@@ -84,9 +84,9 @@ const updatePR = async ({
 	const title = `TR/${locale}`;
 
 	const existingPRs = await octokit.rest.pulls.list({
-		repo: REPO,
-		owner: OWNER,
-		head: `${OWNER}:${branch}`,
+		owner: config.GITHUB_OWNER,
+		repo: config.GITHUB_REPO,
+		head: `${config.GITHUB_OWNER}:${branch}`,
 		state: "open",
 	});
 
@@ -94,24 +94,19 @@ const updatePR = async ({
 	if (existingPRs.data.length > 0) {
 		// PR already exists, use the existing one
 		prResponse = existingPRs.data[0];
-		console.log(`PR already exists for branch ${branch}`);
 	} else {
 		// Create a PR for the translation changes
 		const prBody = `This PR was automatically created. Do not edit PR manually`;
 
 		// Create the PR
 		prResponse = await octokit.rest.pulls.create({
-			owner: OWNER,
-			repo: REPO,
+			owner: config.GITHUB_OWNER,
+			repo: config.GITHUB_REPO,
 			title,
 			head: branch,
 			base: "main",
 			body: prBody,
 		});
-
-		console.log(
-			`Created new PR for branch ${branch}: ${prResponse.data.html_url}`,
-		);
 	}
 };
 
