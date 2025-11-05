@@ -1,6 +1,11 @@
 import get from "lodash/get";
 import config from "../../../config";
-import { type Delta, State, type Translation } from "../../../core/state";
+import {
+	type Delta,
+	type I18nResource,
+	State,
+	type Translation,
+} from "../../../core/state";
 import { Database } from "../../database/database";
 import { AppError, ERROR_TYPES } from "../../utils/errors";
 import { formatContent, inferFormatting } from "../../utils/formatting";
@@ -14,51 +19,92 @@ export class TranslationService {
 		this.locale = locale;
 	}
 
-	private static getRemoteFilePath(locale: string) {
-		return `${config.SOURCE_DIRECTORY}/${locale}/${config.SOURCE_FILE}`;
+	private getFullFilePath(path: string) {
+		return `${config.SOURCE_DIRECTORY}/${this.locale}/${path}`;
 	}
 
-	private static async getRemoteFile({
-		locale,
+	private async compileRemoteDir({
 		branch,
+		locale,
 	}: {
-		locale: string;
 		branch: string;
-	}) {
-		const path = TranslationService.getRemoteFilePath(locale);
-		const file = await github.readFile({ path, ref: branch });
-		return file;
+		locale: string;
+	}): Promise<I18nResource> {
+		const basePath = `${config.SOURCE_DIRECTORY}/${locale}`;
+
+		const walk = async (path: string): Promise<I18nResource> => {
+			const entries = (await github.readDir({ path, ref: branch })) as Array<{
+				type: "dir" | "file";
+				name: string;
+				path: string;
+			}>;
+			const aggregated: Record<string, I18nResource> = {};
+
+			for (const entry of entries) {
+				if (entry.type === "dir") {
+					const nested = await walk(entry.path);
+					if (Object.keys(nested).length > 0) {
+						aggregated[entry.name] = nested;
+					}
+				} else if (entry.type === "file" && entry.name.endsWith(".json")) {
+					const file = await github.readFile({ path: entry.path, ref: branch });
+					aggregated[entry.name] = file.content;
+				}
+			}
+
+			return aggregated;
+		};
+
+		return await walk(basePath);
 	}
 
-	private async updateRemoteFile(translations: Translation[]) {
-		const branch = await github.upsertBranch(this.locale);
-		const path = TranslationService.getRemoteFilePath(this.locale);
+	private async updateRemoteFiles(translations: Translation[]) {
+		const filePathToTranslations = new Map<string, Translation[]>();
 
-		const file = await TranslationService.getRemoteFile({
-			branch,
-			locale: this.locale,
-		});
+		for (const tr of translations) {
+			const isStr = (s: unknown) => typeof s === "string";
+			const idx = tr.path.findIndex((s) => isStr(s) && s.endsWith(".json"));
+			if (idx < 0) throw new Error("No file in path");
+
+			const filePath = tr.path.slice(0, idx + 1).join("/");
+			const fullFilePath = this.getFullFilePath(filePath);
+
+			const adjustedTranslation: Translation = {
+				...tr,
+				path: tr.path.slice(idx + 1),
+			};
+
+			const arr = filePathToTranslations.get(fullFilePath) ?? [];
+			arr.push(adjustedTranslation);
+			filePathToTranslations.set(fullFilePath, arr);
+		}
 
 		const state = new State();
 
-		const content = state.update({
-			state: file.content,
-			translations,
-		});
+		const branch = await github.upsertBranch(this.locale);
 
-		const formatting = inferFormatting(file.raw);
+		for (const [path, translations] of filePathToTranslations) {
+			const file = await github.readFile({ path, ref: branch });
 
-		const formattedContent = formatContent({
-			content,
-			formatting,
-		});
+			const content = state.update({
+				state: file.content,
+				translations,
+			});
 
-		await github.updateFile({
-			branch,
-			path: path,
-			sha: file.sha,
-			content: formattedContent,
-		});
+			const formatting = inferFormatting(file.raw);
+
+			const formattedContent = formatContent({
+				content,
+				formatting,
+			});
+
+			await github.updateFile({
+				branch: branch,
+				path: path,
+				sha: file.sha,
+				content: formattedContent,
+			});
+		}
 
 		await github.updatePR({
 			branch,
@@ -66,28 +112,26 @@ export class TranslationService {
 		});
 	}
 
-	async getUntranslated(): Promise<Delta[]> {
+	async getUntranslatedDeltas(): Promise<Delta[]> {
 		const database = new Database(this.locale);
 
-		const translated = await database.get();
+		const translatedObj = await database.get();
 
-		const sourceFile = await TranslationService.getRemoteFile({
+		const sourceObj = await this.compileRemoteDir({
 			branch: config.SOURCE_BRANCH,
 			locale: config.SOURCE_LOCALE,
 		});
 
-		const sourceFileContent = sourceFile.content;
-
 		const diff = State.diffObjects({
-			oldObj: translated,
-			newObj: sourceFileContent,
+			oldObj: translatedObj,
+			newObj: sourceObj,
 		});
 
 		return diff;
 	}
 
 	async postTranslations(translations: PostTranslation[]) {
-		const sourceFile = await TranslationService.getRemoteFile({
+		const sourceCompilation = await this.compileRemoteDir({
 			branch: config.SOURCE_BRANCH,
 			locale: config.SOURCE_LOCALE,
 		});
@@ -95,7 +139,7 @@ export class TranslationService {
 		// Check if translation is stale
 		for (const translation of translations) {
 			const { from, path } = translation;
-			const source = get(sourceFile.content, path);
+			const source = get(sourceCompilation, path);
 
 			if (from !== source) {
 				throw new AppError({
@@ -106,10 +150,11 @@ export class TranslationService {
 		}
 
 		// Make changes to the repo
-		await this.updateRemoteFile(translations);
+		await this.updateRemoteFiles(translations);
 
 		// Update translations file
 		const database = new Database(this.locale);
+
 		await database.update(translations);
 	}
 }

@@ -6,7 +6,6 @@ const envSchema = Type.Object({
 	SOURCE_LOCALE: Type.String(),
 	SOURCE_BRANCH: Type.String(),
 	SOURCE_DIRECTORY: Type.String(),
-	SOURCE_FILE: Type.String(),
 	GITHUB_REPO: Type.String(),
 	GITHUB_OWNER: Type.String(),
 	GITHUB_TOKEN: Type.String(),
