@@ -1,14 +1,17 @@
 import type { Static } from "@sinclair/typebox/type";
 import type { TranslationSchema } from "./state.schema";
 
+type Key = string | number;
+type Path = Array<Key>;
+
 /** Base structure for all delta types with path information */
 type BaseDelta = {
 	/** The specific key or array index that changed */
 	key: string | number;
 	/** Full path from root to the changed key */
-	path: Array<string | number>;
+	path: Path;
 	/** Path to parent object (excludes the key itself) */
-	leafPath: Array<string | number>;
+	leafPath: Path;
 };
 
 /** Delta representing a newly added value */

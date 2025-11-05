@@ -51,6 +51,21 @@ const readFile = async ({ path, ref }: { path: string; ref: string }) => {
 	return { sha, content, raw };
 };
 
+const readDir = async ({ path, ref }: { path: string; ref: string }) => {
+	const { data } = await octokit.rest.repos.getContent({
+		ref,
+		path,
+		owner: config.GITHUB_OWNER,
+		repo: config.GITHUB_REPO,
+	});
+
+	if (!Array.isArray(data)) {
+		throw new Error(`Path is not a directory: ${path}@${ref}`);
+	}
+
+	return data;
+};
+
 const updateFile = async ({
 	path,
 	content,
@@ -90,16 +105,15 @@ const updatePR = async ({
 		state: "open",
 	});
 
-	let prResponse: any;
-	if (existingPRs.data.length > 0) {
-		// PR already exists, use the existing one
-		prResponse = existingPRs.data[0];
-	} else {
+	if (existingPRs.data.length === 0) {
 		// Create a PR for the translation changes
-		const prBody = `This PR was automatically created. Do not edit PR manually`;
+		const prBody = `
+This PR was automatically created. 
+Do not edit PR manually
+		`;
 
 		// Create the PR
-		prResponse = await octokit.rest.pulls.create({
+		await octokit.rest.pulls.create({
 			owner: config.GITHUB_OWNER,
 			repo: config.GITHUB_REPO,
 			title,
@@ -115,4 +129,5 @@ export default {
 	readFile,
 	updateFile,
 	updatePR,
+	readDir,
 };

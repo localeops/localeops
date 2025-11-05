@@ -46,7 +46,8 @@ export const getUntranslatedHandler = async (
 	if (!locale) return new Response("Missing locale param", { status: 400 });
 
 	const translationService = new TranslationService(locale);
-	const diff = await translationService.getUntranslated();
 
-	return new Response(JSON.stringify(diff));
+	const deltas = await translationService.getUntranslatedDeltas();
+
+	return new Response(JSON.stringify(deltas));
 };
