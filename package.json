@@ -24,6 +24,8 @@
 		}
 	},
 	"dependencies": {
-		"@sinclair/typebox": "^0.34.41"
+		"@octokit/rest": "^22.0.1",
+		"@sinclair/typebox": "^0.34.41",
+		"lodash": "^4.17.21"
 	}
 }
