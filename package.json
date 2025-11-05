@@ -11,6 +11,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "2.2.6",
 		"@types/bun": "latest",
+		"@types/lodash": "^4.17.20",
 		"commitizen": "^4.3.1",
 		"cz-conventional-changelog": "^3.3.0",
 		"lefthook": "^1.13.6"
