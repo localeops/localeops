@@ -1,5 +1,5 @@
 import get from "lodash/get";
-import config from "../../../config";
+import { config } from "../../../config";
 import {
 	type Delta,
 	type I18nResource,
@@ -20,7 +20,7 @@ export class TranslationService {
 	}
 
 	private getFullFilePath(path: string) {
-		return `${config.SOURCE_DIRECTORY}/${this.locale}/${path}`;
+		return `${config.source.directory}/${this.locale}/${path}`;
 	}
 
 	private async compileRemoteDir({
@@ -30,7 +30,7 @@ export class TranslationService {
 		branch: string;
 		locale: string;
 	}): Promise<I18nResource> {
-		const basePath = `${config.SOURCE_DIRECTORY}/${locale}`;
+		const basePath = `${config.source.directory}/${locale}`;
 
 		const walk = async (path: string): Promise<I18nResource> => {
 			const entries = (await github.readDir({ path, ref: branch })) as Array<{
@@ -118,8 +118,8 @@ export class TranslationService {
 		const translatedObj = await database.get();
 
 		const sourceObj = await this.compileRemoteDir({
-			branch: config.SOURCE_BRANCH,
-			locale: config.SOURCE_LOCALE,
+			branch: config.source.branch,
+			locale: config.source.locale,
 		});
 
 		const diff = State.diffObjects({
@@ -132,8 +132,8 @@ export class TranslationService {
 
 	async postTranslations(translations: PostTranslation[]) {
 		const sourceCompilation = await this.compileRemoteDir({
-			branch: config.SOURCE_BRANCH,
-			locale: config.SOURCE_LOCALE,
+			branch: config.source.branch,
+			locale: config.source.locale,
 		});
 
 		// Check if translation is stale
@@ -155,6 +155,6 @@ export class TranslationService {
 		// Update translations file
 		const database = new Database(this.locale);
 
-		await database.update(translations);
+		database.update(translations);
 	}
 }

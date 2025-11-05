@@ -1,31 +1,32 @@
 import { Octokit } from "@octokit/rest";
-import config from "../../config";
+import { config } from "../../config";
 
 const octokit = new Octokit({
-	auth: config.GITHUB_TOKEN,
+	auth: config.source.adapter.access_token,
 });
 
 const upsertBranch = async (locale: string) => {
 	const branch = `tr/${locale}`;
 
+	const [owner, repo] = config.source.adapter.repository_name.split("/") as [
+		string,
+		string,
+	];
+
 	try {
-		await octokit.rest.repos.getBranch({
-			branch,
-			owner: config.GITHUB_OWNER,
-			repo: config.GITHUB_REPO,
-		});
+		await octokit.rest.repos.getBranch({ branch, owner, repo });
 	} catch {
 		const res = await octokit.rest.repos.getBranch({
-			branch: "main",
-			owner: config.GITHUB_OWNER,
-			repo: config.GITHUB_REPO,
+			branch: config.source.branch,
+			owner,
+			repo,
 		});
 
 		await octokit.rest.git.createRef({
 			sha: res.data.commit.sha,
 			ref: `refs/heads/${branch}`,
-			owner: config.GITHUB_OWNER,
-			repo: config.GITHUB_REPO,
+			owner,
+			repo,
 		});
 	}
 
@@ -33,11 +34,16 @@ const upsertBranch = async (locale: string) => {
 };
 
 const readFile = async ({ path, ref }: { path: string; ref: string }) => {
+	const [owner, repo] = config.source.adapter.repository_name.split("/") as [
+		string,
+		string,
+	];
+
 	const { data } = await octokit.rest.repos.getContent({
 		ref,
 		path,
-		owner: config.GITHUB_OWNER,
-		repo: config.GITHUB_REPO,
+		owner,
+		repo,
 	});
 
 	if (Array.isArray(data) || data.type !== "file" || !data.content) {
@@ -52,11 +58,16 @@ const readFile = async ({ path, ref }: { path: string; ref: string }) => {
 };
 
 const readDir = async ({ path, ref }: { path: string; ref: string }) => {
+	const [owner, repo] = config.source.adapter.repository_name.split("/") as [
+		string,
+		string,
+	];
+
 	const { data } = await octokit.rest.repos.getContent({
 		ref,
 		path,
-		owner: config.GITHUB_OWNER,
-		repo: config.GITHUB_REPO,
+		owner,
+		repo,
 	});
 
 	if (!Array.isArray(data)) {
@@ -77,14 +88,19 @@ const updateFile = async ({
 	branch: string;
 	sha?: string;
 }) => {
+	const [owner, repo] = config.source.adapter.repository_name.split("/") as [
+		string,
+		string,
+	];
+
 	const message = `update for ${path}/${"update id"}`;
 	await octokit.rest.repos.createOrUpdateFileContents({
 		path,
 		message,
 		content: Buffer.from(content).toString("base64"),
 		branch,
-		owner: config.GITHUB_OWNER,
-		repo: config.GITHUB_REPO,
+		owner,
+		repo,
 		sha, // Include SHA if updating existing file
 	});
 };
@@ -98,10 +114,15 @@ const updatePR = async ({
 }) => {
 	const title = `TR/${locale}`;
 
+	const [owner, repo] = config.source.adapter.repository_name.split("/") as [
+		string,
+		string,
+	];
+
 	const existingPRs = await octokit.rest.pulls.list({
-		owner: config.GITHUB_OWNER,
-		repo: config.GITHUB_REPO,
-		head: `${config.GITHUB_OWNER}:${branch}`,
+		owner,
+		repo,
+		head: `${owner}:${branch}`,
 		state: "open",
 	});
 
@@ -114,11 +135,11 @@ Do not edit PR manually
 
 		// Create the PR
 		await octokit.rest.pulls.create({
-			owner: config.GITHUB_OWNER,
-			repo: config.GITHUB_REPO,
+			owner,
+			repo,
 			title,
 			head: branch,
-			base: "main",
+			base: config.source.branch,
 			body: prBody,
 		});
 	}
