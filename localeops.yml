@@ -1,0 +1,53 @@
+# =============================================================================
+# LocaleOps Configuration File
+# =============================================================================
+# This YAML file configures LocaleOps for your project.
+# Modify the sections below to customize your setup.
+
+# =============================================================================
+# Server Configuration
+# =============================================================================
+# Configure the HTTP server settings
+
+server:
+  # port: The port number where the server will listen
+  #       Default: 3000 (can be overridden here)
+  port: 3000
+
+# =============================================================================
+# Source Configuration
+# =============================================================================
+# Define where your source translations are stored and how to access them
+
+source:
+  # locale: The base locale code you author translations in (e.g., "en", "en-US")
+  locale: en
+  
+  # branch: The git branch to read source content from and target for translation PRs
+  #         Typically "main" or "master"
+  branch: main
+  
+  # directory: Relative path from repository root to your locales folder
+  #            Example: "src/locales" or "public/locales"
+  directory: src/locales
+  
+  # =============================================================================
+  # Adapter Configuration
+  # =============================================================================
+  # Configure the source control adapter (currently supports GitHub)
+  
+  adapter: 
+    # name: The adapter type to use for version control
+    #       Currently supported: "github"
+    name: github
+    
+    # repository_name: Full repository path in format "owner/repo-name"
+    #                  Example: "acme-inc/webapp" or "john-doe/my-project"
+    repository_name: 
+    
+    # access_token: GitHub personal access token with repository permissions
+    #               Required permissions:
+    #               - Classic tokens: 'repo' (full access), 'pull_request'
+    #               - Fine-grained tokens: 'Contents' (read/write), 'Pull requests' (read/write)
+    #               Generate at: https://github.com/settings/tokens
+    access_token: 

@@ -1,24 +1,48 @@
+import fs from "node:fs";
+import path from "node:path";
 import { Type } from "@sinclair/typebox/type";
 import { Value } from "@sinclair/typebox/value";
+import { YAML } from "bun";
 
-const envSchema = Type.Object({
-	PORT: Type.Integer(),
-	SOURCE_LOCALE: Type.String(),
-	SOURCE_BRANCH: Type.String(),
-	SOURCE_DIRECTORY: Type.String(),
-	GITHUB_REPO: Type.String(),
-	GITHUB_OWNER: Type.String(),
-	GITHUB_TOKEN: Type.String(),
-});
+const isProd = process.env.NODE_ENV === "production";
+const configFileName = `localeops${isProd ? "" : ".dev"}.yml`;
+const dirPath = isProd ? process.execPath : "";
+const configFilePath = path.join(path.dirname(dirPath), configFileName);
 
-const converted = Value.Convert(envSchema, process.env);
+let fileConfig: unknown;
 
-if (!Value.Check(envSchema, converted)) {
-	const errors = Value.Errors(envSchema, converted);
-	console.error("Invalid environment variables", ...errors);
+if (fs.existsSync(configFilePath)) {
+	const text = fs.readFileSync(configFilePath, "utf8");
+	fileConfig = YAML.parse(text);
+}
+
+if (!fileConfig) {
+	console.error(`${configFileName} not found`);
 	process.exit(1);
 }
 
-const config = Value.Parse(envSchema, converted);
+const configSchema = Type.Object({
+	server: Type.Object({
+		port: Type.Integer(),
+	}),
+	source: Type.Object({
+		locale: Type.String(),
+		branch: Type.String(),
+		directory: Type.String(),
+		adapter: Type.Object({
+			name: Type.Union([Type.Literal("github")]),
+			repository_name: Type.String(),
+			access_token: Type.String(),
+		}),
+	}),
+});
 
-export default config;
+const converted = Value.Convert(configSchema, fileConfig);
+
+if (!Value.Check(configSchema, converted)) {
+	const errors = Value.Errors(configSchema, converted);
+	console.error("Invalid environment variables:", ...errors);
+	process.exit(1);
+}
+
+export const config = Value.Parse(configSchema, converted);
