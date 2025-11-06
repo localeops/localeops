@@ -1,14 +1,23 @@
 export const interpolateEnvVars = (input: string): string => {
 	const missingVars: string[] = [];
 
-	const result = input.replace(/\$\{([^}]+)\}/g, (match, varName) => {
-		const value = process.env[varName.trim()];
-		if (value === undefined) {
-			missingVars.push(varName.trim());
-			return match;
-		}
-		return value;
-	});
+	const result = input.replace(
+		// Replace ${VAR} with env values, but skip lines starting with #
+		// (?<=^[^#\n]*) - lookbehind: only match if line doesn't start with #
+		// ${([^}]+)} - capture variable name inside ${}
+		/(?<=^[^#\n]*)(\$\{([^}]+)\})/gm,
+		(match, _, varName) => {
+			const trimmedVar = varName.trim();
+			const value = process.env[trimmedVar];
+
+			if (value === undefined) {
+				missingVars.push(trimmedVar);
+				return match;
+			}
+
+			return value;
+		},
+	);
 
 	if (missingVars.length > 0) {
 		throw new Error(
