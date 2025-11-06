@@ -1,8 +1,21 @@
 # =============================================================================
 # LocaleOps Configuration File
 # =============================================================================
-# This YAML file configures LocaleOps for your project.
-# Modify the sections below to customize your setup.
+# This YAML file defines the configuration for LocaleOps.
+# Modify the sections below to customize your project settings.
+#
+# Usage:
+# - In production: place this file in the same directory as the LocaleOps binary.
+#   The binary will automatically detect and load it at runtime.
+# - In development: LocaleOps will automatically load this file from the project
+#   root directory if present.
+#
+# Environment Variables:
+# - This config file supports environment variable interpolation using ${VAR_NAME} syntax
+# - Set required environment variables before running LocaleOps:
+#     export GITHUB_ACCESS_TOKEN=your_token_here
+# - In CI/CD, configure secrets in your pipeline settings
+
 
 # =============================================================================
 # Server Configuration
@@ -43,11 +56,18 @@ source:
     
     # repository_name: Full repository path in format "owner/repo-name"
     #                  Example: "acme-inc/webapp" or "john-doe/my-project"
-    repository_name: 
+    repository_name: ADD_REPOSITORY_NAME_HERE
     
-    # access_token: GitHub personal access token with repository permissions
+    # access_token: GitHub personal access token (loaded from environment variable)
+    #               ⚠️  DO NOT hardcode your token here - use environment variables!
+    #               
+    #               Setup:
+    #               1. Generate token at: https://github.com/settings/tokens
+    #               2. Set environment variable:
+    #                    export GITHUB_ACCESS_TOKEN=ghp_your_token_here
+    #               3. Run LocaleOps - it will automatically load the token
+    #               
     #               Required permissions:
     #               - Classic tokens: 'repo' (full access), 'pull_request'
     #               - Fine-grained tokens: 'Contents' (read/write), 'Pull requests' (read/write)
-    #               Generate at: https://github.com/settings/tokens
-    access_token: 
+    access_token: ${GITHUB_ACCESS_TOKEN}
