@@ -4,12 +4,14 @@
 	"scripts": {
 		"dev": "bun run --watch src/server/index.ts",
 		"commit": "cz",
+		"check": "biome check",
+		"fix": "biome check --fix",
 		"build": "bun build --compile --minify --production --sourcemap src/server/index.ts --outfile dist/localeops"
 	},
 	"type": "module",
 	"private": true,
 	"devDependencies": {
-		"@biomejs/biome": "2.2.6",
+		"@biomejs/biome": "2.3.4",
 		"@types/bun": "latest",
 		"@types/lodash": "^4.17.20",
 		"commitizen": "^4.3.1",
