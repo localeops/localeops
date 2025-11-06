@@ -1,0 +1,76 @@
+Contributing to LocaleOps
+
+Thank you for your interest in contributing to this project!
+
+================================================================================
+CONTRIBUTOR LICENSE AGREEMENT (CLA)
+================================================================================
+
+By contributing to this project, you agree to the following terms:
+
+1. Grant of Rights to Digital Shed Oy
+
+You hereby grant to Digital Shed Oy:
+
+- A perpetual, worldwide, non-exclusive, royalty-free, irrevocable license 
+  to use, reproduce, modify, display, perform, sublicense, and distribute 
+  your contributions.
+- All intellectual property rights, including copyrights, patents, trademarks, 
+  and trade secrets in your contributions.
+- The right to sublicense these rights to third parties.
+
+2. Transfer of Ownership
+
+To the maximum extent permitted by applicable law, you transfer and assign 
+to Digital Shed Oy all right, title, and interest in and to your contributions, 
+including all intellectual property rights.
+
+3. Your Representations
+
+You confirm that:
+
+- You have the legal right to grant the above rights and make these contributions.
+- Your contributions are your original work or you have sufficient rights to submit them.
+- Your contributions do not violate any third-party rights.
+- You are not aware of any patents (yours or others') that would be infringed 
+  by your contributions.
+
+4. No Obligation
+
+Digital Shed Oy is under no obligation to accept or include your contributions 
+in the project.
+
+================================================================================
+HOW TO CONTRIBUTE
+================================================================================
+
+1. Fork the repository
+2. Create a branch for your feature/fix: git checkout -b feature/my-feature
+3. Make your changes and commit with clear messages based on conventional commits
+4. Test your changes thoroughly
+5. Submit a pull request with a description of your changes
+
+By submitting a pull request, you acknowledge that you have read and agree 
+to the Contributor License Agreement above.
+
+================================================================================
+CODE STANDARDS
+================================================================================
+
+- Follow the existing code style
+- Add tests for new features
+- Update documentation as needed
+- Keep commits atomic and well-described
+
+================================================================================
+QUESTIONS?
+================================================================================
+
+If you have questions about the contribution process or the CLA, please 
+open an issue or contact Digital Shed Oy.
+
+--------------------------------------------------------------------------------
+
+NOTE: The project itself is licensed under the Apache License 2.0. Your 
+contributions will be incorporated under this license, with ownership 
+transferred to Digital Shed Oy as described above.
