@@ -18,14 +18,40 @@
 
 
 # =============================================================================
-# Server Configuration
+# Transport Configuration
 # =============================================================================
-# Configure the HTTP server settings
+# Configure how LocaleOps receives incoming requests (HTTP, WebSocket, etc.)
 
-server:
-  # port: The port number where the server will listen
-  #       Default: 3000 (can be overridden here)
-  port: 3000
+transport:
+  # =============================================================================
+  # Adapter Configuration
+  # =============================================================================
+  # Configure the transport adapter (currently supports HTTP)
+
+  adapter:
+    # name: The transport adapter type to use
+    #       Currently supported: "http"
+    name: http
+
+    # port: The port number where the server will listen
+    port: 3000
+
+    # route: The API endpoint path for translation operations
+    #        Example: "/api/translations" or "/webhooks/locales"
+    route: /api/translations
+
+    # auth: Authentication configuration for incoming requests
+    #
+    #       Option 1 - No authentication (not recommended for production):
+    #       auth:
+    #         type: none
+    #
+    #       Option 2 - Bearer token authentication (recommended):
+    #       auth:
+    #         type: bearer
+    #         token: ${API_AUTH_TOKEN}
+    auth:
+      type: none
 
 # =============================================================================
 # Source Configuration
