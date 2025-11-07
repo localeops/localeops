@@ -1,12 +1,12 @@
 import type { Octokit as OctokitInstance } from "@octokit/rest";
 import { Octokit } from "@octokit/rest";
-import { Value } from "@sinclair/typebox/value";
 import type { Config } from "../config";
-import type { I18nResource } from "../core/state";
-import { i18nResource } from "../core/state/state.schema";
-import { BaseSource, type DirEntry } from "./base.source";
+import { BaseSource, type SourceEntry } from "./base.source";
 
-type GithubSourceConfig = Config["source"]["adapter"];
+type GithubSourceConfig = Extract<
+	Config["source"]["adapter"],
+	{ name: "github" }
+>;
 
 export class GithubSource extends BaseSource {
 	private repo: string;
@@ -14,91 +14,72 @@ export class GithubSource extends BaseSource {
 	private octokit: OctokitInstance;
 
 	constructor(config: GithubSourceConfig) {
-		const [owner, repo] = config.repository_name.split("/") as [string, string];
-
 		super();
-
-		this.repo = repo;
-
-		this.owner = owner;
-
 		this.octokit = new Octokit({ auth: config.access_token });
+		[this.owner, this.repo] = config.repository_name.split("/") as [
+			string,
+			string,
+		];
 	}
 
-	async upsertBranchFromBase({
-		branchName,
-		baseBranch,
-	}: {
-		branchName: string;
-		baseBranch: string;
-	}) {
+	async ensureBranch({ name, base }: { name: string; base: string }) {
 		try {
 			await this.octokit.rest.repos.getBranch({
-				branch: branchName,
-				owner: this.owner,
+				branch: name,
 				repo: this.repo,
+				owner: this.owner,
 			});
 		} catch {
 			const res = await this.octokit.rest.repos.getBranch({
+				branch: base,
 				repo: this.repo,
 				owner: this.owner,
-				branch: baseBranch,
 			});
 
 			await this.octokit.rest.git.createRef({
 				repo: this.repo,
 				owner: this.owner,
 				sha: res.data.commit.sha,
-				ref: `refs/heads/${branchName}`,
+				ref: `refs/heads/${name}`,
 			});
 		}
 	}
 
-	async readFile({ path, ref }: { path: string; ref: string }) {
+	async getFile({ path, branch }: { path: string; branch: string }) {
 		const { data } = await this.octokit.rest.repos.getContent({
-			ref,
 			path,
+			ref: branch,
 			repo: this.repo,
 			owner: this.owner,
 		});
 
 		if (Array.isArray(data) || data.type !== "file" || !data.content) {
-			throw new Error(`Path is not a file: ${path}@${ref}`);
+			throw new Error(`Path is not a file: ${path}@${branch}`);
 		}
 
-		const identifier = data.sha;
-
+		const sha = data.sha;
 		const raw = Buffer.from(data.content, "base64").toString();
+		const content = JSON.parse(raw);
 
-		const content: I18nResource = Value.Parse(i18nResource, JSON.parse(raw));
-
-		return { identifier, content, raw };
+		return { sha, content, raw };
 	}
 
-	async readDir({ path, ref }: { path: string; ref: string }) {
+	async getDirectory({ path, branch }: { path: string; branch: string }) {
 		const { data } = await this.octokit.rest.repos.getContent({
-			ref,
 			path,
+			ref: branch,
 			repo: this.repo,
 			owner: this.owner,
 		});
 
 		if (!Array.isArray(data)) {
-			throw new Error(`Path is not a directory: ${path}@${ref}`);
+			throw new Error(`Path is not a directory: ${path}@${branch}`);
 		}
 
-		const entries: DirEntry[] = [];
+		const entries: SourceEntry[] = [];
 
 		for (const entry of data) {
-			if (entry.type === "dir") {
-				entries.push({
-					type: entry.type,
-					name: entry.name,
-					path: entry.path,
-				});
-			}
-
-			if (entry.type === "file") {
+			if (entry.type === "dir" || entry.type === "file") {
 				entries.push({
 					type: entry.type,
 					name: entry.name,
@@ -110,49 +91,49 @@ export class GithubSource extends BaseSource {
 		return entries;
 	}
 
-	async updateFile({
+	async commitFile({
 		path,
 		branch,
 		content,
-		identifier,
-		commitMessage,
+		sha,
+		message,
 	}: {
 		path: string;
 		branch: string;
 		content: string;
-		identifier: string;
-		commitMessage: string;
+		sha: string;
+		message: string;
 	}) {
 		await this.octokit.rest.repos.createOrUpdateFileContents({
 			path,
 			branch,
-			sha: identifier,
+			sha,
 			repo: this.repo,
 			owner: this.owner,
-			message: commitMessage,
+			message,
 			content: Buffer.from(content).toString("base64"),
 		});
 	}
 
-	async updatePR({
-		branch,
-		title,
+	async ensurePullRequest({
 		body,
 		base,
+		title,
+		branch,
 	}: {
-		branch: string;
-		title: string;
 		body: string;
 		base: string;
+		title: string;
+		branch: string;
 	}) {
-		const existingPRs = await this.octokit.rest.pulls.list({
+		const existingPullRequests = await this.octokit.rest.pulls.list({
 			state: "open",
 			repo: this.repo,
 			owner: this.owner,
 			head: `${this.owner}:${branch}`,
 		});
 
-		if (existingPRs.data.length === 0) {
+		if (existingPullRequests.data.length === 0) {
 			await this.octokit.rest.pulls.create({
 				base,
 				body,

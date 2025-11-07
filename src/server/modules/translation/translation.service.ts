@@ -1,3 +1,4 @@
+import { Value } from "@sinclair/typebox/value";
 import get from "lodash/get";
 import { config } from "../../../config";
 import {
@@ -6,6 +7,7 @@ import {
 	State,
 	type Translation,
 } from "../../../core/state";
+import { i18nResource } from "../../../core/state/state.schema";
 import { createSource } from "../../../sources/factory";
 import { Database } from "../../database/database";
 import { AppError, ERROR_TYPES } from "../../utils/errors";
@@ -94,16 +96,21 @@ export class TranslationService {
 
 		const translationsBranch = this.getTranslationBranchName();
 
-		await source.upsertBranchFromBase({
-			branchName: translationsBranch,
-			baseBranch: config.source.branch,
+		await source.ensureBranch({
+			name: translationsBranch,
+			base: config.source.branch,
 		});
 
 		for (const [path, translations] of filePathToTranslations) {
-			const file = await source.readFile({ path, ref: translationsBranch });
+			const file = await source.getFile({ path, branch: translationsBranch });
+
+			const validatedContent = Value.Parse(
+				i18nResource,
+				file.content as unknown,
+			);
 
 			const content = state.update({
-				state: file.content,
+				state: validatedContent,
 				translations,
 			});
 
@@ -116,11 +123,11 @@ export class TranslationService {
 
 			const commitMessage = this.getCommitMessage(path);
 
-			await source.updateFile({
+			await source.commitFile({
 				path: path,
-				commitMessage,
+				sha: file.sha,
+				message: commitMessage,
 				content: formattedContent,
-				identifier: file.identifier,
 				branch: translationsBranch,
 			});
 		}
@@ -129,7 +136,7 @@ export class TranslationService {
 
 		const body = this.getPullRequestBody();
 
-		await source.updatePR({
+		await source.ensurePullRequest({
 			body,
 			title,
 			branch: translationsBranch,
@@ -141,9 +148,9 @@ export class TranslationService {
 		const baseLocaleDirPath = `${config.source.directory}/${config.source.locale}`;
 
 		const walk = async (dirPath: string): Promise<I18nResource> => {
-			const entries = await source.readDir({
+			const entries = await source.getDirectory({
 				path: dirPath,
-				ref: config.source.branch,
+				branch: config.source.branch,
 			});
 
 			const aggregated: Record<string, I18nResource> = {};
@@ -156,12 +163,16 @@ export class TranslationService {
 						aggregated[entry.name] = nested;
 					}
 				} else if (entry.type === "file" && entry.name.endsWith(".json")) {
-					const file = await source.readFile({
+					const file = await source.getFile({
 						path: entry.path,
-						ref: config.source.branch,
+						branch: config.source.branch,
 					});
 
-					aggregated[entry.name] = file.content;
+					const validatedContent = Value.Parse(
+						i18nResource,
+						file.content as unknown,
+					);
+					aggregated[entry.name] = validatedContent;
 				}
 			}
 
