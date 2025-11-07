@@ -12,18 +12,18 @@ type Routes = Record<string, RouteHandler>;
 
 export class HttpTransport extends BaseTransport {
 	private server: Server<undefined> | null = null;
-	private httpConfig: HttpTransportConfig;
+	private config: HttpTransportConfig;
 	private routes: Routes;
 
 	constructor(config: unknown, routes: Routes) {
-		super(config);
+		super();
 		this.routes = routes;
-		this.httpConfig = config as HttpTransportConfig;
+		this.config = config as HttpTransportConfig;
 	}
 
 	async start(): Promise<void> {
 		this.server = Bun.serve({
-			port: this.httpConfig.port,
+			port: this.config.port,
 			development: process.env.NODE_ENV !== "production",
 			fetch: async (request) => {
 				const isAuthenticated = await this.authenticate(request);
@@ -42,7 +42,7 @@ export class HttpTransport extends BaseTransport {
 			},
 		});
 
-		console.log(`HTTP transport listening on port ${this.httpConfig.port}`);
+		console.log(`HTTP transport listening on port ${this.config.port}`);
 	}
 
 	async stop(): Promise<void> {
@@ -54,13 +54,13 @@ export class HttpTransport extends BaseTransport {
 	}
 
 	protected async authenticate(context: Request): Promise<boolean> {
-		if (this.httpConfig.auth.type === "none") {
+		if (this.config.auth.type === "none") {
 			return true;
 		}
 
-		if (this.httpConfig.auth.type === "bearer") {
+		if (this.config.auth.type === "bearer") {
 			const authHeader = context.headers.get("Authorization");
-			return authHeader === `Bearer ${this.httpConfig.auth.token}`;
+			return authHeader === `Bearer ${this.config.auth.token}`;
 		}
 
 		return false;

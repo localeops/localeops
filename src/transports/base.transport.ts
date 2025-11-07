@@ -1,10 +1,7 @@
+/**
+ * Base class for transport adapters that handle communication protocols
+ */
 export abstract class BaseTransport {
-	protected config: unknown;
-
-	constructor(config: unknown) {
-		this.config = config;
-	}
-
 	/**
 	 * Start the transport (server, listener, etc.)
 	 * Called once during application startup
