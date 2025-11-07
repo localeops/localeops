@@ -1,58 +1,69 @@
-import type { I18nResource } from "../core/state";
-
-type File = {
-	identifier: string;
-	content: I18nResource;
+/**
+ * Represents a file fetched from the source repository
+ */
+export type SourceFile = {
+	sha: string;
 	raw: string;
+	content: unknown;
 };
 
-export type DirEntry = {
+/**
+ * Represents a directory entry (file or subdirectory)
+ */
+export type SourceEntry = {
 	type: "dir" | "file";
 	name: string;
 	path: string;
 };
 
+/**
+ * Base class for source adapters that interact with version control systems
+ */
 export abstract class BaseSource {
 	/**
-	 * Create a new branch from base branch with given name if it doesn't exist
+	 * Gets file content from the repository
+	 * Returns decoded content, raw string, and sha identifier
 	 */
-	abstract upsertBranchFromBase(params: {
-		branchName: string;
-		baseBranch: string;
-	}): Promise<void>;
-
-	/**
-	 * Reads file content
-	 * Returns file content, raw value and indentifier (e.g. sha)
-	 */
-	abstract readFile(params: { path: string; ref: string }): Promise<File>;
-
-	/**
-	 * Reads directory contents
-	 * Returns directory entries
-	 */
-	abstract readDir(param: {
-		path: string;
-		ref: string;
-	}): Promise<Array<DirEntry>>;
-
-	/**
-	 * Updates remote file
-	 */
-	abstract updateFile(params: {
+	abstract getFile(params: {
 		path: string;
 		branch: string;
-		content: string;
-		identifier: string;
-		commitMessage: string;
-	}): Promise<void>;
+	}): Promise<SourceFile>;
 
 	/**
+	 * Gets directory contents from the repository
+	 * Returns list of files and subdirectories
 	 */
-	abstract updatePR(params: {
+	abstract getDirectory(params: {
+		path: string;
+		branch: string;
+	}): Promise<Array<SourceEntry>>;
+
+	/**
+	 * Ensures a branch exists
+	 * Creates the branch from base if it doesn't exist, does nothing if it already exists
+	 */
+	abstract ensureBranch(params: { name: string; base: string }): Promise<void>;
+
+	/**
+	 * Ensures a pull request exists
+	 * Creates the pull request if it doesn't exist, does nothing if it already exists
+	 */
+	abstract ensurePullRequest(params: {
 		branch: string;
 		title: string;
 		body: string;
 		base: string;
+	}): Promise<void>;
+
+	/**
+	 * Commits a file to the repository
+	 * Creates or updates the file and creates a commit with the new content
+	 */
+	abstract commitFile(params: {
+		sha: string;
+		path: string;
+		branch: string;
+		content: string;
+		message: string;
 	}): Promise<void>;
 }
