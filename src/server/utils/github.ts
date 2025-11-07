@@ -1,5 +1,5 @@
 import { Octokit } from "@octokit/rest";
-import { config } from "../../config";
+import { config } from "../../config/config";
 
 const octokit = new Octokit({
 	auth: config.source.adapter.access_token,
