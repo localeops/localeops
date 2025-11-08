@@ -1,0 +1,1 @@
+export { resolveConfigPath } from "./paths";
