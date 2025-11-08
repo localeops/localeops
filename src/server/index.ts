@@ -1,13 +1,10 @@
 import { config } from "../config/config";
 import type { Routes } from "../transports";
 import { createTransport } from "../transports";
-import { initDatabase } from "./database/database";
 import {
 	getUntranslatedHandler,
 	postTranslationsHandler,
 } from "./modules/translation/translation.controller";
-
-await initDatabase();
 
 const routes: Routes = {
 	[config.transport.adapter.route]: async (request) => {

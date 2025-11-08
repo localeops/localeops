@@ -45,9 +45,17 @@ export const getUntranslatedHandler = async (
 
 	if (!locale) return new Response("Missing locale param", { status: 400 });
 
-	const translationService = new TranslationService(locale);
+	try {
+		const translationService = new TranslationService(locale);
 
-	const deltas = await translationService.getUntranslatedDeltas();
+		const deltas = await translationService.getUntranslatedDeltas();
 
-	return new Response(JSON.stringify(deltas));
+		return new Response(JSON.stringify(deltas));
+	} catch (error) {
+		if (error instanceof Error) {
+			return new Response(error.message, { status: 500 });
+		}
+
+		return new Response("Internal Server Error", { status: 500 });
+	}
 };
