@@ -39,3 +39,4 @@ if (!Value.Check(configSchema, configFile)) {
 
 export const config = Value.Parse(configSchema, configFile);
 export type Config = Static<typeof configSchema>;
+export { baseDir };
