@@ -1,6 +1,18 @@
 import { Type } from "@sinclair/typebox/type";
 
 export const configSchema = Type.Object({
+	database: Type.Object({
+		adapter: Type.Union([
+			Type.Object({
+				name: Type.Literal("file"),
+				path: Type.String({ pattern: "\\.json$" }),
+			}),
+			Type.Object({
+				name: Type.Literal("sqlite"),
+				path: Type.String({ pattern: "^(:memory:|.*\\.db)$" }),
+			}),
+		]),
+	}),
 	source: Type.Object({
 		locale: Type.String(),
 		branch: Type.String(),
