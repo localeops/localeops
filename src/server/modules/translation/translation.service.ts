@@ -8,30 +8,37 @@ import {
 	type Translation,
 } from "../../../core/state";
 import { i18nResource } from "../../../core/state/state.schema";
+import type { BaseDatabase, DatabaseRecord } from "../../../databases";
+import { createDatabase } from "../../../databases";
 import { createSource } from "../../../sources/factory";
-import { Database } from "../../database/database";
 import { AppError, ERROR_TYPES } from "../../utils/errors";
 import { formatContent, inferFormatting } from "../../utils/formatting";
 import type { PostTranslation } from "./translation.types";
 
 const source = await createSource(config.source);
+const database = await createDatabase(config.database);
+await database.initialize();
 
 export class TranslationService {
 	locale: string;
+	private database: BaseDatabase;
 
 	constructor(locale: string) {
 		this.locale = locale;
+		this.database = database;
 	}
 
 	async getUntranslatedDeltas(): Promise<Delta[]> {
-		const database = new Database(this.locale);
+		const sourceSnapshot = await this.database.get(this.locale);
 
-		const translatedObj = database.get();
+		// Convert DatabaseRecord to I18nResource
+		// This is the source language snapshot used to track what's been translated
+		const sourceSnapshotObj = Value.Parse(i18nResource, sourceSnapshot);
 
 		const baseLocaleDirCompilation = await this.compileBaseLocaleDir();
 
 		const diff = State.diffObjects({
-			oldObj: translatedObj,
+			oldObj: sourceSnapshotObj,
 			newObj: baseLocaleDirCompilation,
 		});
 
@@ -57,10 +64,8 @@ export class TranslationService {
 		// Make changes to the repo
 		await this.updateRemoteFiles(translations);
 
-		// Update translations file
-		const database = new Database(this.locale);
-
-		database.update(translations);
+		// Update translation progress tracker with source language snapshot
+		await this.updateTranslationProgress(translations);
 	}
 
 	private async updateRemoteFiles(translations: Translation[]) {
@@ -200,5 +205,32 @@ export class TranslationService {
 
 	private getFullFilePath({ path, locale }: { path: string; locale: string }) {
 		return `${config.source.directory}/${locale}/${path}`;
+	}
+
+	private async updateTranslationProgress(translations: PostTranslation[]) {
+		// Store source language text (from) to track what version was translated
+		const sourceTextSnapshots = translations.map((tr) => ({
+			...tr,
+			value: tr.from,
+		}));
+
+		// Get existing source snapshot for this target locale
+		const existingSnapshot = await this.database.get(this.locale);
+		const target = Value.Check(i18nResource, existingSnapshot)
+			? (existingSnapshot as I18nResource)
+			: {};
+
+		// Merge source text snapshots with existing tracked keys
+		const state = new State();
+		const updatedSnapshot = state.update({
+			state: target,
+			translations: sourceTextSnapshots,
+		});
+
+		// Save updated source snapshot back to progress tracker
+		await this.database.set(
+			this.locale,
+			updatedSnapshot as unknown as DatabaseRecord,
+		);
 	}
 }
