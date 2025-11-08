@@ -18,6 +18,48 @@
 
 
 # =============================================================================
+# Database Configuration
+# =============================================================================
+# Configure where LocaleOps stores translation progress tracking data
+
+database:
+  # =============================================================================
+  # Adapter Configuration
+  # =============================================================================
+  # Configure the database adapter for tracking translation progress
+  #
+  # This database stores snapshots of source language text for each target locale
+  # to track translation progress and detect when source text becomes stale.
+
+  adapter:
+    # name: The database adapter type to use
+    #       Supported options:
+    #
+    #       - "file": JSON file-based storage
+    #           ✓ Use for: Development, testing, debugging
+    #           ✓ Benefits: Human-readable, simple setup, easy to inspect
+    #           ⚠️  Limitation: Not safe for concurrent writes (race conditions possible)
+    #
+    #       - "sqlite": SQLite database
+    #           ✓ Supports concurrent access with built-in locking
+    #           ✓ Better performance for production workloads
+    #
+    #       For production deployments, use database adapters with proper transaction
+    #       support (e.g., sqlite, postgres, mysql)
+    name: file
+
+    # path: Location where the database will be stored
+    #
+    #       For file adapter:
+    #       - Must end with .json
+    #       - Example: "./localeops-db.json" or "/var/lib/localeops/database.json"
+    #
+    #       For sqlite adapter:
+    #       - Must end with .db or use ":memory:" for in-memory database
+    #       - Example: "./localeops.db" or ":memory:"
+    path: ./localeops-db.json
+
+# =============================================================================
 # Transport Configuration
 # =============================================================================
 # Configure how LocaleOps receives incoming requests (HTTP, WebSocket, etc.)
