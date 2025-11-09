@@ -49,15 +49,6 @@ export abstract class BaseDatabase {
 	abstract get(key: string): Promise<DatabaseRecord | DatabaseArray>;
 
 	/**
-	 * Updates content for a specific key
-	 * Merges updates with existing content
-	 */
-	abstract update(
-		key: string,
-		updates: DatabaseRecord | DatabaseArray,
-	): Promise<void>;
-
-	/**
 	 * Sets content for a specific key
 	 * Replaces existing content entirely
 	 */
@@ -65,10 +56,4 @@ export abstract class BaseDatabase {
 		key: string,
 		content: DatabaseRecord | DatabaseArray,
 	): Promise<void>;
-
-	/**
-	 * Deletes a key from the database
-	 * Does nothing if key doesn't exist
-	 */
-	abstract delete(key: string): Promise<void>;
 }

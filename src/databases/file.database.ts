@@ -1,5 +1,4 @@
 import fs from "node:fs/promises";
-import merge from "lodash/merge";
 import {
 	BaseDatabase,
 	type DatabaseArray,
@@ -43,39 +42,12 @@ export class FileDatabase extends BaseDatabase {
 		return all[key] ?? {};
 	}
 
-	async update(
-		key: string,
-		updates: DatabaseRecord | DatabaseArray,
-	): Promise<void> {
-		const all = await this.getAll();
-		const existing = all[key];
-
-		// If updating an array, replace it entirely
-		if (Array.isArray(updates)) {
-			all[key] = updates;
-		} else if (Array.isArray(existing)) {
-			// Cannot merge object updates into an array, replace it
-			all[key] = updates;
-		} else {
-			// Deep merge objects
-			all[key] = merge({}, existing ?? {}, updates);
-		}
-
-		await fs.writeFile(this.path, JSON.stringify(all, null, 2), "utf8");
-	}
-
 	async set(
 		key: string,
 		content: DatabaseRecord | DatabaseArray,
 	): Promise<void> {
 		const all = await this.getAll();
 		all[key] = content;
-		await fs.writeFile(this.path, JSON.stringify(all, null, 2), "utf8");
-	}
-
-	async delete(key: string): Promise<void> {
-		const all = await this.getAll();
-		delete all[key];
 		await fs.writeFile(this.path, JSON.stringify(all, null, 2), "utf8");
 	}
 }
