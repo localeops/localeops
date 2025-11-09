@@ -1,5 +1,4 @@
 import { Database } from "bun:sqlite";
-import merge from "lodash/merge";
 import {
 	BaseDatabase,
 	type DatabaseArray,
@@ -61,28 +60,6 @@ export class SqliteDatabase extends BaseDatabase {
 		return JSON.parse(row.source_snapshot) as DatabaseRecord | DatabaseArray;
 	}
 
-	async update(
-		key: string,
-		updates: DatabaseRecord | DatabaseArray,
-	): Promise<void> {
-		const existing = await this.get(key);
-
-		let merged: DatabaseRecord | DatabaseArray;
-
-		// If updating an array, replace it entirely
-		if (Array.isArray(updates)) {
-			merged = updates;
-		} else if (Array.isArray(existing)) {
-			// Cannot merge object updates into an array, replace it
-			merged = updates;
-		} else {
-			// Deep merge objects using lodash
-			merged = merge({}, existing, updates);
-		}
-
-		await this.set(key, merged);
-	}
-
 	async set(
 		key: string,
 		content: DatabaseRecord | DatabaseArray,
@@ -94,9 +71,5 @@ export class SqliteDatabase extends BaseDatabase {
 			 ON CONFLICT(target_locale) DO UPDATE SET source_snapshot = excluded.source_snapshot`,
 			[key, contentStr],
 		);
-	}
-
-	async delete(key: string): Promise<void> {
-		this.db.run(`DELETE FROM ${this.tableName} WHERE target_locale = ?`, [key]);
 	}
 }
