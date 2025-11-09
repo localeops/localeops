@@ -1,0 +1,37 @@
+name: CI
+
+# Run on pull requests and pushes to main
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Install Bun runtime
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # Install project dependencies
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Run Biome checks (linting and formatting)
+      - name: Run Biome checks
+        run: bun run check
+
+      # Build the project to ensure it compiles
+      - name: Build
+        run: bun run build
