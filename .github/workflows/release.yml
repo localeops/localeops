@@ -1,0 +1,47 @@
+name: Release
+
+# Trigger this workflow on every push to the main branch
+on:
+  push:
+    branches:
+      - main
+
+# Permissions required for semantic-release to work properly
+permissions:
+  issues: write         # Required to comment on related issues in release notes
+  contents: write       # Required to push commits (version bumps) and create tags
+  pull-requests: write  # Required to comment on related PRs in release notes
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository code
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # fetch-depth: 0 fetches all history for all branches and tags
+          # This is required for semantic-release to analyze all commits
+          fetch-depth: 0
+          # persist-credentials: false prevents the action from persisting credentials
+          # semantic-release will use GITHUB_TOKEN instead
+          persist-credentials: false
+
+      # Install Bun runtime
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # Install project dependencies
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Run semantic-release to analyze commits and create releases
+      - name: Release
+        env:
+          # GITHUB_TOKEN is automatically provided by GitHub Actions
+          # semantic-release uses it to create releases, update files, and push changes
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bunx semantic-release
