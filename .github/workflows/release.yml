@@ -29,9 +29,8 @@ jobs:
           # fetch-depth: 0 fetches all history for all branches and tags
           # This is required for semantic-release to analyze all commits
           fetch-depth: 0
-          # persist-credentials: false prevents the action from persisting credentials
-          # semantic-release will use GITHUB_TOKEN instead
-          persist-credentials: false
+          # Use PAT token to bypass branch protection rules
+          token: ${{ secrets.PAT_TOKEN }}
 
       # Setup Node.js LTS
       - name: Setup Node.js
@@ -52,7 +51,6 @@ jobs:
       # Run semantic-release to analyze commits and create releases
       - name: Release
         env:
-          # GITHUB_TOKEN is automatically provided by GitHub Actions
-          # semantic-release uses it to create releases, update files, and push changes
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Use PAT token to bypass branch protection and push version commits
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: bunx semantic-release
