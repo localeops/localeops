@@ -17,7 +17,9 @@
 					{ "type": "style", "release": "patch" },
 					{ "type": "chore", "release": "patch" },
 					{ "type": "revert", "release": "patch" },
-					{ "type": "refactor", "release": "patch" }
+					{ "type": "refactor", "release": "patch" },
+
+					{ "breaking": true, "release": "minor" }
 				]
 			}
 		],
