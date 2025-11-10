@@ -1,8 +1,11 @@
 name: Release
 
-# Trigger this workflow on every push to the main branch
+# Trigger this workflow only after CI workflow completes successfully
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
     branches:
       - main
 
@@ -16,6 +19,8 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    # Only run if the CI workflow completed successfully
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       # Checkout the repository code
       - name: Checkout
@@ -27,6 +32,12 @@ jobs:
           # persist-credentials: false prevents the action from persisting credentials
           # semantic-release will use GITHUB_TOKEN instead
           persist-credentials: false
+
+      # Setup Node.js LTS
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
 
       # Install Bun runtime
       - name: Setup Bun
