@@ -8,7 +8,7 @@ import {
 	type Translation,
 } from "../../../core/state";
 import { i18nResource } from "../../../core/state/state.schema";
-import type { BaseDatabase, DatabaseRecord } from "../../../databases";
+import type { BaseDatabase } from "../../../databases";
 import { createDatabase } from "../../../databases";
 import { createSource } from "../../../sources/factory";
 import { AppError, ERROR_TYPES } from "../../utils/errors";
@@ -29,11 +29,16 @@ export class TranslationService {
 	}
 
 	async getUntranslatedDeltas(): Promise<Delta[]> {
-		const sourceSnapshot = await this.database.get(this.locale);
+		let sourceSnapshot = await this.database.get(this.locale);
 
-		// Convert DatabaseRecord to I18nResource
-		// This is the source language snapshot used to track what's been translated
-		const sourceSnapshotObj = Value.Parse(i18nResource, sourceSnapshot);
+		if (sourceSnapshot === null) {
+			sourceSnapshot = JSON.stringify({});
+		}
+
+		const sourceSnapshotObj = Value.Parse(
+			i18nResource,
+			JSON.parse(sourceSnapshot),
+		);
 
 		const baseLocaleDirCompilation = await this.compileBaseLocaleDir();
 
@@ -215,10 +220,13 @@ export class TranslationService {
 		}));
 
 		// Get existing source snapshot for this target locale
-		const existingSnapshot = await this.database.get(this.locale);
-		const target = Value.Check(i18nResource, existingSnapshot)
-			? (existingSnapshot as I18nResource)
-			: {};
+		let existingSnapshot = await this.database.get(this.locale);
+
+		if (existingSnapshot === null) {
+			existingSnapshot = JSON.stringify({});
+		}
+
+		const target = Value.Parse(i18nResource, JSON.parse(existingSnapshot));
 
 		// Merge source text snapshots with existing tracked keys
 		const state = new State();
@@ -228,9 +236,6 @@ export class TranslationService {
 		});
 
 		// Save updated source snapshot back to progress tracker
-		await this.database.set(
-			this.locale,
-			updatedSnapshot as unknown as DatabaseRecord,
-		);
+		await this.database.set(this.locale, JSON.stringify(updatedSnapshot));
 	}
 }
