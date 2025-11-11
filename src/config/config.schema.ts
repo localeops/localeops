@@ -11,6 +11,10 @@ export const configSchema = Type.Object({
 				name: Type.Literal("sqlite"),
 				path: Type.String({ pattern: "^(:memory:|.*\\.db)$" }),
 			}),
+			Type.Object({
+				name: Type.Literal("custom"),
+				path: Type.String({ pattern: "\\.(ts|js)$" }),
+			}),
 		]),
 	}),
 	source: Type.Object({
