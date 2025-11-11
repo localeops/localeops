@@ -21,6 +21,12 @@ export const createDatabase = async (
 		});
 	}
 
+	if (adapter.name === "custom") {
+		const module = await import(adapter.path);
+		const CustomDatabaseClass = module.default || module;
+		return new CustomDatabaseClass();
+	}
+
 	const _exhaustive: never = adapter;
 	throw new Error(
 		`Unknown database adapter: ${(_exhaustive as { name: string }).name}`,
