@@ -43,6 +43,22 @@ database:
     #       - "sqlite": SQLite database
     #           ✓ Supports concurrent access with built-in locking
     #           ✓ Better performance for production workloads
+    # 
+    #       - "custom": Custom database adapter
+    #           ✓ Use for: Integrating with external databases
+    #           ✓ Provide a TypeScript/JavaScript file path that exports a class
+    #           ✓ The class must implement three methods:
+    #               • initialize(): Promise<void>
+    #                   - Initializes the database (creates files, tables, connections, etc.)
+    #                   - Returns: Promise that resolves when initialization is complete
+    #               • get(key: string): Promise<string | null>
+    #                   - Retrieves stored content for the given key
+    #                   - Returns: Promise with the stored string, or null if key doesn't exist
+    #               • set(key: string, content: string): Promise<void>
+    #                   - Stores content for the given key (replaces existing content)
+    #                   - Returns: Promise that resolves when storage is complete
+    #           ✓ Example path: "./adapters/postgres.database.ts"
+    #           ⚠️  The module must export the class as default export
     #
     #       For production deployments, use database adapters with proper transaction
     #       support (e.g., sqlite, postgres, mysql)
