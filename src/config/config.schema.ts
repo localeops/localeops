@@ -12,6 +12,13 @@ export const configSchema = Type.Object({
 				path: Type.String({ pattern: "^(:memory:|.*\\.db)$" }),
 			}),
 			Type.Object({
+				name: Type.Literal("mysql"),
+				port: Type.Number(),
+				hostname: Type.String(),
+				username: Type.String(),
+				password: Type.Optional(Type.String()),
+			}),
+			Type.Object({
 				name: Type.Literal("custom"),
 				path: Type.String({ pattern: "\\.(ts|js)$" }),
 			}),
