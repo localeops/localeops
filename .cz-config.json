@@ -1,0 +1,80 @@
+{
+	"types": [
+		{
+			"value": "feat",
+			"name": "feat:     A new feature"
+		},
+		{
+			"value": "fix",
+			"name": "fix:      A bug fix"
+		},
+		{
+			"value": "docs",
+			"name": "docs:     Documentation only changes"
+		},
+		{
+			"value": "style",
+			"name": "style:    Code style changes (formatting, etc)"
+		},
+		{
+			"value": "refactor",
+			"name": "refactor: A code change that neither fixes a bug nor adds a feature"
+		},
+		{
+			"value": "perf",
+			"name": "perf:     A code change that improves performance"
+		},
+		{
+			"value": "test",
+			"name": "test:     Adding missing tests"
+		},
+		{
+			"value": "chore",
+			"name": "chore:    Changes to the build process or auxiliary tools"
+		},
+		{
+			"value": "revert",
+			"name": "revert:   Revert to a commit"
+		},
+		{
+			"value": "ci",
+			"name": "ci:       CI related changes"
+		}
+	],
+	"scopes": [
+		{
+			"name": "state-manager"
+		},
+		{
+			"name": "config"
+		},
+		{
+			"name": "databases"
+		},
+		{
+			"name": "sources"
+		},
+		{
+			"name": "transports"
+		},
+		{
+			"name": "shared"
+		},
+		{
+			"name": "docs"
+		},
+		{
+			"name": "ci"
+		},
+		{
+			"name": "misc"
+		}
+	],
+	"subjectLimit": 100,
+	"allowCustomScopes": true,
+	"footerPrefix": "ISSUES CLOSED:",
+	"breakingPrefix": "BREAKING CHANGE:",
+	"allowBreakingChanges": ["feat", "fix"],
+	"confirmCommit": "Create the commit above?",
+	"skipQuestions": ["body", "footer", "issues"]
+}
