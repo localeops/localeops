@@ -1,3 +1,9 @@
+## [0.3.3](https://github.com/localeops/localeops/compare/v0.3.2...v0.3.3) (2025-11-12)
+
+### Bug Fixes
+
+* correct release artifact upload configuration ([72b8a8e](https://github.com/localeops/localeops/commit/72b8a8ede7cd76aedee406cbc01199e8c092cee3))
+
 ## [0.3.2](https://github.com/localeops/localeops/compare/v0.3.1...v0.3.2) (2025-11-12)
 
 ### Bug Fixes
