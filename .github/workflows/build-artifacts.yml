@@ -1,0 +1,110 @@
+name: Build Artifacts
+
+# Trigger when a release is published by semantic-release
+on:
+  release:
+    types: [published]
+
+# Required permissions to upload release assets
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # Build matrix for cross-platform binaries
+        # To add a new platform:
+        # 1. Add a new entry with os, platform, and target
+        # 2. platform: used for naming the output file (e.g., localeops-linux-x64)
+        # 3. target: Bun's build target (e.g., bun-linux-x64)
+        include:
+          # Linux x86-64 - Standard Linux, AWS Lambda x86, most VPS/containers
+          - os: ubuntu-latest
+            platform: linux-x64
+            target: bun-linux-x64
+          # Linux ARM64 - AWS Lambda Graviton2 (cheaper), ARM servers
+          - os: ubuntu-latest
+            platform: linux-arm64
+            target: bun-linux-arm64
+
+    steps:
+      # Checkout the repository code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Setup Node.js LTS (required for some dependencies)
+      - name: Setup Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      # Setup Bun runtime for building
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # Cache Bun dependencies for faster builds
+      - name: Cache Bun dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      # Install project dependencies
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Build the standalone binary for the target platform
+      # --compile: Creates a standalone executable
+      # --minify: Reduces binary size
+      # --sourcemap: Generates source maps for debugging
+      # --target: Specifies the platform to build for
+      - name: Build binary for ${{ matrix.platform }}
+        run: |
+          bun build src/server/index.ts --compile --minify --sourcemap --target=${{ matrix.target }} --outfile=dist/localeops-${{ matrix.platform }}
+
+      # Verify the binary was created successfully
+      - name: Verify binary exists
+        shell: bash
+        run: |
+          ls -la dist/localeops-${{ matrix.platform }}
+          file dist/localeops-${{ matrix.platform }} || echo "file command not available"
+
+      # Generate SHA256 checksums for security verification
+      - name: Generate checksums
+        shell: bash
+        run: |
+          cd dist
+          if command -v sha256sum > /dev/null; then
+            sha256sum localeops-${{ matrix.platform }} > localeops-${{ matrix.platform }}.sha256
+          else
+            shasum -a 256 localeops-${{ matrix.platform }} > localeops-${{ matrix.platform }}.sha256
+          fi
+          echo "Checksum generated:"
+          cat *.sha256
+
+      # Upload the binary and checksum to the GitHub release
+      # Uses PAT_TOKEN to bypass branch protection rules
+      - name: Upload artifacts to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/localeops-${{ matrix.platform }}*
+            dist/*.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+      # Upload as workflow artifacts for debugging
+      - name: Upload workflow artifacts
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: debug-${{ matrix.platform }}
+          path: dist/
+          retention-days: 7
