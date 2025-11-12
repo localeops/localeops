@@ -1,3 +1,9 @@
+## [0.3.2](https://github.com/localeops/localeops/compare/v0.3.1...v0.3.2) (2025-11-12)
+
+### Bug Fixes
+
+* update deprecated GitHub Actions to v4 ([909f6bb](https://github.com/localeops/localeops/commit/909f6bbd2199cef14bb8ea7921a5b885169f7348))
+
 ## [0.3.1](https://github.com/localeops/localeops/compare/v0.3.0...v0.3.1) (2025-11-12)
 
 ### Continuous Integration
