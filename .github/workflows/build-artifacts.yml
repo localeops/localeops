@@ -90,13 +90,13 @@ jobs:
           cat *.sha256
 
       # Upload the binary and checksum to the GitHub release
-      # Uses PAT_TOKEN to bypass branch protection rules
+      # Uses PAT_TOKEN because this runs on release event
       - name: Upload artifacts to release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/localeops-${{ matrix.platform }}*
-            dist/*.sha256
+            dist/localeops-${{ matrix.platform }}
+            dist/localeops-${{ matrix.platform }}.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
