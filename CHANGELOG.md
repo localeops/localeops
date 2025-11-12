@@ -1,3 +1,9 @@
+## [0.3.1](https://github.com/localeops/localeops/compare/v0.3.0...v0.3.1) (2025-11-12)
+
+### Continuous Integration
+
+* add cross-platform build workflow for Linux binaries ([7e54239](https://github.com/localeops/localeops/commit/7e54239b38a0606e82aaeefb518567fc8bfc57d6))
+
 ## [0.3.0](https://github.com/localeops/localeops/compare/v0.2.0...v0.3.0) (2025-11-11)
 
 ### Features
