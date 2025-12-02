@@ -36,7 +36,7 @@
 		"commit": "cz",
 		"check": "biome check",
 		"fix": "biome check --fix",
-		"build": "bun build --compile --minify --production --sourcemap src/server/index.ts --outfile dist/localeops",
+		"build": "bun build --compile --minify --production --sourcemap src/index.ts --outfile dist/localeops",
 		"release": "semantic-release"
 	},
 	"type": "module",

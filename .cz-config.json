@@ -43,7 +43,7 @@
 	],
 	"scopes": [
 		{
-			"name": "state-manager"
+			"name": "framework"
 		},
 		{
 			"name": "config"
@@ -53,9 +53,6 @@
 		},
 		{
 			"name": "sources"
-		},
-		{
-			"name": "transports"
 		},
 		{
 			"name": "shared"

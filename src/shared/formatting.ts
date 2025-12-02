@@ -1,5 +1,3 @@
-import type { I18nObject } from "../../core/state";
-
 type Formatting = {
 	indent: string;
 	eol: string;
@@ -18,7 +16,7 @@ export const formatContent = ({
 	content,
 	formatting,
 }: {
-	content: I18nObject;
+	content: unknown;
 	formatting: Formatting;
 }) => {
 	const { indent, eol, tail } = formatting;
