@@ -12,7 +12,7 @@ export const createDatabase = async (
 
 	if (adapter.name === "file") {
 		return new FileDatabase({
-			path: resolveConfigPath(adapter.path),
+			dirPath: resolveConfigPath(adapter.dirPath),
 		});
 	}
 

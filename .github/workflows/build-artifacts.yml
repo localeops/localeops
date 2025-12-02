@@ -67,7 +67,7 @@ jobs:
       # --target: Specifies the platform to build for
       - name: Build binary for ${{ matrix.platform }}
         run: |
-          bun build src/server/index.ts --compile --minify --sourcemap --target=${{ matrix.target }} --outfile=dist/localeops-${{ matrix.platform }}
+          bun build src/index.ts --compile --minify --sourcemap --target=${{ matrix.target }} --outfile=dist/localeops-${{ matrix.platform }}
 
       # Verify the binary was created successfully
       - name: Verify binary exists

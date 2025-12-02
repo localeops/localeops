@@ -1,15 +1,22 @@
 import type { Config } from "../config/config";
 import type { BaseSource } from "./base.source";
-import { GithubSource } from "./github.source";
+import { BitbucketSource } from "./bitbucket/bitbucket.source";
+import { GitHubSource } from "./github/github.source";
 
-export const createSource = async (
-	sourceConfig: Config["source"],
-): Promise<BaseSource> => {
-	const adapter = sourceConfig.adapter;
+export const createSource = (config: Config["source"]): BaseSource => {
+	const name = config.name;
 
-	if (adapter.name === "github") {
-		return new GithubSource(adapter);
+	if (name === "github") {
+		return new GitHubSource(config);
 	}
 
-	throw new Error(`Unknown source adapter: ${adapter.name}`);
+	if (name === "bitbucket") {
+		return new BitbucketSource(config);
+	}
+
+	const _exhaustive: never = name;
+
+	throw new Error(
+		`Unknown source adapter: ${(_exhaustive as { name: string }).name}`,
+	);
 };

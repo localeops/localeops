@@ -1,11 +1,16 @@
 import { Type } from "@sinclair/typebox/type";
 
 export const configSchema = Type.Object({
+	framework: Type.Object({
+		locale: Type.String(),
+		directory: Type.String(),
+		name: Type.Union([Type.Literal("i18next"), Type.Literal("formatjs")]),
+	}),
 	database: Type.Object({
 		adapter: Type.Union([
 			Type.Object({
 				name: Type.Literal("file"),
-				path: Type.String({ pattern: "\\.json$" }),
+				dirPath: Type.String(),
 			}),
 			Type.Object({
 				name: Type.Literal("sqlite"),
@@ -24,41 +29,22 @@ export const configSchema = Type.Object({
 			}),
 		]),
 	}),
-	source: Type.Object({
-		locale: Type.String(),
-		branch: Type.String(),
-		directory: Type.String(),
-		adapter: Type.Object({
-			name: Type.Union([
-				Type.Literal("github"),
-				// Type.Literal("gitlab"),
-				// Type.Literal("bitbucket"),
-			]),
-			access_token: Type.String(),
-			repository_name: Type.String(),
+	source: Type.Union([
+		Type.Object({
+			name: Type.Literal("github"),
+			base: Type.String(),
+			repo: Type.String({ pattern: ".+/.+" }),
+			token: Type.String(),
+			apiUrl: Type.String({ default: "https://api.github.com" }),
 		}),
-	}),
-	transport: Type.Object({
-		adapter: Type.Union([
-			Type.Object({
-				name: Type.Literal("http"),
-				port: Type.Integer(),
-				route: Type.String(),
-				auth: Type.Union([
-					Type.Object({
-						type: Type.Literal("none"),
-					}),
-					Type.Object({
-						type: Type.Literal("bearer"),
-						token: Type.String(),
-					}),
-				]),
-			}),
-			// Type.Object({
-			// 	name: Type.Literal("custom"),
-			// 	path: Type.String(),
-			// 	config: Type.Optional(Type.Record(Type.String(), Type.Any())),
-			// }),
-		]),
-	}),
+		Type.Object({
+			name: Type.Literal("bitbucket"),
+			base: Type.String(),
+			repo: Type.String(),
+			token: Type.String(),
+			apiUrl: Type.Optional(
+				Type.String({ default: "https://api.bitbucket.org/2.0" }),
+			),
+		}),
+	]),
 });
