@@ -1,5 +1,6 @@
 import path from "node:path";
-import { baseDir } from "../config/config";
+
+const baseDir = process.cwd();
 
 /**
  * Resolves a file path relative to the application base directory.

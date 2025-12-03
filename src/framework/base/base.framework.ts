@@ -29,9 +29,6 @@ export abstract class BaseFramework<Resource> {
 
 	/**
 	 * Reads and parses a translation file from disk.
-	 *
-	 * @param path - Absolute file path
-	 * @returns Resource and raw file content (null if file doesn't exist)
 	 */
 	abstract readResourceFile(path: string): {
 		resource: Resource;
@@ -117,7 +114,7 @@ export abstract class BaseFramework<Resource> {
 	 * Retrieves a value from a Resource by its path.
 	 *
 	 * @param resourcePath - Path array to the value (e.g., ["user", "greeting"])
-	 * @returns Translation string at the specified path
+	 * @returns String value at the specified path
 	 */
 	abstract getValueFromResource({
 		resource,

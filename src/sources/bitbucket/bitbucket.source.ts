@@ -1,5 +1,6 @@
 import { Value } from "@sinclair/typebox/value";
 import type { Config } from "../../config";
+import { logger } from "../../shared/logger";
 import { BaseSource } from "../base.source";
 import { BitbucketPullRequestListSchema } from "./bitbucket.schema";
 import type { BitbucketPullRequest } from "./bitbucket.types";
@@ -29,37 +30,33 @@ export class BitbucketSource extends BaseSource {
 	private async findPullRequest(
 		branch: string,
 	): Promise<BitbucketPullRequest | null> {
-		console.log(`[Bitbucket] Finding existing PR for branch "${branch}"...`);
+		logger.debug(`[Bitbucket] Finding existing PR for branch "${branch}"...`);
 
-		try {
-			const response = await fetch(
-				`${this.apiUrl}/repositories/${this.repo}/pullrequests?state=OPEN`,
-				{ headers: this.authHeaders },
+		const response = await fetch(
+			`${this.apiUrl}/repositories/${this.repo}/pullrequests?state=OPEN`,
+			{ headers: this.authHeaders },
+		);
+
+		if (response.ok) {
+			const data = Value.Parse(
+				BitbucketPullRequestListSchema,
+				await response.json(),
 			);
 
-			if (response.ok) {
-				const data = Value.Parse(
-					BitbucketPullRequestListSchema,
-					await response.json(),
-				);
+			const pr = data.values.find((pr) => {
+				return pr.source.branch.name === branch;
+			});
 
-				const pr = data.values.find((pr) => {
-					return pr.source.branch.name === branch;
-				});
+			return pr ?? null;
+		} else if (response.status !== 404) {
+			const errorText = await response.text();
 
-				return pr ?? null;
-			} else if (response.status !== 404) {
-				const errorText = await response.text();
-
-				throw new Error(
-					`[Bitbucket] Failed to get open PRs: ${response.status} ${errorText}`,
-				);
-			}
-
-			return null;
-		} catch (error) {
-			throw new Error(`[Bitbucket] Error finding pull request: ${error}`);
+			throw new Error(
+				`[Bitbucket] Failed to get open PRs: ${response.status} ${errorText}`,
+			);
 		}
+
+		return null;
 	}
 
 	private async updatePullRequest({
@@ -71,7 +68,7 @@ export class BitbucketSource extends BaseSource {
 		title: string;
 		description: string;
 	}) {
-		console.log(`[Bitbucket] Updating pull request #${prId}...`);
+		logger.debug(`[Bitbucket] Updating pull request #${prId}...`);
 
 		const response = await fetch(
 			`${this.apiUrl}/repositories/${this.repo}/pullrequests/${prId}`,
@@ -84,6 +81,7 @@ export class BitbucketSource extends BaseSource {
 
 		if (!response.ok) {
 			const errorText = await response.text();
+
 			throw new Error(
 				`[Bitbucket] Failed to update PR #${prId}: ${response.status} ${errorText}`,
 			);
@@ -99,7 +97,7 @@ export class BitbucketSource extends BaseSource {
 		title: string;
 		description: string;
 	}) {
-		console.log(`[Bitbucket] Creating new pull request for "${branch}"...`);
+		logger.debug(`[Bitbucket] Creating new pull request for "${branch}"...`);
 
 		const response = await fetch(
 			`${this.apiUrl}/repositories/${this.repo}/pullrequests`,
@@ -142,31 +140,22 @@ export class BitbucketSource extends BaseSource {
 		title: string;
 		description: string;
 	}) {
-		console.log(`[Bitbucket] Ensuring pull request for branch "${branch}"...`);
+		logger.debug(`[Bitbucket] Ensuring pull request for branch "${branch}"...`);
 
-		try {
-			const pullRequest = await this.findPullRequest(branch);
+		const pullRequest = await this.findPullRequest(branch);
 
-			if (pullRequest) {
-				await this.updatePullRequest({
-					prId: pullRequest.id,
-					title,
-					description,
-				});
-			} else {
-				await this.createPullRequest({
-					branch,
-					description,
-					title,
-				});
-			}
-		} catch (error) {
-			console.error(
-				`[Bitbucket] Error ensuring pull request for ${branch}:`,
-				error,
-			);
-
-			throw error;
+		if (pullRequest) {
+			await this.updatePullRequest({
+				prId: pullRequest.id,
+				title,
+				description,
+			});
+		} else {
+			await this.createPullRequest({
+				branch,
+				description,
+				title,
+			});
 		}
 	}
 }

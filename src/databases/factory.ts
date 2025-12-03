@@ -1,5 +1,5 @@
-import type { Config } from "../config/config";
-import { resolveConfigPath } from "../shared";
+import type { Config } from "../config";
+import { resolveConfigPath } from "../shared/paths";
 import type { BaseDatabase } from "./base.database";
 import { FileDatabase } from "./file.database";
 import MySQLDatabase from "./mysql.database";
@@ -18,6 +18,8 @@ export const createDatabase = async (
 
 	if (adapter.name === "sqlite") {
 		return new SqliteDatabase({
+			name: adapter.name,
+			table: adapter.table,
 			path: resolveConfigPath(adapter.path),
 		});
 	}
