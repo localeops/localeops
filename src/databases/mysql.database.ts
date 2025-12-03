@@ -10,18 +10,16 @@ type MySQLDatabaseConfig = Extract<
 export default class MySQLDatabase extends BaseDatabase {
 	private sql: SQL;
 
+	private readonly table;
+	private readonly database;
 	private readonly keyColumn = "key";
 	private readonly valueColumn = "value";
-	private readonly tableName = "localeops";
-	private readonly databaseName = "localeops";
-
-	private readonly escapedKeyColumn: SQL.Query<string>;
-	private readonly escapedValueColumn: SQL.Query<string>;
-	private readonly escapedTableName: SQL.Query<string>;
-	private readonly escapedDatabaseName: SQL.Query<string>;
 
 	constructor(config: MySQLDatabaseConfig) {
 		super();
+
+		this.table = config.table;
+		this.database = config.database;
 
 		this.sql = new SQL({
 			adapter: "mysql",
@@ -30,28 +28,23 @@ export default class MySQLDatabase extends BaseDatabase {
 			username: config.username,
 			password: config.password,
 		});
-
-		this.escapedKeyColumn = this.sql(this.keyColumn);
-		this.escapedValueColumn = this.sql(this.valueColumn);
-		this.escapedTableName = this.sql(this.tableName);
-		this.escapedDatabaseName = this.sql(this.databaseName);
 	}
 
 	async initialize(): Promise<void> {
-		await this.sql`CREATE DATABASE IF NOT EXISTS ${this.escapedDatabaseName}`;
+		await this.sql`CREATE DATABASE IF NOT EXISTS ${this.sql(this.database)}`;
 
 		await this.sql`
-			CREATE TABLE IF NOT EXISTS ${this.escapedDatabaseName}.${this.escapedTableName} (
-				${this.escapedKeyColumn} VARCHAR(255) PRIMARY KEY,
-				${this.escapedValueColumn} TEXT NOT NULL
+			CREATE TABLE IF NOT EXISTS ${this.sql(this.database)}.${this.sql(this.table)} (
+				${this.sql(this.keyColumn)} VARCHAR(255) PRIMARY KEY,
+				${this.sql(this.valueColumn)} TEXT NOT NULL
 			)
 		`;
 	}
 
 	async get(key: string): Promise<string | null> {
 		const rows = await this.sql`
-			SELECT ${this.escapedValueColumn} FROM ${this.escapedDatabaseName}.${this.escapedTableName} 
-			WHERE ${this.escapedKeyColumn} = ${key}
+			SELECT ${this.sql(this.valueColumn)} FROM ${this.sql(this.database)}.${this.sql(this.table)} 
+			WHERE ${this.sql(this.keyColumn)} = ${key}
 		`;
 
 		if (rows && rows.length > 0) {
@@ -63,9 +56,9 @@ export default class MySQLDatabase extends BaseDatabase {
 
 	async set(key: string, content: string): Promise<void> {
 		await this.sql`
-			INSERT INTO ${this.escapedDatabaseName}.${this.escapedTableName} 
-			(${this.escapedKeyColumn}, ${this.escapedValueColumn}) VALUES (${key}, ${content}) 
-			ON DUPLICATE KEY UPDATE ${this.escapedValueColumn} = ${content}
+			INSERT INTO ${this.sql(this.database)}.${this.sql(this.table)} 
+			(${this.sql(this.keyColumn)}, ${this.sql(this.valueColumn)}) VALUES (${key}, ${content}) 
+			ON DUPLICATE KEY UPDATE ${this.sql(this.valueColumn)} = ${content}
 		`;
 	}
 }

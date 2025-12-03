@@ -15,6 +15,7 @@ export const configSchema = Type.Object({
 			Type.Object({
 				name: Type.Literal("sqlite"),
 				path: Type.String({ pattern: "^(:memory:|.*\\.db)$" }),
+				table: Type.String(),
 			}),
 			Type.Object({
 				name: Type.Literal("mysql"),
@@ -22,6 +23,8 @@ export const configSchema = Type.Object({
 				hostname: Type.String(),
 				username: Type.String(),
 				password: Type.Optional(Type.String()),
+				database: Type.String(),
+				table: Type.String(),
 			}),
 			Type.Object({
 				name: Type.Literal("custom"),
@@ -35,7 +38,7 @@ export const configSchema = Type.Object({
 			base: Type.String(),
 			repo: Type.String({ pattern: ".+/.+" }),
 			token: Type.String(),
-			apiUrl: Type.String({ default: "https://api.github.com" }),
+			apiUrl: Type.Optional(Type.String({ default: "https://api.github.com" })),
 		}),
 		Type.Object({
 			name: Type.Literal("bitbucket"),

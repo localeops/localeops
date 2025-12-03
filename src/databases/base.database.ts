@@ -9,7 +9,7 @@ export abstract class BaseDatabase {
 	abstract initialize(): Promise<void>;
 
 	/**
-	 * Gets content for a specific key
+	 * Gets content for a specific key or null if key not found
 	 */
 	abstract get(key: string): Promise<string | null>;
 
