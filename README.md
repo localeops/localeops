@@ -1,3 +1,3 @@
 # localeops
 
-A flexible localization operations toolkit.
+A flexible localization operations toolkit
