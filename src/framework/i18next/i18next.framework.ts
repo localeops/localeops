@@ -2,6 +2,7 @@ import fs from "node:fs";
 import { Value } from "@sinclair/typebox/value";
 import get from "lodash/get";
 import set from "lodash/set";
+import { logger } from "../../shared/logger";
 import { BaseFramework } from "../base/base.framework";
 import type {
 	Path,
@@ -66,7 +67,8 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 		for (const filePath of oldSnapshotFilePaths) {
 			if (!newSnapshotFilePaths.has(filePath)) {
 				if (oldSnapshotFilePaths.has(filePath)) {
-					console.log(`File ${filePath} was removed`);
+					// TODO: return translation file removed delta
+					logger.debug(`File ${filePath} was removed`);
 				}
 			}
 		}

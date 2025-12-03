@@ -48,7 +48,7 @@ export abstract class BaseSource {
 
 	/**
 	 * Ensures a pull request exists
-	 * Creates the pull request if it doesn't exist, does nothing if it already exists
+	 * Creates the pull request if it doesn't exist or updates it if it does
 	 */
 	abstract ensurePullRequest({
 		title,

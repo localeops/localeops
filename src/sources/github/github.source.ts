@@ -1,5 +1,6 @@
 import { Value } from "@sinclair/typebox/value";
 import type { Config } from "../../config";
+import { logger } from "../../shared/logger";
 import { BaseSource } from "../base.source";
 import { GitHubPullRequestListSchema } from "./github.schema";
 import type { GitHubPullRequest } from "./github.types";
@@ -29,37 +30,33 @@ export class GitHubSource extends BaseSource {
 	private async findPullRequest(
 		branch: string,
 	): Promise<GitHubPullRequest | null> {
-		console.log(`[GitHub] Finding existing PR for branch "${branch}"...`);
+		logger.debug(`[GitHub] Finding existing PR for branch "${branch}"...`);
 
 		const [owner, repo] = this.repo.split("/");
 
-		try {
-			const response = await fetch(
-				`${this.apiUrl}/repos/${owner}/${repo}/pulls?head=${owner}:${branch}&state=open`,
-				{ headers: this.authHeaders },
+		const response = await fetch(
+			`${this.apiUrl}/repos/${owner}/${repo}/pulls?head=${owner}:${branch}&state=open`,
+			{ headers: this.authHeaders },
+		);
+
+		if (response.ok) {
+			const data = Value.Parse(
+				GitHubPullRequestListSchema,
+				await response.json(),
 			);
 
-			if (response.ok) {
-				const data = Value.Parse(
-					GitHubPullRequestListSchema,
-					await response.json(),
-				);
+			const pr = data[0];
 
-				const pr = data[0];
+			return pr ?? null;
+		} else if (response.status !== 404) {
+			const errorText = await response.text();
 
-				return pr ?? null;
-			} else if (response.status !== 404) {
-				const errorText = await response.text();
-
-				throw new Error(
-					`[GitHub] Failed to get open PRs: ${response.status} ${errorText}`,
-				);
-			}
-
-			return null;
-		} catch (error) {
-			throw new Error(`[GitHub] Error finding pull request: ${error}`);
+			throw new Error(
+				`[GitHub] Failed to get open PRs: ${response.status} ${errorText}`,
+			);
 		}
+
+		return null;
 	}
 
 	private async updatePullRequest({
@@ -71,7 +68,7 @@ export class GitHubSource extends BaseSource {
 		title: string;
 		body: string;
 	}) {
-		console.log(`[GitHub] Updating pull request #${prNumber}...`);
+		logger.debug(`[GitHub] Updating pull request #${prNumber}...`);
 
 		const [owner, repo] = this.repo.split("/");
 
@@ -102,7 +99,7 @@ export class GitHubSource extends BaseSource {
 		title: string;
 		body: string;
 	}) {
-		console.log(`[GitHub] Creating new pull request for "${branch}"...`);
+		logger.debug(`[GitHub] Creating new pull request for "${branch}"...`);
 
 		const [owner, repo] = this.repo.split("/");
 
@@ -138,31 +135,22 @@ export class GitHubSource extends BaseSource {
 		title: string;
 		description: string;
 	}) {
-		console.log(`[GitHub] Ensuring pull request for branch "${branch}"...`);
+		logger.debug(`[GitHub] Ensuring pull request for branch "${branch}"...`);
 
-		try {
-			const pullRequest = await this.findPullRequest(branch);
+		const pullRequest = await this.findPullRequest(branch);
 
-			if (pullRequest) {
-				await this.updatePullRequest({
-					title,
-					body: description,
-					prNumber: pullRequest.number,
-				});
-			} else {
-				await this.createPullRequest({
-					branch,
-					title,
-					body: description,
-				});
-			}
-		} catch (error) {
-			console.error(
-				`[GitHub] Error ensuring pull request for ${branch}:`,
-				error,
-			);
-
-			throw error;
+		if (pullRequest) {
+			await this.updatePullRequest({
+				title,
+				body: description,
+				prNumber: pullRequest.number,
+			});
+		} else {
+			await this.createPullRequest({
+				branch,
+				title,
+				body: description,
+			});
 		}
 	}
 }

@@ -3,6 +3,7 @@ import { Value } from "@sinclair/typebox/value";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { extract } from "./extract";
+import { logger } from "./shared/logger";
 import submitTranslations, {
 	SubmitTranslationSchema,
 } from "./submit-translations";
@@ -28,7 +29,7 @@ yargs(hideBin(process.argv))
 			try {
 				await handleExtract(argv.locale, argv["callback-url"]);
 			} catch (err) {
-				console.error("Error:", err instanceof Error ? err.message : err);
+				logger.error(err instanceof Error ? err.message : "Unknown", err);
 				process.exit(1);
 			}
 		},
@@ -53,7 +54,7 @@ yargs(hideBin(process.argv))
 			try {
 				await handleApply(argv.locale, argv["translations-json"]);
 			} catch (err) {
-				console.error("Error:", err instanceof Error ? err.message : err);
+				logger.error(err instanceof Error ? err.message : "Unknown", err);
 				process.exit(1);
 			}
 		},

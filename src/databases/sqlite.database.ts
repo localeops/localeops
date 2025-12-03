@@ -1,22 +1,30 @@
 import { Database } from "bun:sqlite";
+import type { Config } from "../config";
 import { BaseDatabase } from "./base.database";
+
+type SqliteDatabaseConfig = Extract<
+	Config["database"]["adapter"],
+	{ name: "sqlite" }
+>;
 
 export class SqliteDatabase extends BaseDatabase {
 	private db: Database;
+
+	private readonly table;
 	private readonly keyColumn = "key";
 	private readonly valueColumn = "value";
-	private readonly tableName = "localeops";
 
-	constructor(config: { path: string }) {
+	constructor(config: SqliteDatabaseConfig) {
 		super();
+
+		this.table = config.table;
 
 		this.db = new Database(config.path);
 	}
 
 	async initialize(): Promise<void> {
-		// Create table if it doesn't exist
 		this.db.run(`
-			CREATE TABLE IF NOT EXISTS ${this.tableName} (
+			CREATE TABLE IF NOT EXISTS ${this.table} (
 				${this.keyColumn} TEXT PRIMARY KEY,
 				${this.valueColumn} TEXT NOT NULL
 			)
@@ -26,7 +34,7 @@ export class SqliteDatabase extends BaseDatabase {
 	async get(key: string): Promise<string | null> {
 		const result = this.db
 			.query<{ value: string }, [string]>(
-				`SELECT ${this.valueColumn} FROM ${this.tableName} WHERE ${this.keyColumn} = ?`,
+				`SELECT ${this.valueColumn} FROM ${this.table} WHERE ${this.keyColumn} = ?`,
 			)
 			.get(key);
 
@@ -39,7 +47,7 @@ export class SqliteDatabase extends BaseDatabase {
 
 	async set(key: string, content: string): Promise<void> {
 		this.db.run(
-			`INSERT INTO ${this.tableName} (${this.keyColumn}, ${this.valueColumn}) VALUES (?, ?)
+			`INSERT INTO ${this.table} (${this.keyColumn}, ${this.valueColumn}) VALUES (?, ?)
 			 ON CONFLICT(${this.keyColumn}) DO UPDATE SET ${this.valueColumn} = excluded.${this.valueColumn}`,
 			[key, content],
 		);

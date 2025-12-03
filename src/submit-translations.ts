@@ -8,6 +8,7 @@ import { createDatabase } from "./databases";
 import { SnapshotSchema, UpdateSchema } from "./framework/base/base.schema";
 import { createFramework } from "./framework/factory";
 import { formatContent, inferFormatting } from "./shared/formatting";
+import { logger } from "./shared/logger";
 import { getTranslationBranchName } from "./shared/utils";
 import { createSource } from "./sources/factory";
 
@@ -34,7 +35,7 @@ const updateTargetResourceFiles = async (
 	translations: Translation[],
 	locale: string,
 ) => {
-	console.log("Updating target resource files...");
+	logger.debug("Updating target resource files...");
 
 	const fullFilePathToTranslations = new Map<string, Translation[]>();
 
@@ -91,7 +92,11 @@ const updateTargetResourceFiles = async (
 
 	const description = `This PR updates translation files for locale: ${locale}`;
 
-	source.ensurePullRequest({ description, title, branch: translationsBranch });
+	source.ensurePullRequest({
+		description,
+		title,
+		branch: translationsBranch,
+	});
 };
 
 // TODO: group updates by source files
@@ -99,7 +104,7 @@ const updateSourceLocaleDirSnapshot = async (
 	translations: SubmitTranslation[],
 	locale: string,
 ) => {
-	console.log("Updating source locale directory snapshot...");
+	logger.debug("Updating source locale directory snapshot...");
 
 	// Store source language text (from) to track what version was translated
 	const snapshotUpdates = translations.map((tr) => ({
@@ -124,12 +129,12 @@ const updateSourceLocaleDirSnapshot = async (
 			updates: [update],
 		});
 
-		console.log("Updated resource: ", updatedResource);
+		logger.debug("Updated resource: ", updatedResource);
 
 		snapshotParsed[update.filePath] = updatedResource;
 	}
 
-	console.log("Updated snapshot: ", snapshotParsed);
+	logger.debug("Updated snapshot: ", snapshotParsed);
 
 	// Save updated source snapshot back to progress tracker
 	await database.set(locale, JSON.stringify(snapshotParsed));
@@ -150,7 +155,7 @@ const submitTranslations = async ({
 
 	const currentSnapshot = framework.snapshotSourceLocaleDir();
 
-	console.log("Current snapshot: ", currentSnapshot);
+	logger.debug("Current snapshot: ", currentSnapshot);
 
 	// Check if translations are stale
 	for (const translation of translations) {
