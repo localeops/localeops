@@ -14,6 +14,7 @@ permissions:
   issues: write         # Required to comment on related issues in release notes
   contents: write       # Required to push commits (version bumps) and create tags
   pull-requests: write  # Required to comment on related PRs in release notes
+  id-token: write       # Required for NPM provenance and OIDC authentication
 
 jobs:
   release:

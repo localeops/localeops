@@ -13,7 +13,7 @@
 	"author": "Digital Shed Oy",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/localeops/localeops.git"
+		"url": "git+https://github.com/localeops/localeops.git"
 	},
 	"bugs": {
 		"url": "https://github.com/localeops/localeops/issues"
@@ -23,7 +23,7 @@
 		"access": "public"
 	},
 	"bin": {
-		"localeops": "./dist/localeops"
+		"localeops": "dist/localeops"
 	},
 	"files": [
 		"dist/localeops",
