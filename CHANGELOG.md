@@ -1,3 +1,9 @@
+## [0.3.5](https://github.com/localeops/localeops/compare/v0.3.4...v0.3.5) (2025-12-03)
+
+### Documentation
+
+* **docs:** match package.json description ([e31fc11](https://github.com/localeops/localeops/commit/e31fc11ed68b2c5baecefa86c5ef97abb760d550))
+
 ## [0.3.4](https://github.com/localeops/localeops/compare/v0.3.3...v0.3.4) (2025-12-03)
 
 ### Bug Fixes
