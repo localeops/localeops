@@ -5,153 +5,82 @@
 # Modify the sections below to customize your project settings.
 #
 # Usage:
-# - In production: place this file in the same directory as the LocaleOps binary.
-#   The binary will automatically detect and load it at runtime.
-# - In development: LocaleOps will automatically load this file from the project
-#   root directory if present.
+# - Place this file in the root directory of your project
 #
 # Environment Variables:
 # - This config file supports environment variable interpolation using ${VAR_NAME} syntax
 # - Set required environment variables before running LocaleOps:
-#     export GITHUB_ACCESS_TOKEN=your_token_here
+#     export TOKEN=your_token_here
 # - In CI/CD, configure secrets in your pipeline settings
-
 
 # =============================================================================
 # Database Configuration
 # =============================================================================
-# Configure where LocaleOps stores translation progress tracking data
 
 database:
-  # =============================================================================
-  # Adapter Configuration
-  # =============================================================================
-  # Configure the database adapter for tracking translation progress
-  #
-  # This database stores snapshots of source language text for each target locale
-  # to track translation progress and detect when source text becomes stale.
-
   adapter:
-    # name: The database adapter type to use
-    #       Supported options:
+    # file database
+    #   name: file
+    #   dirPath: string (path where data is stored)
     #
-    #       - "file": JSON file-based storage
-    #           ✓ Use for: Development, testing, debugging
-    #           ✓ Benefits: Human-readable, simple setup, easy to inspect
-    #           ⚠️  Limitation: Not safe for concurrent writes (race conditions possible)
+    # sqlite database
+    #   name: sqlite
+    #   path: string (":memory:" or ends with ".db")
+    #   table: string
     #
-    #       - "sqlite": SQLite database
-    #           ✓ Supports concurrent access with built-in locking
-    #           ✓ Better performance for production workloads
-    # 
-    #       - "custom": Custom database adapter
-    #           ✓ Use for: Integrating with external databases
-    #           ✓ Provide a TypeScript/JavaScript file path that exports a class
-    #           ✓ The class must implement three methods:
-    #               • initialize(): Promise<void>
-    #                   - Initializes the database (creates files, tables, connections, etc.)
-    #                   - Returns: Promise that resolves when initialization is complete
-    #               • get(key: string): Promise<string | null>
-    #                   - Retrieves stored content for the given key
-    #                   - Returns: Promise with the stored string, or null if key doesn't exist
-    #               • set(key: string, content: string): Promise<void>
-    #                   - Stores content for the given key (replaces existing content)
-    #                   - Returns: Promise that resolves when storage is complete
-    #           ✓ Example path: "./adapters/postgres.database.ts"
-    #           ⚠️  The module must export the class as default export
+    # mysql database
+    #   name: mysql
+    #   port: number
+    #   hostname: string
+    #   username: string
+    #   password: string (optional)
+    #   database: string
+    #   table: string
     #
-    #       For production deployments, use database adapters with proper transaction
-    #       support (e.g., sqlite, postgres, mysql)
+    # custom database
+    #   name: custom
+    #   path: string (must end with ".ts" or ".js")
+    #
     name: file
-
-    # path: Location where the database will be stored
-    #
-    #       For file adapter:
-    #       - Must end with .json
-    #       - Example: "./localeops-db.json" or "/var/lib/localeops/database.json"
-    #
-    #       For sqlite adapter:
-    #       - Must end with .db or use ":memory:" for in-memory database
-    #       - Example: "./localeops.db" or ":memory:"
-    path: ./localeops-db.json
+    dirPath: ./localeops-snapshots
 
 # =============================================================================
-# Transport Configuration
+# Version Control System Configuration
 # =============================================================================
-# Configure how LocaleOps receives incoming requests (HTTP, WebSocket, etc.)
-
-transport:
-  # =============================================================================
-  # Adapter Configuration
-  # =============================================================================
-  # Configure the transport adapter (currently supports HTTP)
-
-  adapter:
-    # name: The transport adapter type to use
-    #       Currently supported: "http"
-    name: http
-
-    # port: The port number where the server will listen
-    port: 3000
-
-    # route: The API endpoint path for translation operations
-    #        Example: "/api/translations" or "/webhooks/locales"
-    route: /api/translations
-
-    # auth: Authentication configuration for incoming requests
-    #
-    #       Option 1 - No authentication (not recommended for production):
-    #       auth:
-    #         type: none
-    #
-    #       Option 2 - Bearer token authentication (recommended):
-    #       auth:
-    #         type: bearer
-    #         token: ${API_AUTH_TOKEN}
-    auth:
-      type: none
-
-# =============================================================================
-# Source Configuration
-# =============================================================================
-# Define where your source translations are stored and how to access them
 
 source:
-  # locale: The base locale code you author translations in (e.g., "en", "en-US")
+  # github source
+  #   name: github
+  #   base: string 
+  #   repo: string (must be in format owner/repo)
+  #   apiUrl: string (optional)
+  #
+  # bitbucket source
+  #   name: bitbucket
+  #   base: string 
+  #   repo: string (must be in format owner/repo)
+  #   apiUrl: string (optional)
+  #
+  name: github
+  base: main
+  repo: YOUR_REPO_NAME_HERE
+  token: ${TOKEN}
+
+# =============================================================================
+# Version Control System Configuration
+# =============================================================================
+
+framework:
+  # i18next framework
+  #   name: i18next
+  #   locale: string
+  #   directory: string
+  #
+  # formatjs framework
+  #   name: formatjs
+  #   locale: string
+  #   directory: string
+  #
+  name: i18next
   locale: en
-  
-  # branch: The git branch to read source content from and target for translation PRs
-  #         Typically "main" or "master"
-  branch: main
-  
-  # directory: Relative path from repository root to your locales folder
-  #            Example: "src/locales" or "public/locales"
-  directory: src/locales
-  
-  # =============================================================================
-  # Adapter Configuration
-  # =============================================================================
-  # Configure the source control adapter (currently supports GitHub)
-  
-  adapter: 
-    # name: The adapter type to use for version control
-    #       Currently supported: "github"
-    name: github
-    
-    # repository_name: Full repository path in format "owner/repo-name"
-    #                  Example: "acme-inc/webapp" or "john-doe/my-project"
-    repository_name: ADD_REPOSITORY_NAME_HERE
-    
-    # access_token: GitHub personal access token (loaded from environment variable)
-    #               ⚠️  DO NOT hardcode your token here - use environment variables!
-    #               
-    #               Setup:
-    #               1. Generate token at: https://github.com/settings/tokens
-    #               2. Set environment variable:
-    #                    export GITHUB_ACCESS_TOKEN=ghp_your_token_here
-    #               3. Run LocaleOps - it will automatically load the token
-    #               
-    #               Required permissions:
-    #               - Classic tokens: 'repo' (full access), 'pull_request'
-    #               - Fine-grained tokens: 'Contents' (read/write), 'Pull requests' (read/write)
-    access_token: ${GITHUB_ACCESS_TOKEN}
+  directory: ./locales
