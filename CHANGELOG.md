@@ -1,3 +1,9 @@
+## [0.3.7](https://github.com/localeops/localeops/compare/v0.3.6...v0.3.7) (2025-12-03)
+
+### Bug Fixes
+
+* **ci:** add public config for npm publishing ([92e831c](https://github.com/localeops/localeops/commit/92e831c84517c3574840389d38faa2fa5fae1dc9))
+
 ## [0.3.6](https://github.com/localeops/localeops/compare/v0.3.5...v0.3.6) (2025-12-03)
 
 ### Documentation
