@@ -1,3 +1,9 @@
+## [0.3.8](https://github.com/localeops/localeops/compare/v0.3.7...v0.3.8) (2025-12-03)
+
+### Bug Fixes
+
+* **ci:** resolve npm warnings ([3e493a3](https://github.com/localeops/localeops/commit/3e493a319d12740da0cccf6e167ff301ee64ea77))
+
 ## [0.3.7](https://github.com/localeops/localeops/compare/v0.3.6...v0.3.7) (2025-12-03)
 
 ### Bug Fixes
