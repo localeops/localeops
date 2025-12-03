@@ -1,3 +1,17 @@
+## [0.3.4](https://github.com/localeops/localeops/compare/v0.3.3...v0.3.4) (2025-12-03)
+
+### Bug Fixes
+
+* **ci:** add missing dependency ([be8a6d2](https://github.com/localeops/localeops/commit/be8a6d233707acfb7476480d28c1871a2757aeaf))
+
+### Chores
+
+* **misc:** add cz-customizable config ([5ae0c24](https://github.com/localeops/localeops/commit/5ae0c24f31698de13090177372716392fb321a3c))
+
+### Continuous Integration
+
+* **ci:** publish to npm ([31fabfd](https://github.com/localeops/localeops/commit/31fabfdb63976b015d79a41037052c521ef8786e))
+
 ## [0.3.3](https://github.com/localeops/localeops/compare/v0.3.2...v0.3.3) (2025-11-12)
 
 ### Bug Fixes
