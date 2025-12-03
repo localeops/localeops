@@ -52,6 +52,12 @@
 			}
 		],
 		[
+			"@semantic-release/exec",
+			{
+				"prepareCmd": "bun run build"
+			}
+		],
+		[
 			"@semantic-release/npm",
 			{
 				"npmPublish": true

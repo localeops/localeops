@@ -19,7 +19,18 @@
 		"url": "https://github.com/localeops/localeops/issues"
 	},
 	"homepage": "https://github.com/localeops/localeops#readme",
-	"module": "src/server/index.ts",
+	"publishConfig": {
+		"access": "public"
+	},
+	"bin": {
+		"localeops": "./dist/localeops"
+	},
+	"files": [
+		"dist/localeops",
+		"README.md",
+		"LICENSE",
+		"CHANGELOG.md"
+	],
 	"scripts": {
 		"dev": "bun run --watch src/server/index.ts",
 		"commit": "cz",
@@ -32,6 +43,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "2.3.4",
 		"@semantic-release/changelog": "^6.0.3",
+		"@semantic-release/exec": "^6.0.3",
 		"@semantic-release/git": "^10.0.1",
 		"@types/bun": "latest",
 		"@types/lodash": "^4.17.20",
