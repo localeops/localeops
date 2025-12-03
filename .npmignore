@@ -1,0 +1,36 @@
+# Development files
+.github/
+node_modules/
+*.log
+*.tgz
+
+# Config files
+.releaserc.json
+lefthook.yml
+biome.json
+tsconfig.json
+.cz-config.js
+
+# Documentation
+CONTRIBUTING
+TODO
+CLAUDE.md
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test files
+**/*.test.ts
+**/*.spec.ts
+__tests__/
+coverage/
+
+src/
