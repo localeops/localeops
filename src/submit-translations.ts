@@ -19,17 +19,12 @@ const framework = createFramework(config.framework);
 
 await database.initialize();
 
-const SubmitTranslationSchema = Type.Intersect([
+export const SubmitTranslationSchema = Type.Intersect([
 	UpdateSchema,
 	Type.Object({
 		from: Type.String(),
 	}),
 ]);
-
-const SubmitTranslationsPayload = Type.Object({
-	locale: Type.String(),
-	translations: Type.Array(SubmitTranslationSchema),
-});
 
 type Translation = Static<typeof UpdateSchema>;
 
@@ -85,7 +80,7 @@ const updateTargetResourceFiles = async (
 
 		fs.writeFileSync(fullFilePath, formattedContent, "utf-8");
 
-		const commitMessage = `update ${fullFilePath} with translations`;
+		const commitMessage = `chore(i18n): update translations for ${locale}`;
 
 		source.commitFile({ path: fullFilePath, message: commitMessage });
 	}
@@ -144,18 +139,13 @@ const updateSourceLocaleDirSnapshot = async (
 	source.push(translationsBranch);
 };
 
-const submitTranslations = async () => {
-	const payload = process.env.DISPATCH_PAYLOAD;
-
-	if (!payload) {
-		throw new Error("No dispatch payload");
-	}
-
-	const { locale, translations } = Value.Parse(
-		SubmitTranslationsPayload,
-		JSON.parse(payload),
-	);
-
+const submitTranslations = async ({
+	locale,
+	translations,
+}: {
+	locale: string;
+	translations: SubmitTranslation[];
+}) => {
 	source.checkout(config.source.base);
 
 	const currentSnapshot = framework.snapshotSourceLocaleDir();

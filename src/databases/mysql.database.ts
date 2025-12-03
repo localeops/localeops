@@ -7,9 +7,6 @@ type MySQLDatabaseConfig = Extract<
 	{ name: "mysql" }
 >;
 
-/**
- * MySQL-based database adapter that provides persistent string key-value storage
- */
 export default class MySQLDatabase extends BaseDatabase {
 	private sql: SQL;
 
