@@ -1,3 +1,9 @@
+## [0.3.6](https://github.com/localeops/localeops/compare/v0.3.5...v0.3.6) (2025-12-03)
+
+### Documentation
+
+* **docs:** update docs to trigger npm publishing ([382b260](https://github.com/localeops/localeops/commit/382b2600216f453a26b89a2b9631dfa99c7b21f8))
+
 ## [0.3.5](https://github.com/localeops/localeops/compare/v0.3.4...v0.3.5) (2025-12-03)
 
 ### Documentation
