@@ -1,3 +1,21 @@
+## [0.3.9](https://github.com/localeops/localeops/compare/v0.3.8...v0.3.9) (2025-12-03)
+
+### Chores
+
+* add missing package-lock file ([1c4e7e0](https://github.com/localeops/localeops/commit/1c4e7e09472f46e832924a6fc05618be40e3b337))
+
+### Documentation
+
+* **ci:** make localeops.yml up to date with config ([03e7d5d](https://github.com/localeops/localeops/commit/03e7d5d2eb9fe16dcfb85ba5b0070a2c96a762ea))
+* remove unused .env.example ([df56967](https://github.com/localeops/localeops/commit/df569676125bc17ebc8f5f2e70f2f1ee913b13e5))
+
+### Code Refactoring
+
+* change transport to vcs workflow ([ccc1358](https://github.com/localeops/localeops/commit/ccc1358932daf376ad1ee48f4f9ba31d42c0adab))
+* improvement to path resolution, logging and structure ([bd719c2](https://github.com/localeops/localeops/commit/bd719c2d3ee74d63075b1fb98071b80f64813e7c))
+* **misc:** refactor multiple modules ([ca325bd](https://github.com/localeops/localeops/commit/ca325bd3cc8fb30cd439ec281331958b87312844))
+* remove old state class ([12f8859](https://github.com/localeops/localeops/commit/12f88594167e5ad2541586c6cd44a61c4ccae977))
+
 ## [0.3.8](https://github.com/localeops/localeops/compare/v0.3.7...v0.3.8) (2025-12-03)
 
 ### Bug Fixes
