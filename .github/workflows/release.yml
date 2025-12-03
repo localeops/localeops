@@ -53,4 +53,6 @@ jobs:
         env:
           # Use PAT token to bypass branch protection and push version commits
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          # NPM token for publishing to npm registry
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: bunx semantic-release
