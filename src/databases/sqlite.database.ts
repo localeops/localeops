@@ -1,14 +1,11 @@
 import { Database } from "bun:sqlite";
 import { BaseDatabase } from "./base.database";
 
-/**
- * SQLite-based database adapter that provides persistent string key-value storage
- */
 export class SqliteDatabase extends BaseDatabase {
 	private db: Database;
-	private readonly tableName = "localeops";
 	private readonly keyColumn = "key";
 	private readonly valueColumn = "value";
+	private readonly tableName = "localeops";
 
 	constructor(config: { path: string }) {
 		super();

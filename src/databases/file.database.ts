@@ -5,10 +5,6 @@ import { config } from "../config";
 import { createSource } from "../sources";
 import { BaseDatabase } from "./base.database";
 
-/**
- * File-based database adapter that provides persistent string key-value storage
- */
-
 export class FileDatabase extends BaseDatabase {
 	private dirPath: string;
 
@@ -38,7 +34,6 @@ export class FileDatabase extends BaseDatabase {
 		return null;
 	}
 
-	// TODO: Refactor by moving commiting the change elsewhere
 	async set(key: string, content: string): Promise<void> {
 		const filePath = this.getFilePath(key);
 
@@ -46,7 +41,7 @@ export class FileDatabase extends BaseDatabase {
 
 		const source = createSource(config.source);
 
-		const commitMessage = `store new snapshot`;
+		const commitMessage = `chore(i18n): update snapshot for locale "${key}"`;
 
 		source.commitFile({ path: filePath, message: commitMessage });
 	}

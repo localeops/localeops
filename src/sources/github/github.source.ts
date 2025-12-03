@@ -7,22 +7,22 @@ import type { GitHubPullRequest } from "./github.types";
 type GitHubSourceConfig = Extract<Config["source"], { name: "github" }>;
 
 export class GitHubSource extends BaseSource {
-	token: string;
 	repo: string;
+	token: string;
 	apiUrl: string;
 
 	constructor(config: GitHubSourceConfig) {
 		super(config);
-		this.token = config.token;
 		this.repo = config.repo;
+		this.token = config.token;
 		this.apiUrl = config.apiUrl;
 	}
 
 	private get authHeaders() {
 		return {
+			"Content-Type": "application/json",
 			Authorization: `token ${this.token}`,
 			Accept: "application/vnd.github.v3+json",
-			"Content-Type": "application/json",
 		};
 	}
 

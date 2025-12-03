@@ -19,6 +19,6 @@ export const createFramework = (
 	const _exhaustive: never = name;
 
 	throw new Error(
-		`Unknown database adapter: ${(_exhaustive as { name: string }).name}`,
+		`Unknown framework: ${(_exhaustive as { name: string }).name}`,
 	);
 };
