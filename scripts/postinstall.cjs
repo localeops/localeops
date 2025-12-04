@@ -21,10 +21,7 @@ if (!binaryName) {
 }
 
 const binDir = path.join(__dirname, "..", "bin");
-const binaryPath = path.join(
-	binDir,
-	process.platform === "win32" ? "localeops.exe" : "localeops",
-);
+const binaryPath = path.join(binDir, "localeops");
 
 const url = `https://github.com/${REPO}/releases/download/v${PACKAGE_VERSION}/${binaryName}`;
 
@@ -59,9 +56,7 @@ function download(url, dest) {
 
 download(url, binaryPath)
 	.then(() => {
-		if (process.platform !== "win32") {
-			fs.chmodSync(binaryPath, 0o755);
-		}
+		fs.chmodSync(binaryPath, 0o755);
 		console.log("localeops installed successfully!");
 	})
 	.catch((err) => {
