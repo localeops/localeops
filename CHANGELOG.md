@@ -1,3 +1,9 @@
+## [0.3.12](https://github.com/localeops/localeops/compare/v0.3.11...v0.3.12) (2025-12-04)
+
+### Chores
+
+* **misc:** remove peer dependencies ([e32d7fc](https://github.com/localeops/localeops/commit/e32d7fce3ff034b9927df49e39f1ae0a2359ec7f))
+
 ## [0.3.11](https://github.com/localeops/localeops/compare/v0.3.10...v0.3.11) (2025-12-04)
 
 ### Continuous Integration
