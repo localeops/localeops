@@ -52,7 +52,10 @@
 		"conventional-changelog-conventionalcommits": "^8.0.0",
 		"cz-customizable": "^7.5.1",
 		"lefthook": "^1.13.6",
-		"semantic-release": "^25.0.2"
+		"semantic-release": "^25.0.2",
+		"@sinclair/typebox": "^0.34.41",
+		"lodash": "^4.17.21",
+		"yargs": "^18.0.0"
 	},
 	"peerDependencies": {
 		"typescript": "^5"
@@ -61,11 +64,5 @@
 		"commitizen": {
 			"path": "node_modules/cz-customizable"
 		}
-	},
-	"dependencies": {
-		"@octokit/rest": "^22.0.1",
-		"@sinclair/typebox": "^0.34.41",
-		"lodash": "^4.17.21",
-		"yargs": "^18.0.0"
 	}
 }
