@@ -1,6 +1,6 @@
 {
 	"name": "@localeops/localeops",
-	"version": "0.3.10",
+	"version": "0.3.11",
 	"description": "A flexible localization operations toolkit",
 	"keywords": [
 		"localization",

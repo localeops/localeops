@@ -1,3 +1,9 @@
+## [0.3.11](https://github.com/localeops/localeops/compare/v0.3.10...v0.3.11) (2025-12-04)
+
+### Continuous Integration
+
+* **ci:** fix dependency install in action files ([e3bfc0c](https://github.com/localeops/localeops/commit/e3bfc0c23311d6262e29d743190eea56faa979e3))
+
 ## [0.3.10](https://github.com/localeops/localeops/compare/v0.3.9...v0.3.10) (2025-12-04)
 
 ### Chores
