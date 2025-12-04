@@ -23,10 +23,10 @@
 		"access": "public"
 	},
 	"bin": {
-		"localeops": "dist/localeops"
+		"localeops": "bin/localeops"
 	},
 	"files": [
-		"dist/localeops",
+		"scripts/postinstall.cjs",
 		"README.md",
 		"LICENSE",
 		"CHANGELOG.md"
@@ -37,7 +37,8 @@
 		"check": "biome check",
 		"fix": "biome check --fix",
 		"build": "bun build --compile --minify --production --sourcemap src/index.ts --outfile dist/localeops",
-		"release": "semantic-release"
+		"release": "semantic-release",
+		"postinstall": "node scripts/postinstall.cjs"
 	},
 	"type": "module",
 	"devDependencies": {
