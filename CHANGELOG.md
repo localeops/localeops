@@ -1,3 +1,9 @@
+## [0.3.13](https://github.com/localeops/localeops/compare/v0.3.12...v0.3.13) (2025-12-04)
+
+### Continuous Integration
+
+* **ci:** build macos binary artifact ([aba9934](https://github.com/localeops/localeops/commit/aba993452cca025b781412f25be35f26befad98a))
+
 ## [0.3.12](https://github.com/localeops/localeops/compare/v0.3.11...v0.3.12) (2025-12-04)
 
 ### Chores
