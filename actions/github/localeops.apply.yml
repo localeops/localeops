@@ -1,0 +1,40 @@
+name: apply translations
+
+on:
+  repository_dispatch:
+    types: [localeops_apply]
+
+jobs:
+  apply_translations:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: install localeops
+        run: npm i -g @localeops/localeops
+
+      - name: set env vars
+        run: |
+          echo "LOCALE=${{ github.event.client_payload.locale }}" >> $GITHUB_ENV
+          {
+            echo "TRANSLATIONS<<EOF"
+            echo '${{ toJson(github.event.client_payload.translations) }}'
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: run localeops
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: localeops apply "${LOCALE}" "${TRANSLATIONS}"
