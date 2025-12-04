@@ -1,3 +1,12 @@
+## [0.3.10](https://github.com/localeops/localeops/compare/v0.3.9...v0.3.10) (2025-12-04)
+
+### Chores
+
+* add missing updated bun.lock ([677b715](https://github.com/localeops/localeops/commit/677b715ef08d6bc50ad196f0381107f5cef8c2d7))
+* add postinstall script to download binary ([f82a046](https://github.com/localeops/localeops/commit/f82a046488d931fdd90c9bad6f0e7160e295c134))
+* move all dependencies to devDependencies ([2c849db](https://github.com/localeops/localeops/commit/2c849db0b9283d85277eaa310bfa0c753417198a))
+* remove windows download support ([bb21f6a](https://github.com/localeops/localeops/commit/bb21f6ae3bae5c7800037ee4bf7629d485b942eb))
+
 ## [0.3.9](https://github.com/localeops/localeops/compare/v0.3.8...v0.3.9) (2025-12-03)
 
 ### Chores
