@@ -1,0 +1,29 @@
+name: extract untranslated # Workflow to extract untranslated strings with LocaleOps
+
+on:
+  repository_dispatch:
+    types: [localeops_extract] # Triggered via repository_dispatch event from LocaleOps
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      # Install the LocaleOps CLI globally so we can run `localeops extract`
+      - name: install localeops
+        run: npm i -g @localeops/localeops
+
+      # Pull the locale and callback URL from the event payload into environment variables
+      - name: set env vars
+        run: |
+          echo "LOCALE=${{ github.event.client_payload.locale }}" >> $GITHUB_ENV
+          echo "CALLBACK_URL=${{ github.event.client_payload.callback_url }}" >> $GITHUB_ENV
+
+      # Run LocaleOps to extract untranslated strings for the given locale
+      - name: run localeops
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }} # Pass GitHub token to LocaleOps as TOKEN
+        run: localeops extract "${LOCALE}" "${CALLBACK_URL}"
