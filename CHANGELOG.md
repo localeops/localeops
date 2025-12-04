@@ -1,3 +1,9 @@
+## [0.3.14](https://github.com/localeops/localeops/compare/v0.3.13...v0.3.14) (2025-12-04)
+
+### Chores
+
+* add darwin-arm64 download support ([cec1185](https://github.com/localeops/localeops/commit/cec1185096849591b13ad50b87be2f89c1966801))
+
 ## [0.3.13](https://github.com/localeops/localeops/compare/v0.3.12...v0.3.13) (2025-12-04)
 
 ### Continuous Integration
