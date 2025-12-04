@@ -18,10 +18,8 @@
         "lefthook": "^1.13.6",
         "lodash": "^4.17.21",
         "semantic-release": "^25.0.2",
-        "yargs": "^18.0.0",
-      },
-      "peerDependencies": {
         "typescript": "^5",
+        "yargs": "^18.0.0",
       },
     },
   },
