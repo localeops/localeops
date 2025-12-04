@@ -47,7 +47,7 @@ jobs:
 
       # Install project dependencies
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: bun install --ignore-scripts --frozen-lockfile
 
       # Run semantic-release to analyze commits and create releases
       - name: Release
