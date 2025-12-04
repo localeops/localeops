@@ -29,6 +29,10 @@ jobs:
           - os: ubuntu-latest
             platform: linux-arm64
             target: bun-linux-arm64
+          # macOS ARM64 - Apple Silicon Macs (M1, M2, M3, etc.)
+          - os: macos-latest
+            platform: darwin-arm64
+            target: bun-darwin-arm64
 
     steps:
       # Checkout the repository code
