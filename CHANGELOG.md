@@ -1,3 +1,9 @@
+## [0.3.15](https://github.com/localeops/localeops/compare/v0.3.14...v0.3.15) (2025-12-04)
+
+### Chores
+
+* include bin directory ([93ad78b](https://github.com/localeops/localeops/commit/93ad78b9c51f7629d6626b5ef3ee610f53c5f2d5))
+
 ## [0.3.14](https://github.com/localeops/localeops/compare/v0.3.13...v0.3.14) (2025-12-04)
 
 ### Chores
