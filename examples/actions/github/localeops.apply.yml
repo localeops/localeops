@@ -1,0 +1,43 @@
+name: apply translations # Workflow to apply LocaleOps translations into the repository
+
+on:
+  repository_dispatch:
+    types: [localeops_apply] # Triggered via repository_dispatch event from LocaleOps
+
+jobs:
+  apply_translations:
+    runs-on: ubuntu-latest           # Use the latest Ubuntu runner
+    permissions:
+      contents: write                # Needed to push commits back to the repo
+      pull-requests: write           # Needed if LocaleOps opens/updates PRs
+    
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }} # Authenticate checkout with GitHub token
+
+      - name: configure git
+        run: |
+          git config user.name "github-actions[bot]"       
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Install the LocaleOps CLI globally so we can run `localeops apply`
+      - name: install localeops
+        run: npm i -g @localeops/localeops
+
+      # Pull values from the repository_dispatch payload into environment variables
+      - name: set env vars
+        run: |
+          echo "LOCALE=${{ github.event.client_payload.locale }}" >> $GITHUB_ENV
+          {
+            echo "TRANSLATIONS<<EOF"
+            echo '${{ toJson(github.event.client_payload.translations) }}'
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      # Run LocaleOps to apply translations for the given locale
+      - name: run localeops
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }} # Pass GitHub token to LocaleOps as TOKEN
+        run: localeops apply "${LOCALE}" "${TRANSLATIONS}"
