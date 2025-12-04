@@ -10,6 +10,7 @@ const REPO = "localeops/localeops";
 const PLATFORMS = {
 	"linux-arm64": "localeops-linux-arm64",
 	"linux-x64": "localeops-linux-x64",
+	"darwin-arm64": "localeops-darwin-arm64",
 };
 
 const platform = `${process.platform}-${process.arch}`;
