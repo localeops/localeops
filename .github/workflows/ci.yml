@@ -32,7 +32,7 @@ jobs:
 
       # Install project dependencies
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: bun install --ignore-scripts --frozen-lockfile
 
       # Run Biome checks (linting and formatting)
       - name: Run Biome checks
