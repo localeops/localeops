@@ -1,3 +1,11 @@
+## [0.3.16](https://github.com/localeops/localeops/compare/v0.3.15...v0.3.16) (2025-12-05)
+
+### Documentation
+
+* **docs:** add action examples for github and bitbucket ([1d1772a](https://github.com/localeops/localeops/commit/1d1772a41392010e4d98afaa252a1228d36fabf6))
+* **docs:** add comments to example action files ([21f0594](https://github.com/localeops/localeops/commit/21f059402b58ec3a4c7f638106524fd1cf287038))
+* **docs:** use npx to install localeops ([1c32c06](https://github.com/localeops/localeops/commit/1c32c0673c4d0196519ff97317776d1d5a93ac6b))
+
 ## [0.3.15](https://github.com/localeops/localeops/compare/v0.3.14...v0.3.15) (2025-12-04)
 
 ### Chores
