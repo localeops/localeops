@@ -22,10 +22,6 @@ jobs:
           git config user.name "github-actions[bot]"       
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      # Install the LocaleOps CLI globally so we can run `localeops apply`
-      - name: install localeops
-        run: npm i -g @localeops/localeops
-
       # Pull values from the repository_dispatch payload into environment variables
       - name: set env vars
         run: |
@@ -40,4 +36,4 @@ jobs:
       - name: run localeops
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }} # Pass GitHub token to LocaleOps as TOKEN
-        run: localeops apply "${LOCALE}" "${TRANSLATIONS}"
+        run: npx @localeops/localeops apply "${LOCALE}" "${TRANSLATIONS}"

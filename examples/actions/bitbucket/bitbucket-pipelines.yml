@@ -14,9 +14,8 @@ pipelines:
           caches:
             - node              # Cache node_modules to speed up subsequent runs
           script:
-            - npm i -g @localeops/localeops          # Install the LocaleOps CLI globally
             - export TOKEN="${BITBUCKET_TOKEN}"      # Expose Bitbucket token as TOKEN for LocaleOps
-            - localeops extract "${LOCALE}" "${CALLBACK_URL}" # Run extraction for the given locale and callback
+            - npx @localeops/localeops extract "${LOCALE}" "${CALLBACK_URL}" # Run extraction for the given locale and callback
 
     # Custom pipeline to apply downloaded translations back into the repo
     localeops-apply:
@@ -31,6 +30,5 @@ pipelines:
           script:
             - git config user.name "Bitbucket Pipelines"          # Configure Git author name
             - git config user.email "pipelines@bitbucket.org"     # Configure Git author email
-            - npm i -g @localeops/localeops                       # Install the LocaleOps CLI globally
             - export TOKEN="${BITBUCKET_TOKEN}"                   # Expose Bitbucket token as TOKEN for LocaleOps
-            - localeops apply "${LOCALE}" "${TRANSLATIONS}"       # Apply translations and commit changes
+            - npx @localeops/localeops apply "${LOCALE}" "${TRANSLATIONS}"       # Apply translations and commit changes
