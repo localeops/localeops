@@ -1,3 +1,9 @@
+## [0.3.17](https://github.com/localeops/localeops/compare/v0.3.16...v0.3.17) (2025-12-05)
+
+### Bug Fixes
+
+* **databases:** commit database file after updates in database ([207fdab](https://github.com/localeops/localeops/commit/207fdab8bfb5b41295fdf7d684b6913d44d8652a))
+
 ## [0.3.16](https://github.com/localeops/localeops/compare/v0.3.15...v0.3.16) (2025-12-05)
 
 ### Documentation
