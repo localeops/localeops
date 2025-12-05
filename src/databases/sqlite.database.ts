@@ -1,5 +1,6 @@
 import { Database } from "bun:sqlite";
-import type { Config } from "../config";
+import { type Config, config } from "../config";
+import { createSource } from "../sources";
 import { BaseDatabase } from "./base.database";
 
 type SqliteDatabaseConfig = Extract<
@@ -51,5 +52,11 @@ export class SqliteDatabase extends BaseDatabase {
 			 ON CONFLICT(${this.keyColumn}) DO UPDATE SET ${this.valueColumn} = excluded.${this.valueColumn}`,
 			[key, content],
 		);
+
+		const source = createSource(config.source);
+
+		const commitMessage = `chore(i18n): update snapshot for locale "${key}"`;
+
+		source.commitFile({ path: this.db.filename, message: commitMessage });
 	}
 }
