@@ -1,3 +1,9 @@
+## [0.3.24](https://github.com/localeops/localeops/compare/v0.3.23...v0.3.24) (2025-12-06)
+
+### Continuous Integration
+
+* skip frozen-lockfile for dependabot PRs ([b8f4a40](https://github.com/localeops/localeops/commit/b8f4a4033b7a3695cae124e8a80a299f1a4b06e1))
+
 ## [0.3.23](https://github.com/localeops/localeops/compare/v0.3.22...v0.3.23) (2025-12-06)
 
 ### Continuous Integration
