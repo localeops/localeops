@@ -1,3 +1,9 @@
+## [0.3.19](https://github.com/localeops/localeops/compare/v0.3.18...v0.3.19) (2025-12-06)
+
+### Build System
+
+* **deps-dev:** bump js-yaml from 4.1.0 to 4.1.1 ([c911e8c](https://github.com/localeops/localeops/commit/c911e8c8b8a88c37b5c0680581703f479a3f2853))
+
 ## [0.3.18](https://github.com/localeops/localeops/compare/v0.3.17...v0.3.18) (2025-12-06)
 
 ### Code Refactoring
