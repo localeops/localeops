@@ -62,7 +62,7 @@ jobs:
 
       # Install project dependencies
       - name: Install dependencies
-        run: bun install --ignore-scripts --frozen-lockfile
+        run: bun install --ignore-scripts
 
       # Build the standalone binary for the target platform
       # --compile: Creates a standalone executable
