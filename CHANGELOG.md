@@ -1,3 +1,9 @@
+## [0.3.31](https://github.com/localeops/localeops/compare/v0.3.30...v0.3.31) (2025-12-06)
+
+### Code Refactoring
+
+* **cli:** reserve stdout for application output ([3382295](https://github.com/localeops/localeops/commit/338229590ccd82f7bc9a9fefece1c8bdf86a52a6))
+
 ## [0.3.30](https://github.com/localeops/localeops/compare/v0.3.29...v0.3.30) (2025-12-06)
 
 ### Code Refactoring
