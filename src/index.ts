@@ -64,6 +64,8 @@ async function handleExtract(locales: string[]) {
 
 	logger.debug("Extracted diffs:", diffs);
 
+	console.log(JSON.stringify(diffs, null, 2));
+
 	return diffs;
 }
 
