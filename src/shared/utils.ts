@@ -2,13 +2,10 @@ export const getTranslationBranchName = (locale: string) => {
 	return `tr/${locale}`;
 };
 
-export function runCommand(
-	command: string[],
-	options: { stdio: "inherit" | "ignore" } = { stdio: "ignore" },
-): void {
+export function runCommand(command: string[]): void {
 	const result = Bun.spawnSync(command, {
-		stdout: options.stdio === "inherit" ? "inherit" : "ignore",
-		stderr: options.stdio === "inherit" ? "inherit" : "ignore",
+		stdout: "ignore",
+		stderr: "inherit",
 		stdin: "inherit",
 	});
 
