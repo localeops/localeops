@@ -1,3 +1,9 @@
+## [0.3.23](https://github.com/localeops/localeops/compare/v0.3.22...v0.3.23) (2025-12-06)
+
+### Continuous Integration
+
+* **deps:** bump actions/setup-node from 4 to 6 ([2a734ba](https://github.com/localeops/localeops/commit/2a734bae0744337fd8cfe4d4514066760ff08ab3))
+
 ## [0.3.22](https://github.com/localeops/localeops/compare/v0.3.21...v0.3.22) (2025-12-06)
 
 ### Continuous Integration
