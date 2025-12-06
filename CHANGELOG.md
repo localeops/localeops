@@ -1,3 +1,10 @@
+## [0.3.18](https://github.com/localeops/localeops/compare/v0.3.17...v0.3.18) (2025-12-06)
+
+### Code Refactoring
+
+* **databases:** remove sqlite and mysql adapters ([fc721cd](https://github.com/localeops/localeops/commit/fc721cd11a6cadcd9c8c95e00356e14d1d96fa33))
+* **sources:** remove bitbucket source adapter ([8635f82](https://github.com/localeops/localeops/commit/8635f82abf8e4cfe96d6fa447c7f573f6a766463))
+
 ## [0.3.17](https://github.com/localeops/localeops/compare/v0.3.16...v0.3.17) (2025-12-05)
 
 ### Bug Fixes
