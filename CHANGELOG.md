@@ -1,3 +1,9 @@
+## [0.3.28](https://github.com/localeops/localeops/compare/v0.3.27...v0.3.28) (2025-12-06)
+
+### Code Refactoring
+
+* **cli:** use config for extracting ([ebb5ecd](https://github.com/localeops/localeops/commit/ebb5ecd3ea81990b4e5d73be9967c3742893447d))
+
 ## [0.3.27](https://github.com/localeops/localeops/compare/v0.3.26...v0.3.27) (2025-12-06)
 
 ### Chores
