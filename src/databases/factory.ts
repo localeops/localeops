@@ -2,8 +2,6 @@ import type { Config } from "../config";
 import { resolveConfigPath } from "../shared/paths";
 import type { BaseDatabase } from "./base.database";
 import { FileDatabase } from "./file.database";
-import MySQLDatabase from "./mysql.database";
-import { SqliteDatabase } from "./sqlite.database";
 
 export const createDatabase = async (
 	databaseConfig: Config["database"],
@@ -14,18 +12,6 @@ export const createDatabase = async (
 		return new FileDatabase({
 			dirPath: resolveConfigPath(adapter.dirPath),
 		});
-	}
-
-	if (adapter.name === "sqlite") {
-		return new SqliteDatabase({
-			name: adapter.name,
-			table: adapter.table,
-			path: resolveConfigPath(adapter.path),
-		});
-	}
-
-	if (adapter.name === "mysql") {
-		return new MySQLDatabase(adapter);
 	}
 
 	if (adapter.name === "custom") {

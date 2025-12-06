@@ -13,20 +13,6 @@ export const configSchema = Type.Object({
 				dirPath: Type.String(),
 			}),
 			Type.Object({
-				name: Type.Literal("sqlite"),
-				path: Type.String({ pattern: "^(:memory:|.*\\.db)$" }),
-				table: Type.String(),
-			}),
-			Type.Object({
-				name: Type.Literal("mysql"),
-				port: Type.Number(),
-				hostname: Type.String(),
-				username: Type.String(),
-				password: Type.Optional(Type.String()),
-				database: Type.String(),
-				table: Type.String(),
-			}),
-			Type.Object({
 				name: Type.Literal("custom"),
 				path: Type.String({ pattern: "\\.(ts|js)$" }),
 			}),
