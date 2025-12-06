@@ -1,3 +1,9 @@
+## [0.3.30](https://github.com/localeops/localeops/compare/v0.3.29...v0.3.30) (2025-12-06)
+
+### Code Refactoring
+
+* set stdout to ignore by default for running commands ([0eae950](https://github.com/localeops/localeops/commit/0eae9509c593e34f004d70ab28570de16906468a))
+
 ## [0.3.29](https://github.com/localeops/localeops/compare/v0.3.28...v0.3.29) (2025-12-06)
 
 ### Code Refactoring
