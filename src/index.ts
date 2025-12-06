@@ -2,11 +2,9 @@ import { Type } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
+import submitTranslations, { SubmitTranslationSchema } from "./apply";
 import { extract } from "./extract";
 import { logger } from "./shared/logger";
-import submitTranslations, {
-	SubmitTranslationSchema,
-} from "./submit-translations";
 
 yargs(hideBin(process.argv))
 	.command(
