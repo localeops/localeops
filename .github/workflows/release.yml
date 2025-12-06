@@ -25,7 +25,7 @@ jobs:
     steps:
       # Checkout the repository code
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           # fetch-depth: 0 fetches all history for all branches and tags
           # This is required for semantic-release to analyze all commits

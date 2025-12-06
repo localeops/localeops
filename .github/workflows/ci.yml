@@ -16,7 +16,7 @@ jobs:
     steps:
       # Checkout the repository code
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Setup Node.js LTS
       - name: Setup Node.js
