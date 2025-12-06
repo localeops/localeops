@@ -1,3 +1,9 @@
+## [0.3.26](https://github.com/localeops/localeops/compare/v0.3.25...v0.3.26) (2025-12-06)
+
+### Chores
+
+* **deps-dev:** bump conventional-changelog-conventionalcommits ([b374e52](https://github.com/localeops/localeops/commit/b374e523b4745ad96993bf136a488d61e6098d5a))
+
 ## [0.3.25](https://github.com/localeops/localeops/compare/v0.3.24...v0.3.25) (2025-12-06)
 
 ### Chores
