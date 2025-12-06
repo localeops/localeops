@@ -1,3 +1,13 @@
+## [0.3.25](https://github.com/localeops/localeops/compare/v0.3.24...v0.3.25) (2025-12-06)
+
+### Chores
+
+* **deps-dev:** bump @semantic-release/exec from 6.0.3 to 7.1.0 ([72ae5e8](https://github.com/localeops/localeops/commit/72ae5e861367ae3745191044174d1de0216fd36b))
+
+### Continuous Integration
+
+* use pull_request.user.login for dependabot detection ([4f7f1c2](https://github.com/localeops/localeops/commit/4f7f1c280accab78ca2fe02696783fc05b9ad474))
+
 ## [0.3.24](https://github.com/localeops/localeops/compare/v0.3.23...v0.3.24) (2025-12-06)
 
 ### Continuous Integration
