@@ -1,3 +1,9 @@
+## [0.3.29](https://github.com/localeops/localeops/compare/v0.3.28...v0.3.29) (2025-12-06)
+
+### Code Refactoring
+
+* **cli:** log extract command output to be consumed in later steps ([fb4f2e7](https://github.com/localeops/localeops/commit/fb4f2e7329e697841748c9d703f81210692eb1e8))
+
 ## [0.3.28](https://github.com/localeops/localeops/compare/v0.3.27...v0.3.28) (2025-12-06)
 
 ### Code Refactoring
