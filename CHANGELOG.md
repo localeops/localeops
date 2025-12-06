@@ -1,3 +1,9 @@
+## [0.3.33](https://github.com/localeops/localeops/compare/v0.3.32...v0.3.33) (2025-12-06)
+
+### Documentation
+
+* add README formatting ([5d7152c](https://github.com/localeops/localeops/commit/5d7152c795319001427ebfc5a63d87192643d5b3))
+
 ## [0.3.32](https://github.com/localeops/localeops/compare/v0.3.31...v0.3.32) (2025-12-06)
 
 ### Documentation
