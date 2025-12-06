@@ -1,3 +1,14 @@
+## [0.3.27](https://github.com/localeops/localeops/compare/v0.3.26...v0.3.27) (2025-12-06)
+
+### Chores
+
+* **deps-dev:** bump lefthook from 1.13.6 to 2.0.8 ([b8497f0](https://github.com/localeops/localeops/commit/b8497f01ae2cc13614066ca6ad1cdc2c7a692c6b))
+* **deps-dev:** bump the development-dependencies group with 2 updates ([ec89747](https://github.com/localeops/localeops/commit/ec897474ec1e1e2b2fa5aa549ae14e29bdc94eba))
+
+### Continuous Integration
+
+* remove frozen-lockfile from release and build workflows ([9337ec4](https://github.com/localeops/localeops/commit/9337ec49e0e4b3faaf793377084779e6be3cb967))
+
 ## [0.3.26](https://github.com/localeops/localeops/compare/v0.3.25...v0.3.26) (2025-12-06)
 
 ### Chores
