@@ -1,3 +1,9 @@
+## [0.3.20](https://github.com/localeops/localeops/compare/v0.3.19...v0.3.20) (2025-12-06)
+
+### Continuous Integration
+
+* **dep:** add dependabot configuration for automated dependency updates ([b777963](https://github.com/localeops/localeops/commit/b777963e48b7a98612a3bd8908bbed1679077883))
+
 ## [0.3.19](https://github.com/localeops/localeops/compare/v0.3.18...v0.3.19) (2025-12-06)
 
 ### Build System
