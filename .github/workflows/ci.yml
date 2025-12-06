@@ -34,7 +34,7 @@ jobs:
       # Skip --frozen-lockfile for Dependabot to allow lockfile updates
       - name: Install dependencies
         run: |
-          if [[ "${{ github.actor }}" == "dependabot[bot]" ]]; then
+          if [[ "${{ github.event.pull_request.user.login }}" == "dependabot[bot]" ]]; then
             bun install --ignore-scripts
           else
             bun install --ignore-scripts --frozen-lockfile
