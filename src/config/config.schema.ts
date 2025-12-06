@@ -27,4 +27,5 @@ export const configSchema = Type.Object({
 			apiUrl: Type.Optional(Type.String({ default: "https://api.github.com" })),
 		}),
 	]),
+	locales: Type.Array(Type.String()),
 });
