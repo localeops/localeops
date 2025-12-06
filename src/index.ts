@@ -3,29 +3,21 @@ import { Value } from "@sinclair/typebox/value";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import submitTranslations, { SubmitTranslationSchema } from "./apply";
+import { config } from "./config";
 import { extract } from "./extract";
+import type { SnapshotDelta } from "./framework/base/base.types";
 import { logger } from "./shared/logger";
 
 yargs(hideBin(process.argv))
 	.command(
-		"extract <locale> <callback-url>",
-		"Extract untranslated strings and send to callback URL",
-		(yargs) => {
-			return yargs
-				.positional("locale", {
-					type: "string",
-					demandOption: true,
-					describe: "Target locale to extract translations for",
-				})
-				.positional("callback-url", {
-					type: "string",
-					demandOption: true,
-					describe: "URL to send the extracted translations to",
-				});
-		},
-		async (argv) => {
+		"extract",
+		"Return untranslated strings for configured locales",
+		{},
+		async () => {
 			try {
-				await handleExtract(argv.locale, argv["callback-url"]);
+				const locales = config.locales;
+
+				await handleExtract(locales);
 			} catch (err) {
 				logger.error(err instanceof Error ? err.message : "Unknown", err);
 				process.exit(1);
@@ -62,18 +54,17 @@ yargs(hideBin(process.argv))
 	.strict()
 	.parse();
 
-async function handleExtract(locale: string, callbackUrl: string) {
-	const ExtractPayloadSchema = Type.Object({
-		locale: Type.String(),
-		callbackUrl: Type.String(),
-	});
+async function handleExtract(locales: string[]) {
+	const diffs: Record<string, SnapshotDelta[]> = {};
 
-	const validated = Value.Parse(ExtractPayloadSchema, {
-		locale,
-		callbackUrl,
-	});
+	for (const locale of locales) {
+		const diff = await extract({ locale });
+		diffs[locale] = diff;
+	}
 
-	await extract(validated);
+	logger.debug("Extracted diffs:", diffs);
+
+	return diffs;
 }
 
 async function handleApply(locale: string, translationsJson: string) {
