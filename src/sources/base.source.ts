@@ -13,16 +13,18 @@ export abstract class BaseSource {
 		logger.debug(`[BaseSource] Checking out branch "${branch}"`);
 
 		try {
-			runCommand(["git", "rev-parse", "--verify", branch], {
-				stdio: "ignore",
-			});
+			runCommand(["git", "rev-parse", "--verify", branch]);
 			runCommand(["git", "checkout", branch]);
 		} catch {
 			try {
-				runCommand(
-					["git", "ls-remote", "--exit-code", "--heads", "origin", branch],
-					{ stdio: "ignore" },
-				);
+				runCommand([
+					"git",
+					"ls-remote",
+					"--exit-code",
+					"--heads",
+					"origin",
+					branch,
+				]);
 
 				logger.debug(`[BaseSource] Fetching remote branch "${branch}"`);
 				runCommand(["git", "fetch", "origin", branch]);
