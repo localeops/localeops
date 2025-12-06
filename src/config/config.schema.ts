@@ -26,14 +26,5 @@ export const configSchema = Type.Object({
 			token: Type.String(),
 			apiUrl: Type.Optional(Type.String({ default: "https://api.github.com" })),
 		}),
-		Type.Object({
-			name: Type.Literal("bitbucket"),
-			base: Type.String(),
-			repo: Type.String(),
-			token: Type.String(),
-			apiUrl: Type.Optional(
-				Type.String({ default: "https://api.bitbucket.org/2.0" }),
-			),
-		}),
 	]),
 });

@@ -1,6 +1,5 @@
 import type { Config } from "../config/config";
 import type { BaseSource } from "./base.source";
-import { BitbucketSource } from "./bitbucket/bitbucket.source";
 import { GitHubSource } from "./github/github.source";
 
 export const createSource = (config: Config["source"]): BaseSource => {
@@ -8,10 +7,6 @@ export const createSource = (config: Config["source"]): BaseSource => {
 
 	if (name === "github") {
 		return new GitHubSource(config);
-	}
-
-	if (name === "bitbucket") {
-		return new BitbucketSource(config);
 	}
 
 	const _exhaustive: never = name;

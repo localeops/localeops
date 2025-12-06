@@ -41,12 +41,6 @@ source:
   #   repo: string (must be in format owner/repo)
   #   apiUrl: string (optional)
   #
-  # bitbucket source
-  #   name: bitbucket
-  #   base: string 
-  #   repo: string (must be in format owner/repo)
-  #   apiUrl: string (optional)
-  #
   name: github
   base: main
   repo: YOUR_REPO_NAME_HERE
