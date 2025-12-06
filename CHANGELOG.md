@@ -1,3 +1,9 @@
+## [0.3.21](https://github.com/localeops/localeops/compare/v0.3.20...v0.3.21) (2025-12-06)
+
+### Continuous Integration
+
+* **deps:** bump actions/upload-artifact from 4 to 5 ([59a0928](https://github.com/localeops/localeops/commit/59a0928356f9dce13ac61c49e00055eef6cd4214))
+
 ## [0.3.20](https://github.com/localeops/localeops/compare/v0.3.19...v0.3.20) (2025-12-06)
 
 ### Continuous Integration
