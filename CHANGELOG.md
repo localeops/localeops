@@ -1,3 +1,9 @@
+## [0.3.22](https://github.com/localeops/localeops/compare/v0.3.21...v0.3.22) (2025-12-06)
+
+### Continuous Integration
+
+* **deps:** bump actions/checkout from 4 to 6 ([edbd137](https://github.com/localeops/localeops/commit/edbd1370698818ce7f7d7f704ac1a61da981a9c0))
+
 ## [0.3.21](https://github.com/localeops/localeops/compare/v0.3.20...v0.3.21) (2025-12-06)
 
 ### Continuous Integration
