@@ -151,6 +151,10 @@ const submitTranslations = async ({
 	locale: string;
 	translations: SubmitTranslation[];
 }) => {
+	if (translations.length === 0) {
+		return;
+	}
+
 	source.checkout(config.source.base);
 
 	const currentSnapshot = framework.snapshotSourceLocaleDir();
