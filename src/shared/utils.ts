@@ -1,5 +1,5 @@
 export const getTranslationBranchName = (locale: string) => {
-	return `tr/${locale}`;
+	return `localeops/${locale}`;
 };
 
 export function runCommand(command: string[]): void {

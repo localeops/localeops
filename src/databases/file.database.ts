@@ -13,9 +13,7 @@ export class FileDatabase extends BaseDatabase {
 		this.dirPath = config.dirPath;
 	}
 
-	async initialize(): Promise<void> {
-		await fs.mkdir(this.dirPath, { recursive: true });
-	}
+	async initialize(): Promise<void> {}
 
 	getFilePath(key: string) {
 		const fileName = `${key}.json`;
@@ -35,6 +33,8 @@ export class FileDatabase extends BaseDatabase {
 	}
 
 	async set(key: string, content: string): Promise<void> {
+		await fs.mkdir(this.dirPath, { recursive: true });
+
 		const filePath = this.getFilePath(key);
 
 		await fs.writeFile(filePath, content, "utf8");
