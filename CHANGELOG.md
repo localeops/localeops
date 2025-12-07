@@ -1,3 +1,9 @@
+## [0.3.35](https://github.com/localeops/localeops/compare/v0.3.34...v0.3.35) (2025-12-07)
+
+### Bug Fixes
+
+* **databases:** fix create directory on setting value ([dbcd3b2](https://github.com/localeops/localeops/commit/dbcd3b204a9e4ff4bc0a680950ccbbee230a42c8))
+
 ## [0.3.34](https://github.com/localeops/localeops/compare/v0.3.33...v0.3.34) (2025-12-07)
 
 ### Bug Fixes
