@@ -92,7 +92,7 @@ const updateTargetResourceFiles = async (
 
 	const description = `This PR updates translation files for locale: ${locale}`;
 
-	source.ensurePullRequest({
+	await source.ensurePullRequest({
 		description,
 		title,
 		branch: translationsBranch,
