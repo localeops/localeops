@@ -1,3 +1,13 @@
+## [0.3.34](https://github.com/localeops/localeops/compare/v0.3.33...v0.3.34) (2025-12-07)
+
+### Bug Fixes
+
+* **apply:** return if not translation passed to apply ([d22718d](https://github.com/localeops/localeops/commit/d22718d36454e7a38d74923514b52d74d5eedb57))
+
+### Chores
+
+* reduce release cadence ([47e53fc](https://github.com/localeops/localeops/commit/47e53fcf4f3a26ca5592eaddf46c0989d74c9f60))
+
 ## [0.3.33](https://github.com/localeops/localeops/compare/v0.3.32...v0.3.33) (2025-12-06)
 
 ### Documentation
