@@ -39,6 +39,20 @@ You remain fully in control of the translation provider, workflow, and file form
 
 ## How LocaleOps Works
 
+```
+main branch update
+      │
+      ├──▶ localeops extract (snapshot + diff)
+      │
+      ├──▶ send to translator / AI
+      │
+      ├──▶ receive translated output
+      │
+      ├──▶ localeops apply (update locale files + snapshot)
+      │
+      └──▶ PR with updated translations
+```
+
 LocaleOps provides two core commands:
 
 ### `localeops extract`
