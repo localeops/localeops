@@ -1,24 +1,16 @@
-type Formatting = {
-	indent: string;
-	eol: string;
-	tail: string;
+export type Formatting = {
+	indent: string; // tabs or spaces for nesting
+	eol: string; // \n or \r\n
+	tail: string; // trailing newline or not
 };
 
-export const inferFormatting = (raw: string): Formatting => {
-	const eol = raw.includes("\r\n") ? "\r\n" : "\n";
-	const tail = raw.endsWith(eol) ? eol : "";
-	const indentMatch = raw.match(/^[\t ]+(?=")/m);
-	const indent = indentMatch ? indentMatch[0] : "  ";
-	return { indent, eol, tail };
-};
-
-export const formatContent = ({
-	content,
+export const formatJson = ({
+	resource,
 	formatting,
 }: {
-	content: unknown;
+	resource: unknown;
 	formatting: Formatting;
 }) => {
 	const { indent, eol, tail } = formatting;
-	return JSON.stringify(content, null, indent).replace(/\n/g, eol) + tail;
+	return JSON.stringify(resource, null, indent).replace(/\n/g, eol) + tail;
 };

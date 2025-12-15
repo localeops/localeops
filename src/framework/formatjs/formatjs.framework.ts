@@ -1,109 +1,35 @@
-import fs from "node:fs";
 import { Value } from "@sinclair/typebox/value";
 import get from "lodash/get";
 import set from "lodash/set";
-import { logger } from "../../shared/logger";
+import type { Formatting } from "../../shared/formatting";
+import { formatJson } from "../../shared/formatting";
 import { BaseFramework } from "../base/base.framework";
-import type {
-	Path,
-	ResourceDelta,
-	Snapshot,
-	SnapshotDelta,
-	Update,
-} from "../base/base.types";
+import type { Path, ResourceDelta, ResourceUpdate } from "../base/base.types";
 import { FormatjsResourceSchema } from "./formatjs.schema";
 import type { FormatjsResource } from "./formatjs.types";
 
 export class FormatjsFramework extends BaseFramework<FormatjsResource> {
-	readResourceFile(path: string): {
-		resource: FormatjsResource;
-		raw: string | null;
-	} {
-		try {
-			const raw = fs.readFileSync(path, { encoding: "utf-8" });
-			const resource = Value.Parse(FormatjsResourceSchema, JSON.parse(raw));
-			return { resource, raw };
-		} catch {
-			return { resource: {}, raw: null };
-		}
+	private formatting: Formatting = {
+		eol: "\n",
+		indent: "\t",
+		tail: "\n",
+	};
+
+	deserialize(raw: string) {
+		return Value.Parse(FormatjsResourceSchema, JSON.parse(raw));
 	}
 
-	diffSnapshots({
-		oldSnapshot,
-		newSnapshot,
-	}: {
-		oldSnapshot: Snapshot<FormatjsResource>;
-		newSnapshot: Snapshot<FormatjsResource>;
-	}): SnapshotDelta[] {
-		const changes: SnapshotDelta[] = [];
-
-		const oldSnapshotFilePaths = new Set(Object.keys(oldSnapshot));
-		const newSnapshotFilePaths = new Set(Object.keys(newSnapshot));
-
-		// Added file path
-		for (const filePath of newSnapshotFilePaths) {
-			if (!oldSnapshotFilePaths.has(filePath)) {
-				if (newSnapshotFilePaths.has(filePath)) {
-					const newRes = newSnapshot[filePath];
-
-					if (!newRes) {
-						throw new Error(`Invariant: newSnapshot[${filePath}] is missing`);
-					}
-
-					const resourceDeltas = this.diffResources({
-						oldResource: {},
-						newResource: newRes,
-						path: [],
-					});
-
-					changes.push(...resourceDeltas.map((d) => ({ ...d, filePath })));
-				}
-			}
-		}
-
-		// Removed file path
-		for (const filePath of oldSnapshotFilePaths) {
-			if (!newSnapshotFilePaths.has(filePath)) {
-				if (oldSnapshotFilePaths.has(filePath)) {
-					// TODO: return translation file removed delta
-					logger.debug(`File ${filePath} was removed`);
-				}
-			}
-		}
-
-		// File path present in both: compare resources
-		for (const filePath of newSnapshotFilePaths) {
-			if (newSnapshotFilePaths.has(filePath)) {
-				if (oldSnapshotFilePaths.has(filePath)) {
-					const oldResource = oldSnapshot[filePath];
-					const newResource = newSnapshot[filePath];
-
-					if (!oldResource) {
-						throw new Error(`Invariant: oldSnapshot[${filePath}] is missing`);
-					}
-
-					if (!newResource) {
-						throw new Error(`Invariant: newSnapshot[${filePath}] is missing`);
-					}
-
-					const resourceDeltas = this.diffResources({
-						oldResource,
-						newResource,
-						path: [],
-					});
-
-					changes.push(...resourceDeltas.map((d) => ({ ...d, filePath })));
-				}
-			}
-		}
-
-		return changes;
+	serialize(resource: FormatjsResource) {
+		return formatJson({
+			resource,
+			formatting: this.formatting,
+		});
 	}
 
-	diffResources({
-		oldResource,
+	diff({
+		oldResource = {},
 		newResource,
-		path,
+		path = [],
 	}: {
 		oldResource: FormatjsResource;
 		newResource: FormatjsResource;
@@ -179,7 +105,7 @@ export class FormatjsFramework extends BaseFramework<FormatjsResource> {
 		return changes;
 	}
 
-	getValueFromResource({
+	resolve({
 		resource,
 		resourcePath,
 	}: {
@@ -189,8 +115,8 @@ export class FormatjsFramework extends BaseFramework<FormatjsResource> {
 		return get(resource, resourcePath);
 	}
 
-	updateValuesInResource(params: {
-		updates: Update[];
+	patch(params: {
+		updates: ResourceUpdate[];
 		resource?: FormatjsResource;
 	}): FormatjsResource {
 		const resource = params.resource ?? {};

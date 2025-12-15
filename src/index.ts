@@ -2,7 +2,7 @@ import { Type } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import submitTranslations, { SubmitTranslationSchema } from "./apply";
+import submitTranslations, { TranslationSchema } from "./apply";
 import { config } from "./config";
 import { extract } from "./extract";
 import type { SnapshotDelta } from "./framework/base/base.types";
@@ -70,7 +70,7 @@ async function handleExtract(locales: string[]) {
 async function handleApply(locale: string, translationsJson: string) {
 	const ApplyPayloadSchema = Type.Object({
 		locale: Type.String(),
-		translations: Type.Array(SubmitTranslationSchema),
+		translations: Type.Array(TranslationSchema),
 	});
 
 	const translations = JSON.parse(translationsJson);
