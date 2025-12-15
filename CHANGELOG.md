@@ -1,3 +1,24 @@
+## [0.3.36](https://github.com/localeops/localeops/compare/v0.3.35...v0.3.36) (2025-12-15)
+
+### Bug Fixes
+
+* **ci:** pin exact dependency versions and remove frozen-lockfile check ([19375c4](https://github.com/localeops/localeops/commit/19375c4d1e411fd7d6ef2d38d1a6b64516fbf4a2))
+
+### Chores
+
+* **deps-dev:** bump @types/bun in the development-dependencies group ([87947c8](https://github.com/localeops/localeops/commit/87947c8e059e83455b4e4bd090b818a8aecfe0da))
+* **deps-dev:** bump lefthook in the development-dependencies group ([d1fdef9](https://github.com/localeops/localeops/commit/d1fdef9c48f76f7f14d121747fd976a7eead348b))
+
+### Documentation
+
+* add basic diagram of localeops workflow ([e73feaf](https://github.com/localeops/localeops/commit/e73feaf999b315611755c5b9670523fb1f0d12ab))
+* **docs:** improve readme.md ([89e23c1](https://github.com/localeops/localeops/commit/89e23c13b2b9e6d654e649b9bdb57ba6d4b7d5f3))
+
+### Continuous Integration
+
+* **deps:** bump actions/cache from 4 to 5 ([5b475a3](https://github.com/localeops/localeops/commit/5b475a32377f5c7805490a8b939aac9749ac4055))
+* **deps:** bump actions/upload-artifact from 5 to 6 ([ea52588](https://github.com/localeops/localeops/commit/ea5258873e3b35ee1ad508f5ac270b36affdf643))
+
 ## [0.3.35](https://github.com/localeops/localeops/compare/v0.3.34...v0.3.35) (2025-12-07)
 
 ### Bug Fixes
