@@ -37,6 +37,8 @@
 		"commit": "cz",
 		"check": "biome check",
 		"fix": "biome check --fix",
+		"test": "bun test",
+		"test:watch": "bun test --watch",
 		"build": "bun build --compile --minify --production --sourcemap src/index.ts --outfile dist/localeops",
 		"release": "semantic-release",
 		"postinstall": "node scripts/postinstall.cjs"
