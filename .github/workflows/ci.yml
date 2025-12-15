@@ -31,14 +31,8 @@ jobs:
           bun-version: latest
 
       # Install project dependencies
-      # Skip --frozen-lockfile for Dependabot to allow lockfile updates
       - name: Install dependencies
-        run: |
-          if [[ "${{ github.event.pull_request.user.login }}" == "dependabot[bot]" ]]; then
-            bun install --ignore-scripts
-          else
-            bun install --ignore-scripts --frozen-lockfile
-          fi
+        run: bun install --ignore-scripts
 
       # Run Biome checks (linting and formatting)
       - name: Run Biome checks
