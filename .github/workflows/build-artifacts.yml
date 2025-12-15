@@ -37,23 +37,25 @@ jobs:
     steps:
       # Checkout the repository code
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
 
       # Setup Node.js LTS (required for some dependencies)
       - name: Setup Node.js LTS
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
         with:
           node-version: 'lts/*'
 
       # Setup Bun runtime for building
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2.0.2
         with:
           bun-version: latest
 
       # Cache Bun dependencies for faster builds
       - name: Cache Bun dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         with:
           path: ~/.bun/install/cache
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
@@ -96,7 +98,7 @@ jobs:
       # Upload the binary and checksum to the GitHub release
       # Uses PAT_TOKEN because this runs on release event
       - name: Upload artifacts to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
         with:
           files: |
             dist/localeops-${{ matrix.platform }}
@@ -107,7 +109,7 @@ jobs:
       # Upload as workflow artifacts for debugging
       - name: Upload workflow artifacts
         if: failure()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: debug-${{ matrix.platform }}
           path: dist/
