@@ -1,5 +1,4 @@
 import { Value } from "@sinclair/typebox/value";
-
 import { config } from "./config";
 import { createDatabase } from "./databases/factory";
 import { SnapshotSchema } from "./framework/base/base.schema";
@@ -24,9 +23,11 @@ export async function extract(params: {
 
 	try {
 		const localeBranchName = getTranslationBranchName(locale);
+
 		source.checkout(localeBranchName);
 
 		const oldSnapshot = await database.get(locale);
+
 		const oldSnapshotParsed = oldSnapshot
 			? Value.Parse(SnapshotSchema, JSON.parse(oldSnapshot))
 			: {};
@@ -34,7 +35,8 @@ export async function extract(params: {
 		logger.debug("Old snapshot", oldSnapshotParsed);
 
 		source.checkout(config.source.base);
-		const newSnapshot = framework.snapshotSourceLocaleDir();
+
+		const newSnapshot = framework.snapshot();
 
 		logger.debug("New snapshot", newSnapshot);
 
@@ -46,8 +48,8 @@ export async function extract(params: {
 		logger.debug("Snapshot diff", diff);
 
 		return diff;
-	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error);
+	} catch (err) {
+		const message = err instanceof Error ? err.message : String(err);
 		throw new Error(`Error extracting untranslated\n${message}`);
 	}
 }

@@ -1,11 +1,7 @@
 import type { Static } from "@sinclair/typebox";
-import type { UpdateSchema } from "./base.schema";
+import type { PathSchema, ResourceUpdateSchema } from "./base.schema";
 
-export type Path = Array<string | number>;
-
-export type SnapshotDelta = ResourceDelta & {
-	filePath: string;
-};
+export type Path = Static<typeof PathSchema>;
 
 type ResourceBaseDelta = {
 	resourcePath: Path;
@@ -28,9 +24,13 @@ type ResourceRemovedDelta = ResourceBaseDelta & {
 
 export type ResourceDelta =
 	| ResourceAddedDelta
-	| ResourceRemovedDelta
-	| ResourceChangedDelta;
+	| ResourceChangedDelta
+	| ResourceRemovedDelta;
 
-export type Update = Static<typeof UpdateSchema>;
+export type SnapshotDelta = ResourceDelta & {
+	filePath: string;
+};
+
+export type ResourceUpdate = Static<typeof ResourceUpdateSchema>;
 
 export type Snapshot<Resource> = Record<string, Resource>;
