@@ -68,17 +68,13 @@ const updateTargetResourceFiles = async (
 				updates: translations,
 			});
 
-			content = framework.serialize({
-				resource: updatedResource,
-			});
+			content = framework.serialize(updatedResource);
 		} else {
 			const updatedResource = framework.patch({
 				updates: translations,
 			});
 
-			content = framework.serialize({
-				resource: updatedResource,
-			});
+			content = framework.serialize(updatedResource);
 		}
 
 		fs.mkdirSync(path.dirname(fullFilePath), { recursive: true });
