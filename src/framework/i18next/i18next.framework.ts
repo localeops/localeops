@@ -41,7 +41,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 		const oldKeys = new Set(Object.keys(oldResource));
 		const newKeys = new Set(Object.keys(newResource));
 
-		// Added keyss
+		// Added keys
 		for (const key of newKeys) {
 			if (!oldKeys.has(key)) {
 				if (newResource[key]) {
