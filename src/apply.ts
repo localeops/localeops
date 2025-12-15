@@ -5,9 +5,8 @@ import { Type } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
 import { config } from "./config";
 import { createDatabase } from "./databases";
-import { SnapshotSchema, UpdateSchema } from "./framework/base/base.schema";
+import { SnapshotSchema } from "./framework/base/base.schema";
 import { createFramework } from "./framework/factory";
-import { formatContent, inferFormatting } from "./shared/formatting";
 import { logger } from "./shared/logger";
 import { getTranslationBranchName } from "./shared/utils";
 import { createSource } from "./sources/factory";
@@ -20,16 +19,14 @@ const framework = createFramework(config.framework);
 
 await database.initialize();
 
-export const SubmitTranslationSchema = Type.Intersect([
-	UpdateSchema,
-	Type.Object({
-		from: Type.String(),
-	}),
-]);
+export const TranslationSchema = Type.Object({
+	value: Type.String(),
+	from: Type.String(),
+	filePath: Type.String(),
+	resourcePath: Type.Array(Type.Union([Type.Number(), Type.String()])),
+});
 
-type Translation = Static<typeof UpdateSchema>;
-
-type SubmitTranslation = Static<typeof SubmitTranslationSchema>;
+export type Translation = Static<typeof TranslationSchema>;
 
 const updateTargetResourceFiles = async (
 	translations: Translation[],
@@ -42,9 +39,9 @@ const updateTargetResourceFiles = async (
 	for (const tr of translations) {
 		const { filePath } = tr;
 
-		const fullFilePath = framework.getFullFilePath({
-			filePath: filePath,
-			locale: locale,
+		const fullFilePath = framework.resolveFilePath({
+			locale,
+			filePath,
 		});
 
 		const arr = fullFilePathToTranslations.get(fullFilePath) ?? [];
@@ -59,27 +56,34 @@ const updateTargetResourceFiles = async (
 	source.checkout(translationsBranch);
 
 	for (const [fullFilePath, translations] of fullFilePathToTranslations) {
-		const { resource, raw } = framework.readResourceFile(fullFilePath);
+		let content: string;
 
-		const content = framework.updateValuesInResource({
-			resource,
-			updates: translations,
-		});
+		if (fs.existsSync(fullFilePath)) {
+			const raw = fs.readFileSync(fullFilePath, { encoding: "utf8" });
 
-		let formattedContent = JSON.stringify(content, null, 2);
+			const resource = framework.deserialize(raw);
 
-		if (raw) {
-			const formatting = inferFormatting(raw);
+			const updatedResource = framework.patch({
+				resource: resource,
+				updates: translations,
+			});
 
-			formattedContent = formatContent({
-				content,
-				formatting,
+			content = framework.serialize({
+				resource: updatedResource,
+			});
+		} else {
+			const updatedResource = framework.patch({
+				updates: translations,
+			});
+
+			content = framework.serialize({
+				resource: updatedResource,
 			});
 		}
 
 		fs.mkdirSync(path.dirname(fullFilePath), { recursive: true });
 
-		fs.writeFileSync(fullFilePath, formattedContent, "utf-8");
+		fs.writeFileSync(fullFilePath, content);
 
 		const commitMessage = `chore(i18n): update translations for ${locale}`;
 
@@ -88,7 +92,7 @@ const updateTargetResourceFiles = async (
 
 	source.push(translationsBranch);
 
-	const title = `Update translations for ${locale}`;
+	const title = `LocaleOps: update translations for ${locale}`;
 
 	const description = `This PR updates translation files for locale: ${locale}`;
 
@@ -101,7 +105,7 @@ const updateTargetResourceFiles = async (
 
 // TODO: group updates by source files
 const updateSourceLocaleDirSnapshot = async (
-	translations: SubmitTranslation[],
+	translations: Translation[],
 	locale: string,
 ) => {
 	logger.debug("Updating source locale directory snapshot...");
@@ -124,7 +128,7 @@ const updateSourceLocaleDirSnapshot = async (
 	for (const update of snapshotUpdates) {
 		const resource = snapshotParsed[update.filePath];
 
-		const updatedResource = framework.updateValuesInResource({
+		const updatedResource = framework.patch({
 			resource,
 			updates: [update],
 		});
@@ -149,7 +153,7 @@ const submitTranslations = async ({
 	translations,
 }: {
 	locale: string;
-	translations: SubmitTranslation[];
+	translations: Translation[];
 }) => {
 	if (translations.length === 0) {
 		return;
@@ -157,7 +161,7 @@ const submitTranslations = async ({
 
 	source.checkout(config.source.base);
 
-	const currentSnapshot = framework.snapshotSourceLocaleDir();
+	const currentSnapshot = framework.snapshot();
 
 	logger.debug("Current snapshot: ", currentSnapshot);
 
@@ -167,7 +171,7 @@ const submitTranslations = async ({
 
 		const resource = currentSnapshot[filePath];
 
-		const current = framework.getValueFromResource({
+		const current = framework.resolve({
 			resource,
 			resourcePath,
 		});

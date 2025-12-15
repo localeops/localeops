@@ -1,111 +1,36 @@
-import fs from "node:fs";
 import { Value } from "@sinclair/typebox/value";
 import get from "lodash/get";
 import set from "lodash/set";
-import { logger } from "../../shared/logger";
+import { type Formatting, formatJson } from "../../shared/formatting";
 import { BaseFramework } from "../base/base.framework";
-import type {
-	Path,
-	ResourceDelta,
-	Snapshot,
-	SnapshotDelta,
-	Update,
-} from "../base/base.types";
+import type { Path, ResourceDelta, ResourceUpdate } from "../base/base.types";
 import { I18nextResourceSchema } from "./i18next.schema";
 import type { I18nextArray, I18nextResource } from "./i18next.types";
 
 export class I18nextFramework extends BaseFramework<I18nextResource> {
 	convertedPaths = new Set<string>();
 
-	readResourceFile(path: string): {
-		resource: I18nextResource;
-		raw: string | null;
-	} {
-		try {
-			const raw = fs.readFileSync(path, { encoding: "utf-8" });
-			const resource = Value.Parse(I18nextResourceSchema, JSON.parse(raw));
-			return { resource, raw };
-		} catch {
-			return { resource: {}, raw: null };
-		}
+	private formatting: Formatting = {
+		eol: "\n",
+		indent: "\t",
+		tail: "\n",
+	};
+
+	deserialize(raw: string) {
+		return Value.Parse(I18nextResourceSchema, JSON.parse(raw));
 	}
 
-	diffSnapshots({
-		oldSnapshot,
-		newSnapshot,
-	}: {
-		oldSnapshot: Snapshot<I18nextResource>;
-		newSnapshot: Snapshot<I18nextResource>;
-	}): SnapshotDelta[] {
-		const changes: SnapshotDelta[] = [];
-
-		const oldSnapshotFilePaths = new Set(Object.keys(oldSnapshot));
-		const newSnapshotFilePaths = new Set(Object.keys(newSnapshot));
-
-		// Added file path
-		for (const filePath of newSnapshotFilePaths) {
-			if (!oldSnapshotFilePaths.has(filePath)) {
-				if (newSnapshotFilePaths.has(filePath)) {
-					const newResource = newSnapshot[filePath];
-
-					if (!newResource) {
-						throw new Error(`Invariant: newSnapshot[${filePath}] is missing`);
-					}
-
-					const resourceDeltas = this.diffResources({
-						oldResource: {},
-						newResource,
-						path: [],
-					});
-
-					changes.push(...resourceDeltas.map((d) => ({ ...d, filePath })));
-				}
-			}
-		}
-
-		// Removed file path
-		for (const filePath of oldSnapshotFilePaths) {
-			if (!newSnapshotFilePaths.has(filePath)) {
-				if (oldSnapshotFilePaths.has(filePath)) {
-					// TODO: return translation file removed delta
-					logger.debug(`File ${filePath} was removed`);
-				}
-			}
-		}
-
-		// File path present in both: compare resources
-		for (const filePath of newSnapshotFilePaths) {
-			if (newSnapshotFilePaths.has(filePath)) {
-				if (oldSnapshotFilePaths.has(filePath)) {
-					const oldResource = oldSnapshot[filePath];
-					const newResource = newSnapshot[filePath];
-
-					if (!oldResource) {
-						throw new Error(`Invariant: oldSnapshot[${filePath}] is missing`);
-					}
-
-					if (!newResource) {
-						throw new Error(`Invariant: newSnapshot[${filePath}] is missing`);
-					}
-
-					const resourceDeltas = this.diffResources({
-						oldResource: oldResource,
-						newResource: newResource,
-						path: [],
-					});
-
-					changes.push(...resourceDeltas.map((d) => ({ ...d, filePath })));
-				}
-			}
-		}
-
-		return changes;
+	serialize(resource: I18nextResource) {
+		return formatJson({
+			resource,
+			formatting: this.formatting,
+		});
 	}
 
-	diffResources({
-		oldResource,
+	diff({
+		oldResource = {},
 		newResource,
-		path,
+		path = [],
 	}: {
 		oldResource: I18nextResource;
 		newResource: I18nextResource;
@@ -116,7 +41,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 		const oldKeys = new Set(Object.keys(oldResource));
 		const newKeys = new Set(Object.keys(newResource));
 
-		// Added keys
+		// Added keyss
 		for (const key of newKeys) {
 			if (!oldKeys.has(key)) {
 				if (newResource[key]) {
@@ -138,7 +63,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 						);
 					} else {
 						changes.push(
-							...this.diffResources({
+							...this.diff({
 								oldResource: {},
 								newResource: newValue,
 								path: nextPath,
@@ -190,7 +115,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 								});
 							} else {
 								changes.push(
-									...this.diffResources({
+									...this.diff({
 										newResource: {},
 										oldResource: oldValue,
 										path: nextPath,
@@ -232,7 +157,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 						} else {
 							if (typeof oldValue === "string") {
 								changes.push(
-									...this.diffResources({
+									...this.diff({
 										oldResource: {},
 										newResource: newValue,
 										path: nextPath,
@@ -240,7 +165,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 								);
 							} else if (Array.isArray(oldValue)) {
 								changes.push(
-									...this.diffResources({
+									...this.diff({
 										oldResource: {},
 										newResource: newValue,
 										path: nextPath,
@@ -248,7 +173,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 								);
 							} else {
 								changes.push(
-									...this.diffResources({
+									...this.diff({
 										oldResource: oldValue,
 										newResource: newValue,
 										path: nextPath,
@@ -262,6 +187,55 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 		}
 
 		return changes;
+	}
+
+	resolve({
+		resource,
+		resourcePath,
+	}: {
+		resource: I18nextResource;
+		resourcePath: Path;
+	}): string {
+		return get(resource, resourcePath);
+	}
+
+	patch(params: {
+		updates: ResourceUpdate[];
+		resource?: I18nextResource;
+	}): I18nextResource {
+		const resource = params.resource ?? {};
+
+		for (const update of params.updates) {
+			const { resourcePath, value } = update;
+
+			const currentPath: (string | number)[] = [];
+
+			for (let i = 0; i < resourcePath.length; i++) {
+				const key = resourcePath[i];
+				if (key === undefined) throw new Error("Invalid path key");
+				currentPath.push(key);
+
+				if (typeof resourcePath[i + 1] === "number") {
+					const pathKey = currentPath.join(".");
+					if (!this.convertedPaths.has(pathKey)) {
+						if (!Array.isArray(get(resource, currentPath))) {
+							set(resource, currentPath, []);
+							this.convertedPaths.add(pathKey);
+						}
+					}
+				}
+			}
+
+			set(resource, resourcePath, value);
+		}
+
+		if (!Value.Check(I18nextResourceSchema, resource)) {
+			throw new TypeError(
+				"[I18Next] i18n resource validation failed after update",
+			);
+		}
+
+		return resource;
 	}
 
 	private diffArrays({
@@ -311,7 +285,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 					);
 				} else {
 					changes.push(
-						...this.diffResources({
+						...this.diff({
 							newResource: newValue,
 							oldResource: {},
 							path: nextPath,
@@ -378,7 +352,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 				} else {
 					if (typeof oldValue === "string") {
 						changes.push(
-							...this.diffResources({
+							...this.diff({
 								oldResource: {},
 								newResource: newValue,
 								path: nextPath,
@@ -386,7 +360,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 						);
 					} else if (Array.isArray(oldValue)) {
 						changes.push(
-							...this.diffResources({
+							...this.diff({
 								oldResource: {},
 								newResource: newValue,
 								path: nextPath,
@@ -394,7 +368,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 						);
 					} else {
 						changes.push(
-							...this.diffResources({
+							...this.diff({
 								oldResource: oldValue,
 								newResource: newValue,
 								path: nextPath,
@@ -406,54 +380,5 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 		}
 
 		return changes;
-	}
-
-	getValueFromResource({
-		resource,
-		resourcePath,
-	}: {
-		resource: I18nextResource;
-		resourcePath: Path;
-	}): string {
-		return get(resource, resourcePath);
-	}
-
-	updateValuesInResource(params: {
-		updates: Update[];
-		resource?: I18nextResource;
-	}): I18nextResource {
-		const resource = params.resource ?? {};
-
-		for (const update of params.updates) {
-			const { resourcePath, value } = update;
-
-			const currentPath: (string | number)[] = [];
-
-			for (let i = 0; i < resourcePath.length; i++) {
-				const key = resourcePath[i];
-				if (key === undefined) throw new Error("Invalid path key");
-				currentPath.push(key);
-
-				if (typeof resourcePath[i + 1] === "number") {
-					const pathKey = currentPath.join(".");
-					if (!this.convertedPaths.has(pathKey)) {
-						if (!Array.isArray(get(resource, currentPath))) {
-							set(resource, currentPath, []);
-							this.convertedPaths.add(pathKey);
-						}
-					}
-				}
-			}
-
-			set(resource, resourcePath, value);
-		}
-
-		if (!Value.Check(I18nextResourceSchema, resource)) {
-			throw new TypeError(
-				"[I18Next] i18n resource validation failed after update",
-			);
-		}
-
-		return resource;
 	}
 }
