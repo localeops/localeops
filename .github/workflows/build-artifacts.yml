@@ -107,7 +107,7 @@ jobs:
       # Upload as workflow artifacts for debugging
       - name: Upload workflow artifacts
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: debug-${{ matrix.platform }}
           path: dist/
