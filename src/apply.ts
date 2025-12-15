@@ -79,7 +79,7 @@ const updateTargetResourceFiles = async (
 
 		fs.mkdirSync(path.dirname(fullFilePath), { recursive: true });
 
-		fs.writeFileSync(fullFilePath, content);
+		fs.writeFileSync(fullFilePath, content, { encoding: "utf8" });
 
 		const commitMessage = `chore(i18n): update translations for ${locale}`;
 
