@@ -5,9 +5,11 @@ on:
   release:
     types: [published]
 
-# Required permissions to upload release assets
+# Required permissions to upload release assets and create attestations
 permissions:
   contents: write
+  id-token: write  # Required for build provenance attestation
+  attestations: write  # Required for GitHub attestations
 
 jobs:
   build:
@@ -94,6 +96,12 @@ jobs:
           fi
           echo "Checksum generated:"
           cat *.sha256
+
+      # Attest the binary with GitHub's build provenance
+      - name: Attest binary provenance
+        uses: actions/attest-build-provenance@1c608d11d69870c2092266b3f9a6f3abbf17002c # v1.4.3
+        with:
+          subject-path: 'dist/localeops-${{ matrix.platform }}'
 
       # Upload the binary and checksum to the GitHub release
       # Uses PAT_TOKEN because this runs on release event
