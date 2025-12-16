@@ -1,10 +1,10 @@
 import type { Static } from "@sinclair/typebox";
-import type { PathSchema, ResourceUpdateSchema } from "./base.schema";
+import type { ResourcePathSchema, ResourceUpdateSchema } from "./base.schema";
 
-export type Path = Static<typeof PathSchema>;
+export type ResourcePath = Static<typeof ResourcePathSchema>;
 
 type ResourceBaseDelta = {
-	resourcePath: Path;
+	resourcePath: ResourcePath;
 };
 
 type ResourceAddedDelta = ResourceBaseDelta & {

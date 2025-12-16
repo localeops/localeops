@@ -4,7 +4,11 @@ import set from "lodash/set";
 import type { Formatting } from "../../shared/formatting";
 import { formatJson } from "../../shared/formatting";
 import { BaseFramework } from "../base/base.framework";
-import type { Path, ResourceDelta, ResourceUpdate } from "../base/base.types";
+import type {
+	ResourceDelta,
+	ResourcePath,
+	ResourceUpdate,
+} from "../base/base.types";
 import { FormatjsResourceSchema } from "./formatjs.schema";
 import type { FormatjsResource } from "./formatjs.types";
 
@@ -33,7 +37,7 @@ export class FormatjsFramework extends BaseFramework<FormatjsResource> {
 	}: {
 		oldResource: FormatjsResource;
 		newResource: FormatjsResource;
-		path: Path;
+		path: ResourcePath;
 	}): ResourceDelta[] {
 		const changes: ResourceDelta[] = [];
 
@@ -110,7 +114,7 @@ export class FormatjsFramework extends BaseFramework<FormatjsResource> {
 		resourcePath,
 	}: {
 		resource: FormatjsResource;
-		resourcePath: Path;
+		resourcePath: ResourcePath;
 	}): string {
 		return get(resource, resourcePath);
 	}

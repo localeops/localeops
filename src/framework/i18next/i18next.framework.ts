@@ -3,7 +3,11 @@ import get from "lodash/get";
 import set from "lodash/set";
 import { type Formatting, formatJson } from "../../shared/formatting";
 import { BaseFramework } from "../base/base.framework";
-import type { Path, ResourceDelta, ResourceUpdate } from "../base/base.types";
+import type {
+	ResourceDelta,
+	ResourcePath,
+	ResourceUpdate,
+} from "../base/base.types";
 import { I18nextResourceSchema } from "./i18next.schema";
 import type { I18nextArray, I18nextResource } from "./i18next.types";
 
@@ -34,7 +38,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 	}: {
 		oldResource: I18nextResource;
 		newResource: I18nextResource;
-		path: Path;
+		path: ResourcePath;
 	}): ResourceDelta[] {
 		const changes: ResourceDelta[] = [];
 
@@ -194,7 +198,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 		resourcePath,
 	}: {
 		resource: I18nextResource;
-		resourcePath: Path;
+		resourcePath: ResourcePath;
 	}): string {
 		return get(resource, resourcePath);
 	}
