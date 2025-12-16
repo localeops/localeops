@@ -1,13 +1,9 @@
 name: CI
 
-# Run on pull requests and pushes to main
+# Run on all pull requests and pushes to any branch
 on:
   pull_request:
-    branches:
-      - main
   push:
-    branches:
-      - main
 
 jobs:
   validate:
