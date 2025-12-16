@@ -23,7 +23,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
         with:
-          node-version: 'lts/*'
+          node-version: "lts/*"
 
       # Install Bun runtime
       - name: Setup Bun
@@ -42,3 +42,7 @@ jobs:
       # Build the project to ensure it compiles
       - name: Build
         run: bun run build
+
+      # Ensure tests run successfully
+      - name: Run tests
+        run: bun run test

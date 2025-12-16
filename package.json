@@ -39,7 +39,9 @@
 		"fix": "biome check --fix",
 		"build": "bun build --compile --minify --production --sourcemap src/index.ts --outfile dist/localeops",
 		"release": "semantic-release",
-		"postinstall": "node scripts/postinstall.cjs"
+		"postinstall": "node scripts/postinstall.cjs",
+		"test": "bun test",
+		"test:watch": "bun test --watch"
 	},
 	"type": "module",
 	"devDependencies": {
