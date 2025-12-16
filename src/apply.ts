@@ -5,7 +5,10 @@ import { Type } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
 import { config } from "./config";
 import { createDatabase } from "./databases";
-import { SnapshotSchema } from "./framework/base/base.schema";
+import {
+	ResourcePathSchema,
+	SnapshotSchema,
+} from "./framework/base/base.schema";
 import { createFramework } from "./framework/factory";
 import { logger } from "./shared/logger";
 import { getTranslationBranchName } from "./shared/utils";
@@ -23,7 +26,7 @@ export const TranslationSchema = Type.Object({
 	value: Type.String(),
 	from: Type.String(),
 	filePath: Type.String(),
-	resourcePath: Type.Array(Type.Union([Type.Number(), Type.String()])),
+	resourcePath: ResourcePathSchema,
 });
 
 export type Translation = Static<typeof TranslationSchema>;
