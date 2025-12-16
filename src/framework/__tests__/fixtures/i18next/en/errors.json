@@ -1,0 +1,8 @@
+{
+	"notFound": "Not found",
+	"serverError": "Server error",
+	"validation": {
+		"required": "This field is required",
+		"email": "Invalid email address"
+	}
+}

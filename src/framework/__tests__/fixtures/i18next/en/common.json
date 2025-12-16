@@ -1,0 +1,8 @@
+{
+	"hello": "Hello",
+	"goodbye": "Goodbye",
+	"nested": {
+		"welcome": "Welcome to our app",
+		"subtitle": "Enjoy your stay"
+	}
+}
