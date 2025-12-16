@@ -3,8 +3,8 @@ import path from "node:path";
 import type { Config } from "../../config";
 import { logger } from "../../shared/logger";
 import type {
-	Path,
 	ResourceDelta,
+	ResourcePath,
 	ResourceUpdate,
 	Snapshot,
 	SnapshotDelta,
@@ -219,7 +219,7 @@ export abstract class BaseFramework<Resource> {
 	 * return the string value found at that location.
 	 *
 	 * @param resource - The Resource object to query
-	 * @param resourcePath - Path array specifying the location of the translation key
+	 * @param resourcePath - ResourcePath array specifying the location of the translation key
 	 * @returns The translation string value at the specified path
 	 * @throws Error if the resourcePath does not exist in the resource
 	 */
@@ -228,6 +228,6 @@ export abstract class BaseFramework<Resource> {
 		resourcePath,
 	}: {
 		resource: Resource;
-		resourcePath: Path;
+		resourcePath: ResourcePath;
 	}): string;
 }
