@@ -200,7 +200,13 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 		resource: I18nextResource;
 		resourcePath: ResourcePath;
 	}): string {
-		return get(resource, resourcePath);
+		const value = get(resource, resourcePath);
+
+		if (value === undefined) {
+			throw new Error(`No value at path: ${resourcePath.join(".")}`);
+		}
+
+		return value;
 	}
 
 	patch(params: {

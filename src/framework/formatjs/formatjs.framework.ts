@@ -116,7 +116,13 @@ export class FormatjsFramework extends BaseFramework<FormatjsResource> {
 		resource: FormatjsResource;
 		resourcePath: ResourcePath;
 	}): string {
-		return get(resource, resourcePath);
+		const value = get(resource, resourcePath);
+
+		if (value === undefined) {
+			throw new Error(`No value at path: ${resourcePath.join(".")}`);
+		}
+
+		return value;
 	}
 
 	patch(params: {
