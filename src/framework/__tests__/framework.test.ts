@@ -108,7 +108,7 @@ describe.each(frameworks)("$name Framework", ({
 			expect(() =>
 				framework.resolve({
 					resource,
-					resourcePath: [Math.random().toString(10)],
+					resourcePath: ["this", "path", "does", "not", "exist"],
 				}),
 			).toThrow();
 		});
@@ -166,7 +166,7 @@ describe.each(frameworks)("$name Framework", ({
 			for (const translation of translations) {
 				const fullFilePath = framework.resolveFilePath({
 					filePath: translation.filePath,
-					locale: locale,
+					locale,
 				});
 
 				let content: string;
@@ -177,7 +177,7 @@ describe.each(frameworks)("$name Framework", ({
 					const resource = framework.deserialize(raw);
 
 					const updatedResource = framework.patch({
-						resource: resource,
+						resource,
 						updates: [translation],
 					});
 
