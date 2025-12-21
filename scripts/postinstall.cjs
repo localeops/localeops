@@ -2,6 +2,20 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
+
+// Skip binary download when developing the package itself
+// Check if src/index.ts exists in parent directory and ensure we're not inside node_modules
+const isInstalledInNodeModules = __dirname
+	.split(path.sep)
+	.includes("node_modules");
+const isLocalDevelopment =
+	fs.existsSync(path.join(__dirname, "..", "src", "index.ts")) &&
+	!isInstalledInNodeModules;
+if (isLocalDevelopment) {
+	console.log("Skipping binary download: local development detected");
+	process.exit(0);
+}
+
 const https = require("node:https");
 
 const PACKAGE_VERSION = require("../package.json").version;
