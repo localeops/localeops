@@ -9,34 +9,35 @@ on:
     branches:
       - main
 
-# Permissions required for semantic-release to work properly
-# workflow_run has write-all by default, so we explicitly restrict to least privilege
+# workflow_run has write-all by default, so we explicitly restrict to least privilege at job level
 # Reference: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
-permissions:
-  # Required permissions
-  issues: write        # Required to comment on related issues in release notes
-  contents: write      # Required to push commits (version bumps) and create tags
-  id-token: write      # Required for NPM provenance and OIDC authentication
-  pull-requests: write # Required to comment on related PRs in release notes
+permissions: {}
 
-  # Explicitly denied permissions
-  actions: none             # Work with GitHub Actions (cancel workflow runs)
-  attestations: none        # Generate artifact attestations for build provenance
-  checks: none              # Work with check runs and check suites
-  deployments: none         # Work with deployments
-  discussions: none         # Interact with GitHub Discussions
-  packages: none            # Upload and publish packages on GitHub Packages
-  pages: none               # Request GitHub Pages builds
-  repository-projects: none # Work with repository projects
-  security-events: none     # Access code scanning alerts
-  statuses: none            # List and manage commit statuses
-  
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
     # Only run if the CI workflow completed successfully
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # Permissions required for semantic-release to work properly
+    permissions:
+      # Required permissions
+      issues: write        # Required to comment on related issues in release notes
+      contents: write      # Required to push commits (version bumps) and create tags
+      id-token: write      # Required for NPM provenance and OIDC authentication
+      pull-requests: write # Required to comment on related PRs in release notes
+
+      # Explicitly denied permissions
+      actions: none             # Work with GitHub Actions (cancel workflow runs)
+      attestations: none        # Generate artifact attestations for build provenance
+      checks: none              # Work with check runs and check suites
+      deployments: none         # Work with deployments
+      discussions: none         # Interact with GitHub Discussions
+      packages: none            # Upload and publish packages on GitHub Packages
+      pages: none               # Request GitHub Pages builds
+      repository-projects: none # Work with repository projects
+      security-events: none     # Access code scanning alerts
+      statuses: none            # List and manage commit statuses
     steps:
       # Checkout the repository code
       - name: Checkout
