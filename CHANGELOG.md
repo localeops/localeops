@@ -1,3 +1,9 @@
+## [0.4.0](https://github.com/localeops/localeops/compare/v0.3.37...v0.4.0) (2025-12-21)
+
+### Features
+
+* **ci:** add signing to release artifacts ([e329c97](https://github.com/localeops/localeops/commit/e329c97c5119f906789153be6e8121ebc70814ad))
+
 ## [0.3.37](https://github.com/localeops/localeops/compare/v0.3.36...v0.3.37) (2025-12-21)
 
 ### Bug Fixes
