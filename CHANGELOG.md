@@ -1,3 +1,41 @@
+## [0.3.37](https://github.com/localeops/localeops/compare/v0.3.36...v0.3.37) (2025-12-21)
+
+### Bug Fixes
+
+* add utf8 encoding for file writes ([2d6302c](https://github.com/localeops/localeops/commit/2d6302c792c289dfbb5694c91504a8775d470143))
+* **framework:** fix framework serialize invocation ([b19e2d9](https://github.com/localeops/localeops/commit/b19e2d9cc4235adc1f5d737279f6becc20fae53f))
+
+### Tests
+
+* **framework:** add tests for framework class ([2e2069c](https://github.com/localeops/localeops/commit/2e2069c1c4cbfe1d16d6193ceaee1b05987781e2))
+* **framework:** cover localization file updates in test ([321e23a](https://github.com/localeops/localeops/commit/321e23a901d96f0d67ac2058e46aa9234f01a9ad))
+
+### Chores
+
+* **scripts:** skip binary download during local install ([07bccbc](https://github.com/localeops/localeops/commit/07bccbcb5eb36a0644c7f020afb3162ae58271a5))
+
+### Styles
+
+* **framework:** format framework test files ([d324ee3](https://github.com/localeops/localeops/commit/d324ee366b13797929f3d2335cf5e837bf64e7cc))
+
+### Documentation
+
+* add CODEOWNERS file for code review requirements ([f4f2f49](https://github.com/localeops/localeops/commit/f4f2f4951f488e644ab625713c3424420e4f1dc3))
+* add SECURITY.md ([333172c](https://github.com/localeops/localeops/commit/333172c4d098780f59b380affc2b728c036bfddd))
+
+### Continuous Integration
+
+* pin actions dependencies to commit hash ([fb88226](https://github.com/localeops/localeops/commit/fb88226aca5fe6127278561dcd34f1d20d6ca98d))
+* run CI checks on all branches ([f72a70d](https://github.com/localeops/localeops/commit/f72a70d3f10d15262ac291676d11af8566b28ca1))
+* **security:** add build provenance attestations to binaries ([47dbc61](https://github.com/localeops/localeops/commit/47dbc6143d14f259d67ed1c4fc13f3e393d87b5e))
+* **security:** add explicit minimal permissions to CI workflow ([2d2a86b](https://github.com/localeops/localeops/commit/2d2a86b3da33a661b3e77d53bd2d0579c83b7987))
+
+### Code Refactoring
+
+* **framework:** ensure deterministic test behavior ([2cab36e](https://github.com/localeops/localeops/commit/2cab36e043443230e4dcf0b13f1b9525c14bc7b6))
+* **framework:** refactor framework class ([63f7f08](https://github.com/localeops/localeops/commit/63f7f0819bd80d76396b857c9d82483e4cf30d85))
+* **framework:** use resource path schema in translation schema ([c8667f1](https://github.com/localeops/localeops/commit/c8667f10875c087a111fbb94bfccd86b2bb1d7e1))
+
 ## [0.3.36](https://github.com/localeops/localeops/compare/v0.3.35...v0.3.36) (2025-12-15)
 
 ### Bug Fixes
