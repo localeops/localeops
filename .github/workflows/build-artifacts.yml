@@ -103,7 +103,13 @@ jobs:
         with:
           subject-path: 'dist/localeops-${{ matrix.platform }}'
 
-      # Upload the binary and checksum to the GitHub release
+      # Sign the binary with Sigstore for cryptographic verification
+      - name: Sign binary with Sigstore
+        uses: sigstore/gh-action-sigstore-python@a5caf349bc536fbef3668a10ed7f5cd309a4b53d # v3.2.0
+        with:
+          inputs: dist/localeops-${{ matrix.platform }}
+
+      # Upload the binary, checksum, and signature files to the GitHub release
       # Uses PAT_TOKEN because this runs on release event
       - name: Upload artifacts to release
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
@@ -111,6 +117,8 @@ jobs:
           files: |
             dist/localeops-${{ matrix.platform }}
             dist/localeops-${{ matrix.platform }}.sha256
+            dist/localeops-${{ matrix.platform }}.sigstore
+            dist/localeops-${{ matrix.platform }}.sigstore.json
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
