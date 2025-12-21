@@ -5,31 +5,33 @@ on:
   release:
     types: [published]
 
-# Required permissions to upload release assets and create attestations
+# Set minimal permissions at top level, grant specific permissions at job level
 # Reference: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
-permissions:
-  # Required permissions
-  attestations: write  # Required for GitHub attestations
-  contents: write      # Required to upload release assets
-  id-token: write      # Required for build provenance attestation
-
-  # Explicitly denied permissions
-  actions: none             # Work with GitHub Actions (cancel workflow runs)
-  checks: none              # Work with check runs and check suites
-  deployments: none         # Work with deployments
-  discussions: none         # Interact with GitHub Discussions
-  issues: none              # Work with issues
-  packages: none            # Upload and publish packages on GitHub Packages
-  pages: none               # Request GitHub Pages builds
-  pull-requests: none       # Work with pull requests
-  repository-projects: none # Work with repository projects
-  security-events: none     # Access code scanning alerts
-  statuses: none            # List and manage commit statuses
+permissions: {}
 
 jobs:
   build:
     name: Build ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
+    # Required permissions to upload release assets and create attestations
+    permissions:
+      # Required permissions
+      attestations: write  # Required for GitHub attestations
+      contents: write      # Required to upload release assets
+      id-token: write      # Required for build provenance attestation
+
+      # Explicitly denied permissions
+      actions: none             # Work with GitHub Actions (cancel workflow runs)
+      checks: none              # Work with check runs and check suites
+      deployments: none         # Work with deployments
+      discussions: none         # Interact with GitHub Discussions
+      issues: none              # Work with issues
+      packages: none            # Upload and publish packages on GitHub Packages
+      pages: none               # Request GitHub Pages builds
+      pull-requests: none       # Work with pull requests
+      repository-projects: none # Work with repository projects
+      security-events: none     # Access code scanning alerts
+      statuses: none            # List and manage commit statuses
     strategy:
       matrix:
         # Build matrix for cross-platform binaries
