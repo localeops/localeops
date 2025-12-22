@@ -1,8 +1,10 @@
 # LocaleOps
 
+> **Looking for Early Adopters!** We're searching for teams who want to streamline their translation workflow. If you're interested, we're happy to help you set it up. [Start a discussion](https://github.com/localeops/localeops/discussions) or reach out!
+
 LocaleOps is a Git-native utility for managing translations directly inside your codebase. It sits between your locale files and your translation provider - human translators, agencies, or AI.
 
-LocaleOps is **not** a translation platform. It doesn’t store your strings in a proprietary database or force you into a web UI. Instead, it makes your existing workflow - **Git, pull requests, CI, automation** - work naturally for translations.
+LocaleOps is **not** a translation platform. It doesn't store your strings in a proprietary database or force you into a web UI. Instead, it makes your existing workflow - **Git, pull requests, CI, automation** - work naturally for translations.
 
 ## Why LocaleOps Exists
 
