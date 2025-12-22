@@ -116,7 +116,7 @@ jobs:
 
       # Attest the binary with GitHub's build provenance
       - name: Attest binary provenance
-        uses: actions/attest-build-provenance@1c608d11d69870c2092266b3f9a6f3abbf17002c # v1.4.3
+        uses: actions/attest-build-provenance@00014ed6ed5efc5b1ab7f7f34a39eb55d41aa4f8 # v3.1.0
         with:
           subject-path: 'dist/localeops-${{ matrix.platform }}'
 
