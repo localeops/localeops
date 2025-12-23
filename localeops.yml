@@ -21,7 +21,7 @@ database:
   adapter:
     # file database
     #   name: file
-    #   dirPath: string (path where data is stored)
+    #   dirPath: string (path where data is stored, defaults to ".localeops/snapshots")
     #
     # custom database
     #   name: custom
