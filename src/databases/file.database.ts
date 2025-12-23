@@ -16,7 +16,7 @@ export class FileDatabase extends BaseDatabase {
 	async initialize(): Promise<void> {}
 
 	getFilePath(key: string) {
-		const fileName = `${key}.json`;
+		const fileName = `${key}.snapshot.json`;
 		const filePath = path.join(this.dirPath, fileName);
 		return filePath;
 	}
