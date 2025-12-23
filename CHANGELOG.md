@@ -1,3 +1,28 @@
+## [0.5.0](https://github.com/localeops/localeops/compare/v0.4.0...v0.5.0) (2025-12-23)
+
+### ⚠ BREAKING CHANGES
+
+* **databases:** changed snapshot file name postfix
+
+### Features
+
+* **databases:** add default for database directory name ([2e5faf3](https://github.com/localeops/localeops/commit/2e5faf35c544aa62eb4f1e846271835dd2f54932))
+
+### Chores
+
+* **ci:** explicitly restrict workflow token permissions ([0cb3e07](https://github.com/localeops/localeops/commit/0cb3e070193f5cbf7dccb7be95fd7877b66d30c4))
+* **deps-dev:** bump the development-dependencies group with 4 updates ([a107871](https://github.com/localeops/localeops/commit/a107871246f1d8956c7056113b82f052a4ea4af4))
+
+### Documentation
+
+* add early adopters call to README ([40fc701](https://github.com/localeops/localeops/commit/40fc701fd9d93512bdf3518d236ccc500ce59054))
+
+### Continuous Integration
+
+* **ci:** switch to use github app token instead of pat ([9695d38](https://github.com/localeops/localeops/commit/9695d38250f191a416f9d4e0e77f982c050008d2))
+* **deps:** bump actions/attest-build-provenance from 1.4.3 to 3.1.0 ([a966e12](https://github.com/localeops/localeops/commit/a966e1238e6711f15a5cb36c57dc7d07ba97a025))
+* **workflows:** move permissions to job level ([2ae5246](https://github.com/localeops/localeops/commit/2ae5246e7e31428d6791a0f9d3bf123276a84443))
+
 ## [0.4.0](https://github.com/localeops/localeops/compare/v0.3.37...v0.4.0) (2025-12-21)
 
 ### Features
