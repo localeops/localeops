@@ -1,5 +1,4 @@
 import type { Config } from "../config";
-import { resolveConfigPath } from "../shared/paths";
 import type { BaseDatabase } from "./base.database";
 import { FileDatabase } from "./file.database";
 
@@ -9,9 +8,7 @@ export const createDatabase = async (
 	const adapter = databaseConfig.adapter;
 
 	if (adapter.name === "file") {
-		return new FileDatabase({
-			dirPath: resolveConfigPath(adapter.dirPath),
-		});
+		return new FileDatabase();
 	}
 
 	if (adapter.name === "custom") {

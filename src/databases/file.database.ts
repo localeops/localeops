@@ -6,12 +6,7 @@ import { createSource } from "../sources";
 import { BaseDatabase } from "./base.database";
 
 export class FileDatabase extends BaseDatabase {
-	private dirPath: string;
-
-	constructor(config: { dirPath: string }) {
-		super();
-		this.dirPath = config.dirPath;
-	}
+	private dirPath = ".localeops/snapshots";
 
 	async initialize(): Promise<void> {}
 

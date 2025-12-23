@@ -21,14 +21,12 @@ database:
   adapter:
     # file database
     #   name: file
-    #   dirPath: string (path where data is stored)
     #
     # custom database
     #   name: custom
     #   path: string (must end with ".ts" or ".js")
     #
     name: file
-    dirPath: ./localeops-snapshots
 
 # =============================================================================
 # Version Control System Configuration
@@ -37,7 +35,7 @@ database:
 source:
   # github source
   #   name: github
-  #   base: string 
+  #   base: string
   #   repo: string (must be in format owner/repo)
   #   apiUrl: string (optional)
   #
@@ -64,3 +62,8 @@ framework:
   name: i18next
   locale: en
   directory: ./locales
+
+locales:
+  - es
+  - fr
+  - de

@@ -12,14 +12,11 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
 
-      # Pull the locale and callback URL from the event payload into environment variables
-      - name: set env vars
-        run: |
-          echo "LOCALE=${{ github.event.client_payload.locale }}" >> $GITHUB_ENV
-          echo "CALLBACK_URL=${{ github.event.client_payload.callback_url }}" >> $GITHUB_ENV
-
-      # Run LocaleOps to extract untranslated strings for the given locale
-      - name: run localeops
+      # Run LocaleOps to extract untranslated strings for configured locales
+      - name: extract
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }} # Pass GitHub token to LocaleOps as TOKEN
-        run: npx @localeops/localeops extract "${LOCALE}" "${CALLBACK_URL}"
+          # DEBUG: "true"
+        run: |
+          output=$(npx @localeops/localeops extract)
+          echo "$output"
