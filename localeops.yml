@@ -21,7 +21,7 @@ database:
   adapter:
     # file database
     #   name: file
-    #   dirPath: string (path where data is stored)
+    #   dirPath: string (path where data is stored, defaults to ".localeops/snapshots" in project root)
     #
     # custom database
     #   name: custom
@@ -37,7 +37,7 @@ database:
 source:
   # github source
   #   name: github
-  #   base: string 
+  #   base: string
   #   repo: string (must be in format owner/repo)
   #   apiUrl: string (optional)
   #
@@ -64,3 +64,8 @@ framework:
   name: i18next
   locale: en
   directory: ./locales
+
+locales: # target locales to translate to
+  - es
+  - fr
+  - de
