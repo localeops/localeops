@@ -10,7 +10,9 @@ export const configSchema = Type.Object({
 		adapter: Type.Union([
 			Type.Object({
 				name: Type.Literal("file"),
-				dirPath: Type.String(),
+				dirPath: Type.Optional(
+					Type.String({ default: ".localeops/snapshots" }),
+				),
 			}),
 			Type.Object({
 				name: Type.Literal("custom"),
