@@ -39,6 +39,14 @@ jobs:
       security-events: none     # Access code scanning alerts
       statuses: none            # List and manage commit statuses
     steps:
+      # Generate a LocaleOps Bot token
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.LOCALEOPS_BOT_APP_ID }}
+          private-key: ${{ secrets.LOCALEOPS_BOT_PRIVATE_KEY }}
+
       # Checkout the repository code
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
@@ -47,7 +55,7 @@ jobs:
           # This is required for semantic-release to analyze all commits
           fetch-depth: 0
           # Use PAT token to bypass branch protection rules
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
 
       # Setup Node.js LTS
       - name: Setup Node.js
@@ -69,7 +77,7 @@ jobs:
       - name: Release
         env:
           # Use PAT token to bypass branch protection and push version commits
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           # NPM token for publishing to npm registry
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: bunx semantic-release

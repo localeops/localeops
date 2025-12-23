@@ -126,8 +126,15 @@ jobs:
         with:
           inputs: dist/localeops-${{ matrix.platform }}
 
+      # Generate a LocaleOps Bot token
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.LOCALEOPS_BOT_APP_ID }}
+          private-key: ${{ secrets.LOCALEOPS_BOT_PRIVATE_KEY }}
+
       # Upload the binary, checksum, and signature files to the GitHub release
-      # Uses PAT_TOKEN because this runs on release event
       - name: Upload artifacts to release
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
         with:
@@ -137,7 +144,7 @@ jobs:
             dist/localeops-${{ matrix.platform }}.sigstore
             dist/localeops-${{ matrix.platform }}.sigstore.json
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
       # Upload as workflow artifacts for debugging
       - name: Upload workflow artifacts
