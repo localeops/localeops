@@ -64,3 +64,8 @@ framework:
   name: i18next
   locale: en
   directory: ./locales
+
+locales: # target locales to translate to
+  - es
+  - fr
+  - de

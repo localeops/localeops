@@ -4,6 +4,10 @@ on:
   repository_dispatch:
     types: [localeops_apply] # Triggered via repository_dispatch event from LocaleOps
 
+concurrency:
+  group: localeops_apply
+  cancel-in-progress: false
+  
 jobs:
   apply_translations:
     runs-on: ubuntu-latest           # Use the latest Ubuntu runner
