@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "bun:test";
 import fs from "node:fs";
 import path from "node:path";
-import type { Translation } from "../../apply";
+import type { Translation } from "../../core/types";
 import type { BaseFramework } from "../base/base.framework";
 import type { Snapshot } from "../base/base.types";
 import { createFramework } from "../factory";
