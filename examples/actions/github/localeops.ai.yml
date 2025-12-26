@@ -1,0 +1,64 @@
+name: localeops AI translate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/locales/en/**'
+
+concurrency:
+  group: localeops_ai
+  cancel-in-progress: false
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: extract and translate
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set -e
+
+          out=$(npx @localeops/localeops extract)
+
+          # Collect all items needing translation into flat array with locale
+          to_translate=$(echo "$out" | jq '[to_entries[] | .key as $loc | .value[] | select(.type == "added" or .type == "changed") | {locale: $loc, filePath, resourcePath, text: (if .type == "added" then .value else .newValue end)}]')
+
+          [ "$(echo "$to_translate" | jq 'length')" -eq 0 ] && echo "Nothing to translate" && exit 0
+
+          response=$(curl -s https://api.anthropic.com/v1/messages \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: $ANTHROPIC_API_KEY" \
+            -H "anthropic-version: 2023-06-01" \
+            -d "$(jq -n --arg items "$to_translate" '{
+              model: "claude-sonnet-4-20250514",
+              max_tokens: 8192,
+              messages: [{role: "user", content: "Translate each item to its target locale. Keep placeholders like {name}, {{count}}, %s intact.\n\nReturn JSON array: [{\"locale\": \"...\", \"filePath\": \"...\", \"resourcePath\": \"...\", \"value\": \"<translation>\", \"from\": \"<original>\"}]\n\nItems:\n\($items)"}]
+            }')")
+
+          echo "[DEBUG] $response"
+
+          translated=$(echo "$response" | jq -r '.content[0].text' | sed 's/```json//g; s/```//g')
+
+          echo "[DEBUG] $translated"
+
+          # Build translations object keyed by locale
+          translations_by_locale=$(echo "$translated" | jq 'group_by(.locale) | map({ (.[0].locale): map({filePath, resourcePath, value, from}) }) | add')
+
+          echo "[DEBUG] translations_by_locale: $translations_by_locale"
+
+          npx @localeops/localeops apply "$translations_by_locale"
