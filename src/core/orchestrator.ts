@@ -46,16 +46,8 @@ export class LocaleOpsOrchestrator {
 		}
 	}
 
-	async apply(params: {
-		locale: string;
-		translations: Translation[];
-	}): Promise<void> {
-		const { locale, translations } = params;
+	async apply(allTranslations: Record<string, Translation[]>): Promise<void> {
 		const { framework, source, config } = this.ctx;
-
-		if (translations.length === 0) {
-			return;
-		}
 
 		source.checkout(config.source.base);
 
@@ -63,26 +55,33 @@ export class LocaleOpsOrchestrator {
 
 		logger.debug("Current snapshot: ", currentSnapshot);
 
-		// Check if translations are stale
-		for (const translation of translations) {
-			const { from, filePath, resourcePath } = translation;
-
-			const resource = currentSnapshot[filePath];
-
-			const current = framework.resolve({
-				resource,
-				resourcePath,
-			});
-
-			if (from !== current) {
-				throw new Error(
-					`Translation for ${filePath}:${resourcePath} is stale. From: ${from}, Current: ${current}`,
-				);
+		for (const [locale, translations] of Object.entries(allTranslations)) {
+			if (translations.length === 0) {
+				continue;
 			}
-		}
 
-		await this.updateTargetResourceFiles(translations, locale);
-		await this.updateSourceLocaleDirSnapshot(translations, locale);
+			// Check if any translation is stale
+			for (const translation of translations) {
+				const { from, filePath, resourcePath } = translation;
+
+				const resource = currentSnapshot[filePath];
+
+				const current = framework.resolve({
+					resource,
+					resourcePath,
+				});
+
+				if (from !== current) {
+					throw new Error(
+						`Translation for ${filePath}:${resourcePath} is stale. From: ${from}, Current: ${current}`,
+					);
+				}
+			}
+
+			await this.updateTargetResourceFiles(translations, locale);
+
+			await this.updateSourceLocaleDirSnapshot(translations, locale);
+		}
 	}
 
 	private async updateTargetResourceFiles(
