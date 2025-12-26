@@ -40,25 +40,20 @@ export class CLI {
 				},
 			)
 			.command(
-				"apply <locale> <translations-json>",
-				"Apply translations and create pull request",
+				"apply <translations-json>",
+				"Apply translations and create pull requests",
 				(yargs) => {
-					return yargs
-						.positional("locale", {
-							type: "string",
-							demandOption: true,
-							describe: "Target locale to apply translations to",
-						})
-						.positional("translations-json", {
-							type: "string",
-							demandOption: true,
-							describe: "JSON string containing translations",
-						});
+					return yargs.positional("translations-json", {
+						type: "string",
+						demandOption: true,
+						describe:
+							"JSON object string with keys as locales and values as translations",
+					});
 				},
 				async (argv) => {
 					try {
 						const applyCommand = new ApplyCommand(orchestrator);
-						await applyCommand.execute(argv.locale, argv["translations-json"]);
+						await applyCommand.execute(argv["translations-json"]);
 					} catch (err) {
 						logger.error(err instanceof Error ? err.message : "Unknown", err);
 						process.exit(1);

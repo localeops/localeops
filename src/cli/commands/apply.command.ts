@@ -6,11 +6,11 @@ import { TranslationSchema } from "../../core/types";
 export class ApplyCommand {
 	constructor(private orchestrator: LocaleOpsOrchestrator) {}
 
-	async execute(locale: string, translationsJson: string): Promise<void> {
-		const ApplyPayloadSchema = Type.Object({
-			locale: Type.String(),
-			translations: Type.Array(TranslationSchema),
-		});
+	async execute(translationsJson: string): Promise<void> {
+		const ApplyPayloadSchema = Type.Record(
+			Type.String(),
+			Type.Array(TranslationSchema),
+		);
 
 		let translations: unknown;
 		try {
@@ -22,10 +22,7 @@ export class ApplyCommand {
 			});
 		}
 
-		const validated = Value.Parse(ApplyPayloadSchema, {
-			locale,
-			translations,
-		});
+		const validated = Value.Parse(ApplyPayloadSchema, translations);
 
 		await this.orchestrator.apply(validated);
 	}

@@ -7,14 +7,14 @@ on:
 concurrency:
   group: localeops_apply
   cancel-in-progress: false
-  
+
 jobs:
   apply_translations:
-    runs-on: ubuntu-latest           # Use the latest Ubuntu runner
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
     permissions:
-      contents: write                # Needed to push commits back to the repo
-      pull-requests: write           # Needed if LocaleOps opens/updates PRs
-    
+      contents: write # Needed to push commits back to the repo
+      pull-requests: write # Needed if LocaleOps opens/updates PRs
+
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -29,7 +29,6 @@ jobs:
       # Pull values from the repository_dispatch payload into environment variables
       - name: set env vars
         run: |
-          echo "LOCALE=${{ github.event.client_payload.locale }}" >> $GITHUB_ENV
           {
             echo "TRANSLATIONS<<EOF"
             echo '${{ toJson(github.event.client_payload.translations) }}'
@@ -40,4 +39,4 @@ jobs:
       - name: run localeops
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }} # Pass GitHub token to LocaleOps as TOKEN
-        run: npx @localeops/localeops apply "${LOCALE}" "${TRANSLATIONS}"
+        run: npx @localeops/localeops apply "${TRANSLATIONS}"
