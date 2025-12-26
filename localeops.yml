@@ -1,12 +1,13 @@
 # =============================================================================
 # LocaleOps Configuration File
 # =============================================================================
+
 # This YAML file defines the configuration for LocaleOps.
 # Modify the sections below to customize your project settings.
-#
+
 # Usage:
 # - Place this file in the root directory of your project
-#
+
 # Environment Variables:
 # - This config file supports environment variable interpolation using ${VAR_NAME} syntax
 # - Set required environment variables before running LocaleOps:
@@ -14,18 +15,29 @@
 # - In CI/CD, configure secrets in your pipeline settings
 
 # =============================================================================
+# Target Locales
+# =============================================================================
+
+locales:
+  - es
+  - fr
+  - de
+
+# =============================================================================
 # Database Configuration
 # =============================================================================
 
 database:
   adapter:
-    # file database
-    #   name: file
-    #   dirPath: string (path where data is stored, defaults to ".localeops/snapshots")
+    # Database adapter configuration.
     #
-    # custom database
-    #   name: custom
-    #   path: string (must end with ".ts" or ".js")
+    # file database (stores data in your repository):
+    #   name: file
+    #   dirPath: string    # Path where data will be stored. Defaults to ".localeops/snapshots".
+    #
+    # custom database:
+    #   name: custom       # Use 'custom' for a custom adapter.
+    #   path: string       # Path to adapter file (must end with ".ts" or ".js").
     #
     name: file
     dirPath: ./localeops-snapshots
@@ -35,11 +47,14 @@ database:
 # =============================================================================
 
 source:
-  # github source
+  # Source provider configuration for version control integration.
+  #
+  # github source:
   #   name: github
-  #   base: string 
-  #   repo: string (must be in format owner/repo)
-  #   apiUrl: string (optional)
+  #   base: string         # Branch to track for changes in source locale (e.g., 'main', 'master').
+  #   repo: string         # GitHub repository in 'owner/repo' format.
+  #   token: string        # GitHub API token for authentication. Use environment variable (e.g., ${TOKEN}).
+  #   apiUrl: string       # (optional) Custom GitHub API URL for GitHub Enterprise.
   #
   name: github
   base: main
@@ -51,21 +66,18 @@ source:
 # =============================================================================
 
 framework:
-  # i18next framework
-  #   name: i18next
-  #   locale: string
-  #   directory: string
+  # Framework configuration for locale file management.
   #
-  # formatjs framework
+  # i18next framework:
+  #   name: i18next
+  #   locale: string     # Source locale files directory name (e.g., 'en').
+  #   directory: string  # Directory containing all locale files.
+  #
+  # formatjs framework:
   #   name: formatjs
-  #   locale: string
-  #   directory: string
+  #   locale: string     # Source locale files directory name (e.g., 'en').
+  #   directory: string  # Directory containing all locale files.
   #
   name: i18next
   locale: en
-  directory: ./locales
-
-locales: # target locales to translate to
-  - es
-  - fr
-  - de
+  directory: public/locales

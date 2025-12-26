@@ -1,3 +1,16 @@
+## Quick Start
+
+To start using LocaleOps:
+
+1. **Add `localeops.yml` to your project root and populate it.**
+      - See the [localeops.yml config example](localeops.yml) in this repo for available options and reference.
+
+2. **Copy example workflows from this repo and adjust if necessary.**
+      - Browse the [example GitHub Actions workflows](examples/actions/github/) for ready-to-use automation:
+        - [localeops.ai.yml](examples/actions/github/localeops.ai.yml)
+        - [localeops.apply.yml](examples/actions/github/localeops.apply.yml)
+        - [localeops.extract.yml](examples/actions/github/localeops.extract.yml)
+
 # LocaleOps
 
 > **Looking for Early Adopters!** We're searching for teams who want to streamline their translation workflow. If you're interested, we're happy to help you set it up. [Start a discussion](https://github.com/localeops/localeops/discussions) or reach out!
