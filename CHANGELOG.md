@@ -1,3 +1,28 @@
+## [0.6.0](https://github.com/localeops/localeops/compare/v0.5.0...v0.6.0) (2025-12-26)
+
+### ⚠ BREAKING CHANGES
+
+* changed apply command interface
+
+### Features
+
+* allow apply translations for multiple locales at once ([3c377df](https://github.com/localeops/localeops/commit/3c377df842782ae5d1dac3f23d8957402ee727ef))
+
+### Chores
+
+* **ci:** pin docs github actions to hash ([f464a45](https://github.com/localeops/localeops/commit/f464a45f6a9805dd8b94e9201a4e486f47b8c917))
+* pin create-github-app-token to v2.2.1 ([6d843a2](https://github.com/localeops/localeops/commit/6d843a2f4d91bfeef97bc73942802a6f097dafbf))
+
+### Documentation
+
+* **docs:** fix example workflows run order issue ([19232c2](https://github.com/localeops/localeops/commit/19232c24dd9c9990eed0e7008a732df0a228c14a))
+* point docs config to localeops.com ([bc22661](https://github.com/localeops/localeops/commit/bc226611b5a1c4cb879c31c52a9033ca77726aff))
+* setup Astro Starlight with GitHub Pages deployment ([9ea3191](https://github.com/localeops/localeops/commit/9ea3191b7e9a65a9ca2a09c5e081379a626b8e78))
+
+### Code Refactoring
+
+* **core:** implement core architecture with cli and orchestrator layers ([8e6821f](https://github.com/localeops/localeops/commit/8e6821f344904d75a8cb20b267ded7322b500e7a))
+
 ## [0.5.0](https://github.com/localeops/localeops/compare/v0.4.0...v0.5.0) (2025-12-23)
 
 ### ⚠ BREAKING CHANGES
