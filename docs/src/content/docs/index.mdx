@@ -1,40 +1,79 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
-template: splash # Remove or comment out this line to display the site sidebar on this page.
-hero:
-  tagline: Congrats on setting up a new Starlight project!
-  image:
-    file: ../../assets/houston.webp
-  actions:
-    - text: Example Guide
-      link: /guides/example/
-      icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
-      icon: external
-      variant: minimal
+title: Introduction
+description: Git-native translation workflow automation for i18n projects
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+LocaleOps prevents wasted translation work by tracking what changed in your source language and detecting when existing translations become stale - all while keeping your strings in Git instead of a vendor's database.
 
-## Next steps
+**The problem:** When developers change source strings (e.g., "Submit Form" → "Submit Your Application"), existing translations become wrong, but most tools don't detect this. Teams waste money re-translating or ship incorrect translations.
 
-<CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Change page layout" icon="document">
-		Delete `template: splash` in `src/content/docs/index.mdx` to display a
-		sidebar on this page.
-	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
-</CardGrid>
+**The solution:** LocaleOps snapshots your source language after each translation, then diffs against it to detect exactly what changed. No vendor lock-in, no external database - everything stays in Git.
+
+## Key Features
+
+- **Git-Native**: Translations stay in your repository under version control
+- **Framework Support**: Works with i18next, FormatJS, and custom parsers
+- **Provider Agnostic**: Use any translation service (AI, human, or agency)
+- **Change Detection**: Automatically detects new and modified strings
+- **CI/CD Ready**: Runs entirely in GitHub Actions or any CI pipeline
+- **Pull Request Automation**: Creates PRs for translation updates
+- **Extensible Architecture**: Built on base classes for custom frameworks, storage, and workflows
+
+## Quick Start
+
+### Installation
+
+```bash
+npm install -g @localeops/localeops
+```
+
+### Configuration
+
+Create a `localeops.yml` file in your project root:
+
+```yaml
+framework:
+  name: i18next
+  locale: en
+  directory: ./locales
+
+database:
+  adapter:
+    name: file
+
+source:
+  name: github
+  base: main
+  repo: your-org/your-repo
+  token: ${GITHUB_TOKEN}
+
+locales:
+  - es
+  - fr
+```
+
+### Basic Usage
+
+Extract new and changed strings:
+
+```bash
+localeops extract
+```
+
+Apply completed translations:
+
+```bash
+localeops apply <translations-json>
+```
+
+### Automation
+
+For automated workflows, check out the [GitHub Actions examples](/examples/github-actions).
+
+For complete configuration options, see the [localeops.yml reference](https://github.com/localeops/localeops/blob/main/localeops.yml).
+
+## Learn More
+
+- [Motivation](/motivation) - Why LocaleOps exists and what problems it solves
+- [Architecture](/architecture) - How LocaleOps works and workflow patterns
+- [Examples](/examples/github-actions) - Ready-to-use GitHub Actions workflows

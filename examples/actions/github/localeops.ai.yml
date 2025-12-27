@@ -1,11 +1,31 @@
-name: localeops AI translate
+# =============================================================================
+# LocaleOps AI Translation Workflow
+# =============================================================================
+#
+# This workflow automatically extracts untranslated strings and translates them
+# using Claude AI, then applies the translations back to your repository.
+#
+# Workflow:
+# 1. Triggered when English locale files change on main branch
+# 2. Extracts new/changed strings using LocaleOps
+# 3. Sends strings to Claude API for translation
+# 4. Applies translated strings and creates a PR
+#
+# Requirements:
+# - GITHUB_TOKEN: Automatically provided by GitHub Actions
+# - ANTHROPIC_API_KEY: Must be set in repository secrets
+#
+# =============================================================================
+
+name: AI translation
 
 on:
   push:
     branches: [main]
     paths:
-      - 'public/locales/en/**'
+      - 'public/locales/en/**'  # Only trigger when English (source) locale changes
 
+# Prevent multiple translation workflows from running simultaneously
 concurrency:
   group: localeops_ai
   cancel-in-progress: false
@@ -14,32 +34,38 @@ jobs:
   translate:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
+      contents: write        # Required to push commits
+      pull-requests: write   # Required to create pull requests
 
     steps:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      # Configure git for commits created by LocaleOps
       - run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: extract and translate
         env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}              # GitHub token for LocaleOps
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}  # Claude API key
         run: |
           set -e
 
+          # Step 1: Extract untranslated strings using LocaleOps
           out=$(npx @localeops/localeops extract)
 
-          # Collect all items needing translation into flat array with locale
+          # Step 2: Transform extracted data into flat array for translation
+          # Collect all items needing translation (added or changed strings)
+          # Output format: [{locale, filePath, resourcePath, text}, ...]
           to_translate=$(echo "$out" | jq '[to_entries[] | .key as $loc | .value[] | select(.type == "added" or .type == "changed") | {locale: $loc, filePath, resourcePath, text: (if .type == "added" then .value else .newValue end)}]')
 
+          # Exit early if nothing needs translation
           [ "$(echo "$to_translate" | jq 'length')" -eq 0 ] && echo "Nothing to translate" && exit 0
 
+          # Step 3: Send strings to Claude API for translation
           response=$(curl -s https://api.anthropic.com/v1/messages \
             -H "Content-Type: application/json" \
             -H "x-api-key: $ANTHROPIC_API_KEY" \
@@ -50,15 +76,19 @@ jobs:
               messages: [{role: "user", content: "Translate each item to its target locale. Keep placeholders like {name}, {{count}}, %s intact.\n\nReturn JSON array: [{\"locale\": \"...\", \"filePath\": \"...\", \"resourcePath\": \"...\", \"value\": \"<translation>\", \"from\": \"<original>\"}]\n\nItems:\n\($items)"}]
             }')")
 
-          echo "[DEBUG] $response"
+          echo "[DEBUG] API Response: $response"
 
+          # Step 4: Extract translated text from Claude's response
+          # Remove markdown code blocks if present
           translated=$(echo "$response" | jq -r '.content[0].text' | sed 's/```json//g; s/```//g')
 
-          echo "[DEBUG] $translated"
+          echo "[DEBUG] Extracted translations: $translated"
 
-          # Build translations object keyed by locale
+          # Step 5: Reorganize translations by locale for LocaleOps apply command
+          # Transform from array to object: {locale: [{filePath, resourcePath, value, from}]}
           translations_by_locale=$(echo "$translated" | jq 'group_by(.locale) | map({ (.[0].locale): map({filePath, resourcePath, value, from}) }) | add')
 
-          echo "[DEBUG] translations_by_locale: $translations_by_locale"
+          echo "[DEBUG] Grouped by locale: $translations_by_locale"
 
+          # Step 6: Apply translations and create PR
           npx @localeops/localeops apply "$translations_by_locale"

@@ -33,14 +33,13 @@ database:
     #
     # file database (stores data in your repository):
     #   name: file
-    #   dirPath: string    # Path where data will be stored. Defaults to ".localeops/snapshots".
+    #   dirPath: string    # (optional) Path where data will be stored. Defaults to ".localeops/snapshots".
     #
     # custom database:
     #   name: custom       # Use 'custom' for a custom adapter.
     #   path: string       # Path to adapter file (must end with ".ts" or ".js").
     #
     name: file
-    dirPath: ./localeops-snapshots
 
 # =============================================================================
 # Version Control System Configuration

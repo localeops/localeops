@@ -1,0 +1,124 @@
+---
+title: Architecture
+description: How LocaleOps works and workflow patterns
+---
+
+## Core Workflow
+
+```
+main branch update
+      │
+      ├──▶ localeops extract (snapshot + diff)
+      │
+      ├──▶ send to translator / AI
+      │
+      ├──▶ receive translated output
+      │
+      ├──▶ localeops apply (update locale files + snapshot)
+      │
+      └──▶ PR with updated translations
+```
+
+## Core Commands
+
+LocaleOps provides two primary commands that work together:
+
+### `localeops extract`
+
+Analyzes your locale files and creates a translation delta:
+
+- Compares current locale files against the last snapshot
+- Detects new strings that need translation
+- Identifies modified strings that require re-translation
+- Outputs structured JSON containing the translation delta
+
+The output JSON is sent to your translation provider (AI, agency, or human translators).
+
+### `localeops apply`
+
+Takes completed translations and integrates them back into your codebase:
+
+- Reads translation JSON from your provider
+- Updates locale files with new translations
+- Creates a snapshot of the current state
+- Creates a pull request with changes
+
+## Design Principles
+
+### Provider Agnostic
+
+LocaleOps outputs standard JSON. You control what happens next:
+
+- Send to a translation agency API
+- Process with an LLM (Claude, GPT, etc.)
+- Convert to CSV/Excel for human translators
+- Pipe through your own transformation logic
+- Store in any format your workflow requires
+
+Because LocaleOps is open source and format-agnostic, you can customize how translations flow through your stack.
+
+### No Infrastructure Required
+
+LocaleOps runs as a CLI tool - no servers, databases, or services needed:
+
+- Runs in CI/CD (GitHub Actions, GitLab CI, etc.)
+- Uses Git for snapshot storage
+- No external dependencies beyond your translation provider
+- Scales with your repository, not separate infrastructure
+
+## Workflow Patterns
+
+LocaleOps supports multiple workflow patterns depending on your needs:
+
+### Synchronous (Fully Automated)
+
+Complete the entire translation cycle in one CI job:
+
+1. Run `localeops extract` when source locale changes
+2. Send JSON to AI translation service
+3. Receive translations immediately
+4. Run `localeops apply` to create PR
+
+**Best for:** Fully automated pipelines with AI translation
+
+### Asynchronous (Human-in-the-Loop)
+
+Split extraction and application across separate workflows:
+
+1. Run `localeops extract` in CI on source changes
+2. Send JSON to external service, API, or human translators
+3. Wait for translations (minutes, hours, or days)
+4. Trigger second workflow when translations are ready
+5. Run `localeops apply` to create PR
+
+**Best for:** Human review cycles, agency workflows, or batch processing
+
+## Extensibility
+
+LocaleOps is built with extensibility in mind through abstract base classes:
+
+### Framework Support
+
+Extend `BaseFramework` to add support for new i18n libraries:
+
+- **Built-in:** i18next, FormatJS
+- **Custom:** Implement `deserialize()`, `serialize()`, and `diff()` methods
+
+Each framework adapter handles its specific file format and translation structure.
+
+### Storage Adapters
+
+Extend `BaseDatabase` for custom snapshot storage:
+
+- **Built-in:** File-based storage (Git-friendly)
+- **Custom:** Implement `get()`, `set()`, and `initialize()` methods
+- **Examples:** PostgreSQL, Redis, S3, or any key-value store
+
+### Source Control
+
+Extend `BaseSource` for different Git workflows:
+
+- **Built-in:** GitHub integration
+- **Custom:** GitLab, Bitbucket, or custom Git workflows
+
+The base classes provide a clean abstraction layer, making LocaleOps adaptable to your specific stack and workflow requirements.

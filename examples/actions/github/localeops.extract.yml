@@ -1,26 +1,81 @@
-name: extract untranslated # Workflow to extract untranslated strings with LocaleOps
+# =============================================================================
+# LocaleOps Extract Strings Workflow
+# =============================================================================
+#
+# This workflow extracts untranslated and changed strings from your locale files.
+# It's designed for manual or external translation workflows where you want to
+# extract strings without automatically translating them.
+#
+# Workflow:
+# 1. Triggered via repository_dispatch event
+# 2. Extracts new/changed strings using LocaleOps
+# 3. Outputs the extraction result (can be sent to external service)
+#
+# The output is a JSON object containing:
+# - New strings (type: "added")
+# - Changed strings (type: "changed")
+# - Organized by locale, file path, and resource path
+#
+# Example output:
+# {
+#   "es": [
+#     {"type": "added", "filePath": "common.json", "resourcePath": "hello", "value": "Hello"}
+#   ]
+# }
+#
+# Trigger this workflow using GitHub API:
+# ```bash
+# curl -X POST \
+#   -H "Authorization: token YOUR_GITHUB_TOKEN" \
+#   -H "Accept: application/vnd.github.v3+json" \
+#   https://api.github.com/repos/OWNER/REPO/dispatches \
+#   -d '{"event_type":"localeops_extract"}'
+# ```
+#
+# Use cases:
+# - Send extracted strings to a translation agency
+# - Export to CSV/Excel for human translators
+# - Trigger external translation API
+# - Review what needs translation before processing
+#
+# Requirements:
+# - GITHUB_TOKEN: Automatically provided by GitHub Actions
+#
+# =============================================================================
+
+name: extract strings
 
 on:
   repository_dispatch:
-    types: [localeops_extract] # Triggered via repository_dispatch event from LocaleOps
+    types: [localeops_extract]  # Triggered via repository_dispatch event
 
+# Prevent multiple extract workflows from running simultaneously
 concurrency:
   group: localeops_extract
   cancel-in-progress: false
 
 jobs:
   extract:
-    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    runs-on: ubuntu-latest
 
     steps:
       - name: checkout
         uses: actions/checkout@v4
 
-      # Run LocaleOps to extract untranslated strings for configured locales
+      # Extract untranslated strings and output the result
+      # Note: You can pipe this output to external services or save it as an artifact
       - name: extract
         env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }} # Pass GitHub token to LocaleOps as TOKEN
-          # DEBUG: "true"
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for accessing repository
+          # DEBUG: "true"  # (optional) Uncomment to enable debug output
         run: |
           output=$(npx @localeops/localeops extract)
           echo "$output"
+
+          # Optional: Save output as artifact for later use
+          # echo "$output" > extraction-result.json
+
+          # Optional: Send to external service
+          # curl -X POST https://your-translation-service.com/api/translate \
+          #   -H "Content-Type: application/json" \
+          #   -d "$output"

@@ -1,117 +1,94 @@
-## Quick Start
+<div align="center">
+  <h1>LocaleOps</h1>
+  <p>Git-native translation workflow automation for i18n projects</p>
 
-To start using LocaleOps:
+  <p>
+    <a href="https://localeops.com"><strong>Documentation</strong></a> ·
+    <a href="https://github.com/localeops/localeops/discussions"><strong>Discussions</strong></a>
+  </p>
 
-1. **Add `localeops.yml` to your project root and populate it.**
-      - See the [localeops.yml config example](localeops.yml) in this repo for available options and reference.
+  <p>
+    <a href="https://www.npmjs.com/package/@localeops/localeops">
+      <img src="https://img.shields.io/npm/v/@localeops/localeops.svg" alt="npm version">
+    </a>
+    <a href="https://github.com/localeops/localeops/blob/main/LICENSE">
+      <img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License">
+    </a>
+  </p>
+</div>
 
-2. **Copy example workflows from this repo and adjust if necessary.**
-      - Browse the [example GitHub Actions workflows](examples/actions/github/) for ready-to-use automation:
-        - [localeops.ai.yml](examples/actions/github/localeops.ai.yml)
-        - [localeops.apply.yml](examples/actions/github/localeops.apply.yml)
-        - [localeops.extract.yml](examples/actions/github/localeops.extract.yml)
-
-# LocaleOps
+---
 
 > **Looking for Early Adopters!** We're searching for teams who want to streamline their translation workflow. If you're interested, we're happy to help you set it up. [Start a discussion](https://github.com/localeops/localeops/discussions) or reach out!
 
-LocaleOps is a Git-native utility for managing translations directly inside your codebase. It sits between your locale files and your translation provider - human translators, agencies, or AI.
+LocaleOps prevents wasted translation work by tracking what changed in your source language and detecting when existing translations become stale - all while keeping your strings in Git instead of a vendor's database.
 
-LocaleOps is **not** a translation platform. It doesn't store your strings in a proprietary database or force you into a web UI. Instead, it makes your existing workflow - **Git, pull requests, CI, automation** - work naturally for translations.
+**The problem:** When developers change source strings (e.g., "Submit Form" → "Submit Your Application"), existing translations become wrong, but most tools don't detect this. Teams waste money re-translating or ship incorrect translations.
 
-## Why LocaleOps Exists
+**The solution:** LocaleOps snapshots your source language after each translation, then diffs against it to detect exactly what changed. No vendor lock-in, no external database - everything stays in Git.
 
-Most tools fit into one of two categories:
+**[📚 Read the full documentation →](https://localeops.com)**
 
-### 1. Framework utilities (e.g., i18next tools)
-They can extract untranslated strings and check missing keys, but:
-- They do not track changes to existing strings.
-- They do not detect stale translations.
-- They provide no diffs.
-- Any change made by developers can invalidate translations already in progress.
+## Quick Start
 
-This leaves teams manually tracking what changed - a painful and error-prone process.
-
-### 2. Translation management systems
-Comprehensive, but:
-- They introduce vendor lock-in.
-- Strings live outside your repo.
-- You import/export through their UI.
-- Switching providers becomes difficult.
-- They are often overkill and expensive.
-- They require onboarding non-technical managers.
-
-### LocaleOps: the middle layer
-
-LocaleOps keeps your locale files in Git and automates the tedious parts:
-- Diffing string changes
-- Detecting stale or outdated translations
-- Generating translation extraction sets
-- Opening pull requests with translation changes
-- Writing translated strings back into your repo
-
-You remain fully in control of the translation provider, workflow, and file formats.
-
-## How LocaleOps Works
-
-```
-main branch update
-      │
-      ├──▶ localeops extract (snapshot + diff)
-      │
-      ├──▶ send to translator / AI
-      │
-      ├──▶ receive translated output
-      │
-      ├──▶ localeops apply (update locale files + snapshot)
-      │
-      └──▶ PR with updated translations
+```bash
+npm install -g @localeops/localeops
 ```
 
-LocaleOps provides two core commands:
+Create a `localeops.yml` config file:
 
-### `localeops extract`
-Detects:
-- New strings
-- Changed strings
+```yaml
+framework:
+  name: i18next
+  locale: en
+  directory: ./locales
 
-Outputs a structured JSON file (the translation delta) that you send to your translation provider.
+database:
+  adapter:
+    name: file
 
-### `localeops apply`
-Takes completed translations and writes them into your locale files, creating commits or pull requests.
+source:
+  name: github
+  base: main
+  repo: your-org/your-repo
+  token: ${GITHUB_TOKEN}
 
-## Provider-Agnostic by Design
+locales:
+  - es
+  - fr
+```
 
-LocaleOps simply produces JSON. From there, you control the workflow:
-- Send JSON to a translation agency  
-- Translate via an LLM  
-- Convert to CSV/Excel  
-- Pipe into your own API  
-- Store or transform it however you want  
+Then run:
 
-Because LocaleOps is open source and format-agnostic, you can fully customize how translations move through your stack.
+```bash
+# Extract untranslated strings
+localeops extract
 
-## Workflow Flexibility: Synchronous & Asynchronous
+# Send to translation provider (AI, human, or agency)
 
-LocaleOps doesn’t enforce a specific workflow - developers decide how automation works.
+# Apply translations and create PR
+localeops apply <translations-json>
+```
 
-### Synchronous workflow (single step)
-You can:
-1. Run `localeops extract`
-2. Send the JSON to an AI translator
-3. Receive translations
-4. Run `localeops apply`
+## Key Features
 
-All inside a single GitHub Action job. Ideal for fully automated, continuous translation pipelines.
+- **Git-Native**: Translations stay in your repository under version control
+- **Framework Support**: Works with i18next, FormatJS, and custom parsers
+- **Provider Agnostic**: Use any translation service (AI, human, or agency)
+- **Change Detection**: Automatically detects new and modified strings
+- **Pull Request Automation**: Creates PRs for translation updates
+- **CI/CD Ready**: Runs entirely in GitHub Actions or any CI pipeline
 
-### Asynchronous workflow (multi-step)
-You can also:
-1. Run `localeops extract` in CI
-2. Send JSON to your own API, external service, or human translators
-3. Trigger a second workflow (or API callback) later
-4. Run `localeops apply` when translations are ready
+## Examples
 
-Perfect for human review cycles, batching, or custom internal processes.
+- [i18next Example](examples/i18next)
+- [FormatJS Example](examples/formatjs)
 
-### No extra servers required
-LocaleOps can run entirely inside CI/CD pipelines and GitHub Actions, so if you don't want to manage infrastructure, you don't have to.
+## Community
+
+- [Documentation](https://localeops.com)
+- [Discussions](https://github.com/localeops/localeops/discussions)
+
+## License
+
+Apache 2.0

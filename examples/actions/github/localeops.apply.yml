@@ -1,32 +1,63 @@
-name: apply translations # Workflow to apply LocaleOps translations into the repository
+# =============================================================================
+# LocaleOps Apply Translations Workflow
+# =============================================================================
+#
+# This workflow applies completed translations to your repository.
+# It's designed for asynchronous translation workflows where translations
+# are completed by external services, human translators, or APIs.
+#
+# Workflow:
+# 1. Triggered via repository_dispatch event
+# 2. Receives translations in the event payload
+# 3. Applies translations using LocaleOps
+# 4. Creates a pull request with the changes
+#
+# Trigger this workflow using GitHub API:
+# ```bash
+# curl -X POST \
+#   -H "Authorization: token YOUR_GITHUB_TOKEN" \
+#   -H "Accept: application/vnd.github.v3+json" \
+#   https://api.github.com/repos/OWNER/REPO/dispatches \
+#   -d '{"event_type":"localeops_apply","client_payload":{"translations":{...}}}'
+# ```
+#
+# Requirements:
+# - GITHUB_TOKEN: Automatically provided by GitHub Actions
+#
+# =============================================================================
+
+name: apply translations
 
 on:
   repository_dispatch:
-    types: [localeops_apply] # Triggered via repository_dispatch event from LocaleOps
+    types: [localeops_apply]  # Triggered via repository_dispatch event
 
+# Prevent multiple apply workflows from running simultaneously
 concurrency:
   group: localeops_apply
   cancel-in-progress: false
 
 jobs:
   apply_translations:
-    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    runs-on: ubuntu-latest
     permissions:
-      contents: write # Needed to push commits back to the repo
-      pull-requests: write # Needed if LocaleOps opens/updates PRs
+      contents: write        # Required to push commits
+      pull-requests: write   # Required to create pull requests
 
     steps:
       - name: checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }} # Authenticate checkout with GitHub token
+          token: ${{ secrets.GITHUB_TOKEN }}
 
+      # Configure git for commits created by LocaleOps
       - name: configure git
         run: |
-          git config user.name "github-actions[bot]"       
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      # Pull values from the repository_dispatch payload into environment variables
+      # Extract translations from repository_dispatch payload
+      # The payload should contain: {translations: {locale: [{filePath, resourcePath, value}]}}
       - name: set env vars
         run: |
           {
@@ -35,8 +66,8 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_ENV"
 
-      # Run LocaleOps to apply translations for the given locale
+      # Apply translations to locale files and create PR
       - name: run localeops
         env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }} # Pass GitHub token to LocaleOps as TOKEN
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for creating PR
         run: npx @localeops/localeops apply "${TRANSLATIONS}"
