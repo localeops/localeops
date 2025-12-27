@@ -1,0 +1,67 @@
+---
+title: Motivation
+description: Why LocaleOps exists and what problems it solves
+---
+
+## The Core Problem: Translation Drift
+
+LocaleOps solves the **"translation drift" problem** - the gap between when developers change source strings and when translations get updated.
+
+**Common scenario:**
+
+A developer changes "Hello" to "Welcome back!" in the English locale. The Spanish translation still says "Hola" but should now say "¡Bienvenido de nuevo!".
+
+Without change tracking, this goes unnoticed. The translation is outdated, but there's no automated way to detect it. Teams either ship stale translations or manually track every string change - both are error-prone and time-consuming.
+
+## The Landscape
+
+### The Problem with Framework Utilities
+
+Tools like i18next CLI can extract untranslated strings and check for missing keys, but they have critical limitations:
+
+- **No change tracking**: Modified strings aren't detected
+- **No diff support**: Can't identify what actually changed
+- **No stale detection**: Outdated translations go unnoticed
+- **Manual coordination**: Teams track changes in spreadsheets or issue trackers
+
+This creates a painful workflow where any code change can silently invalidate in-progress translations.
+
+### The Problem with Translation Management Systems
+
+Comprehensive platforms (Phrase, Lokalise, Crowdin) handle everything, but at a cost:
+
+- **Vendor lock-in**: Switching providers means data migration and workflow changes
+- **External storage**: Strings live outside your repository
+- **High cost**: Often expensive, especially for smaller teams
+- **Complexity overhead**: Requires onboarding non-technical stakeholders
+- **Integration friction**: Another system to integrate with your CI/CD
+
+### The LocaleOps Approach
+
+LocaleOps provides the middle layer - automation without platform lock-in:
+
+**What LocaleOps does:**
+- Tracks string changes with Git-based snapshots
+- Detects new, modified, and stale translations
+- Generates structured diffs for translation providers
+- Automates pull request creation for translation updates
+- Runs entirely in your existing CI/CD pipeline
+
+**What you keep control of:**
+- Translation provider (AI, agency, or human translators)
+- Workflow and automation logic
+- File formats and repository structure
+- Data ownership and access control
+
+LocaleOps works with your existing Git workflow, not against it.
+
+## How LocaleOps Solves This
+
+LocaleOps tracks changes through snapshots:
+
+1. **After translation:** LocaleOps saves a snapshot of the source language
+2. **On next extract:** Compares current source against the snapshot
+3. **Detects drift:** Identifies strings that changed after translation
+4. **Output:** Structured diff showing exactly what needs re-translation
+
+Instead of manually tracking or guessing what changed, you get an automated, accurate list of stale translations.

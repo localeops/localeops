@@ -5,7 +5,8 @@
 	"scripts": {
 		"dev": "astro dev",
 		"start": "astro dev",
-		"build": "astro build",
+		"build": "bun run generate:github-actions && astro build",
+		"generate:github-actions": "bun run scripts/generate-github-actions.ts",
 		"preview": "astro preview",
 		"astro": "astro"
 	},
