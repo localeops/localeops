@@ -17,6 +17,10 @@ jobs:
     steps:
       - name: Checkout your repository using git
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2.0.2
+        with:
+          bun-version: 1.3.5
       - name: Install, build, and upload your site
         uses: withastro/action@fd83e9d976da29fe29a0cc268443b7203c18f9ba # v5.0.2
         with:
