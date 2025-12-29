@@ -1,4 +1,4 @@
-const isDebug = process.env.DEBUG === "true";
+export const isDebug = process.env.DEBUG === "true";
 
 export const logger = {
 	debug: (message: string, data?: unknown) => {
@@ -7,6 +7,6 @@ export const logger = {
 		}
 	},
 	error: (message: string, data?: unknown) => {
-		console.error(`[ERROR] ${message}`, data ?? "");
+		console.error(message, data ?? "");
 	},
 };

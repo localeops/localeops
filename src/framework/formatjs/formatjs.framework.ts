@@ -1,6 +1,7 @@
 import { Value } from "@sinclair/typebox/value";
 import get from "lodash/get";
 import set from "lodash/set";
+import { FrameworkError } from "../../core/errors";
 import type { Formatting } from "../../shared/formatting";
 import { formatJson } from "../../shared/formatting";
 import { BaseFramework } from "../base/base.framework";
@@ -53,7 +54,9 @@ export class FormatjsFramework extends BaseFramework<FormatjsResource> {
 					const newValue = newResource[key];
 
 					if (!newValue) {
-						throw new Error(`Invariant: newResource[${key}] is missing`);
+						throw new FrameworkError(
+							`Invariant: newResource[${key}] is missing`,
+						);
 					}
 
 					changes.push({
@@ -86,11 +89,15 @@ export class FormatjsFramework extends BaseFramework<FormatjsResource> {
 					const newValue = newResource[key];
 
 					if (!oldValue) {
-						throw new Error(`Invariant: oldResource[${key}] is missing`);
+						throw new FrameworkError(
+							`Invariant: oldResource[${key}] is missing`,
+						);
 					}
 
 					if (!newValue) {
-						throw new Error(`Invariant: newResource[${key}] is missing`);
+						throw new FrameworkError(
+							`Invariant: newResource[${key}] is missing`,
+						);
 					}
 
 					if (newValue !== oldValue) {
@@ -119,7 +126,7 @@ export class FormatjsFramework extends BaseFramework<FormatjsResource> {
 		const value = get(resource, resourcePath);
 
 		if (value === undefined) {
-			throw new Error(`No value at path: ${resourcePath.join(".")}`);
+			throw new FrameworkError(`No value at path: ${resourcePath.join(".")}`);
 		}
 
 		return value;
@@ -137,7 +144,9 @@ export class FormatjsFramework extends BaseFramework<FormatjsResource> {
 		}
 
 		if (!Value.Check(FormatjsResourceSchema, resource)) {
-			throw new TypeError("Formatjs resource validation failed after update");
+			throw new FrameworkError(
+				"Formatjs resource validation failed after update",
+			);
 		}
 
 		return resource;

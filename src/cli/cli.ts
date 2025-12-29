@@ -2,8 +2,8 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { config } from "../config";
 import { LocaleOpsContext } from "../core/context";
+import { handleCliError } from "../core/error-handler";
 import { LocaleOpsOrchestrator } from "../core/orchestrator";
-import { logger } from "../shared/logger";
 import { ApplyCommand } from "./commands/apply.command";
 import { ExtractCommand } from "./commands/extract.command";
 
@@ -34,8 +34,7 @@ export class CLI {
 						// Output results to stdout for consumption by translation services
 						console.log(JSON.stringify(diffs, null, 2));
 					} catch (err) {
-						logger.error(err instanceof Error ? err.message : "Unknown", err);
-						process.exit(1);
+						handleCliError(err);
 					}
 				},
 			)
@@ -55,8 +54,7 @@ export class CLI {
 						const applyCommand = new ApplyCommand(orchestrator);
 						await applyCommand.execute(argv["translations-json"]);
 					} catch (err) {
-						logger.error(err instanceof Error ? err.message : "Unknown", err);
-						process.exit(1);
+						handleCliError(err);
 					}
 				},
 			)
