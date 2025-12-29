@@ -81,7 +81,7 @@ localeops apply <translations-json>
 
 ## Examples
 
-- [i18next Example](examples/i18next)
+- [React + Vite + i18next](examples/react-vite-i18next) - Complete starter with AI translation
 - [FormatJS Example](examples/formatjs)
 
 ## Community

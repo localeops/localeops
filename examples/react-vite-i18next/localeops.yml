@@ -1,0 +1,22 @@
+# LocaleOps configuration for i18next
+framework:
+  name: i18next
+  locale: en # Source language
+  directory: ./src/i18n/locales # Translation files location
+
+# Store translation metadata in files
+database:
+  adapter:
+    name: file
+
+# GitHub repository settings
+# Note: These environment variables are automatically provided by GitHub Actions
+source:
+  name: github
+  base: main # Base branch for comparisons
+  repo: ${GITHUB_REPOSITORY} # Automatically set in GitHub Actions
+  token: ${GITHUB_TOKEN} # Automatically set in GitHub Actions
+
+# Target languages to translate into
+locales:
+  - es
