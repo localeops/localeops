@@ -2,39 +2,48 @@ import fs from "node:fs";
 import type { Static } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
 import { YAML } from "bun";
-import { logger } from "../shared/logger";
+import { handleCliError } from "../core/error-handler";
+import { ConfigError } from "../core/errors";
 import { resolveConfigPath } from "../shared/paths";
 import { configSchema } from "./config.schema";
 import { interpolateEnvVars } from "./config.utils";
 
-const configFileName = "localeops.yml";
+export const configFileName = "localeops.yml";
 
 const configFilePath = resolveConfigPath(configFileName);
 
-if (!fs.existsSync(configFilePath)) {
-	logger.error(`${configFileName} not found at ${configFilePath}`);
-
-	process.exit(1);
-}
-
 let configFile: unknown;
 try {
-	let configContent = fs.readFileSync(configFilePath, "utf8");
-	configContent = interpolateEnvVars(configContent);
-	configFile = YAML.parse(configContent);
-} catch (err) {
-	logger.error(err instanceof Error ? err.message : "Unknown", err);
-
-	process.exit(1);
-}
-
-if (!Value.Check(configSchema, configFile)) {
-	const errors = [...Value.Errors(configSchema, configFile)];
-	logger.error("Invalid config structure:");
-	for (const error of errors) {
-		logger.error(`  - ${error.path}: ${error.message}`);
+	if (!fs.existsSync(configFilePath)) {
+		throw new ConfigError(
+			`LocaleOps configuration file not found at "${configFilePath}".\nCreate ${configFileName} at the root of your project.`,
+		);
 	}
-	process.exit(1);
+
+	const configContent = fs.readFileSync(configFilePath, "utf8");
+
+	const interpolatedConfigContent = interpolateEnvVars(configContent);
+
+	try {
+		configFile = YAML.parse(interpolatedConfigContent);
+	} catch (error) {
+		throw new ConfigError(
+			`Config file contains invalid YAML syntax.\nEnsure the file is correctly formatted YAML.`,
+			{ cause: error },
+		);
+	}
+
+	if (!Value.Check(configSchema, configFile)) {
+		const errors = [...Value.Errors(configSchema, configFile)];
+
+		throw new ConfigError(
+			`Invalid config structure:
+			${errors.map((e) => `\n- ${e.path}: ${e.message}`).join("")}
+			`,
+		);
+	}
+} catch (error) {
+	handleCliError(error);
 }
 
 export const config = Value.Parse(configSchema, configFile);

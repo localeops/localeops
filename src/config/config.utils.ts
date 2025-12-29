@@ -1,3 +1,5 @@
+import { ConfigError } from "../core/errors";
+
 export const interpolateEnvVars = (input: string): string => {
 	const missingVars: string[] = [];
 
@@ -20,9 +22,9 @@ export const interpolateEnvVars = (input: string): string => {
 	);
 
 	if (missingVars.length > 0) {
-		throw new Error(
+		throw new ConfigError(
 			`Missing environment variables: ${missingVars.join(", ")}\n` +
-				`Please set: ${missingVars.map((v) => `export ${v}=value`).join("; ")}`,
+				`Please set: ${missingVars.map((v) => `export ${v}=value`).join("; ")}\n`,
 		);
 	}
 

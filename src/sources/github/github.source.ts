@@ -1,5 +1,6 @@
 import { Value } from "@sinclair/typebox/value";
 import type { Config } from "../../config";
+import { SourceError } from "../../core/errors";
 import { logger } from "../../shared/logger";
 import { BaseSource } from "../base.source";
 import { GitHubPullRequestListSchema } from "./github.schema";
@@ -51,7 +52,7 @@ export class GitHubSource extends BaseSource {
 		} else if (response.status !== 404) {
 			const errorText = await response.text();
 
-			throw new Error(
+			throw new SourceError(
 				`[GitHub] Failed to get open PRs: ${response.status} ${errorText}`,
 			);
 		}
@@ -84,7 +85,7 @@ export class GitHubSource extends BaseSource {
 		if (!response.ok) {
 			const errorText = await response.text();
 
-			throw new Error(
+			throw new SourceError(
 				`[GitHub] Failed to update PR #${prNumber}: ${response.status} ${errorText}`,
 			);
 		}
@@ -120,7 +121,7 @@ export class GitHubSource extends BaseSource {
 		if (!response.ok) {
 			const errorText = await response.text();
 
-			throw new Error(
+			throw new SourceError(
 				`[GitHub] Failed to create PR: ${response.status} ${errorText}`,
 			);
 		}

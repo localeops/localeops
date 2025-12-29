@@ -1,6 +1,7 @@
 import { Value } from "@sinclair/typebox/value";
 import get from "lodash/get";
 import set from "lodash/set";
+import { FrameworkError } from "../../core/errors";
 import { type Formatting, formatJson } from "../../shared/formatting";
 import { BaseFramework } from "../base/base.framework";
 import type {
@@ -203,7 +204,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 		const value = get(resource, resourcePath);
 
 		if (value === undefined) {
-			throw new Error(`No value at path: ${resourcePath.join(".")}`);
+			throw new FrameworkError(`No value at path: ${resourcePath.join(".")}`);
 		}
 
 		return value;
@@ -222,7 +223,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 
 			for (let i = 0; i < resourcePath.length; i++) {
 				const key = resourcePath[i];
-				if (key === undefined) throw new Error("Invalid path key");
+				if (key === undefined) throw new FrameworkError("Invalid path key");
 				currentPath.push(key);
 
 				if (typeof resourcePath[i + 1] === "number") {
@@ -240,7 +241,7 @@ export class I18nextFramework extends BaseFramework<I18nextResource> {
 		}
 
 		if (!Value.Check(I18nextResourceSchema, resource)) {
-			throw new TypeError(
+			throw new FrameworkError(
 				"[I18Next] i18n resource validation failed after update",
 			);
 		}

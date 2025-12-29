@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Config } from "../../config";
+import { FrameworkError } from "../../core/errors";
 import { logger } from "../../shared/logger";
 import type {
 	ResourceDelta,
@@ -97,11 +98,15 @@ export abstract class BaseFramework<Resource> {
 				const newResource = newSnapshot[filePath];
 
 				if (!oldResource) {
-					throw new Error(`Invariant: oldSnapshot[${filePath}] is missing`);
+					throw new FrameworkError(
+						`Invariant: oldSnapshot[${filePath}] is missing`,
+					);
 				}
 
 				if (!newResource) {
-					throw new Error(`Invariant: newSnapshot[${filePath}] is missing`);
+					throw new FrameworkError(
+						`Invariant: newSnapshot[${filePath}] is missing`,
+					);
 				}
 
 				const resourceDeltas = this.diff({
@@ -116,7 +121,9 @@ export abstract class BaseFramework<Resource> {
 				const newResource = newSnapshot[filePath];
 
 				if (!newResource) {
-					throw new Error(`Invariant: newSnapshot[${filePath}] is missing`);
+					throw new FrameworkError(
+						`Invariant: newSnapshot[${filePath}] is missing`,
+					);
 				}
 
 				const resourceDeltas = this.diff({

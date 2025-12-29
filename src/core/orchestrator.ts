@@ -14,36 +14,32 @@ export class LocaleOpsOrchestrator {
 	async extract(locale: string): Promise<SnapshotDelta[]> {
 		const { framework, database, source, config } = this.ctx;
 
-		try {
-			const localeBranchName = getTranslationBranchName(locale);
+		const localeBranchName = getTranslationBranchName(locale);
 
-			source.checkout(localeBranchName);
+		source.checkout(localeBranchName);
 
-			const oldSnapshot = await database.get(locale);
-			const oldSnapshotParsed = oldSnapshot
-				? Value.Parse(SnapshotSchema, JSON.parse(oldSnapshot))
-				: {};
+		const oldSnapshot = await database.get(locale);
 
-			logger.debug("Old snapshot", oldSnapshotParsed);
+		const oldSnapshotParsed = oldSnapshot
+			? Value.Parse(SnapshotSchema, JSON.parse(oldSnapshot))
+			: {};
 
-			source.checkout(config.source.base);
+		logger.debug("Old snapshot", oldSnapshotParsed);
 
-			const newSnapshot = framework.snapshot();
+		source.checkout(config.source.base);
 
-			logger.debug("New snapshot", newSnapshot);
+		const newSnapshot = framework.snapshot();
 
-			const diff = framework.diffSnapshots({
-				newSnapshot,
-				oldSnapshot: oldSnapshotParsed,
-			});
+		logger.debug("New snapshot", newSnapshot);
 
-			logger.debug("Snapshot diff", diff);
+		const diff = framework.diffSnapshots({
+			newSnapshot,
+			oldSnapshot: oldSnapshotParsed,
+		});
 
-			return diff;
-		} catch (err) {
-			const message = err instanceof Error ? err.message : String(err);
-			throw new Error(`Error extracting untranslated\n${message}`);
-		}
+		logger.debug("Snapshot diff", diff);
+
+		return diff;
 	}
 
 	async apply(allTranslations: Record<string, Translation[]>): Promise<void> {
@@ -73,7 +69,7 @@ export class LocaleOpsOrchestrator {
 
 				if (from !== current) {
 					throw new Error(
-						`Translation for ${filePath}:${resourcePath} is stale. From: ${from}, Current: ${current}`,
+						`Translation for ${filePath}:${resourcePath} is stale. From: ${from}, Current: ${current}\nPlease re-extract translations to get current source locale values.`,
 					);
 				}
 			}
