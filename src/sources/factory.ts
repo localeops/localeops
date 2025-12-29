@@ -1,4 +1,4 @@
-import { type Config, configFileName } from "../config/config";
+import type { Config } from "../config/config";
 import { SourceError } from "../core/errors";
 import type { BaseSource } from "./base.source";
 import { GitHubSource } from "./github/github.source";
@@ -13,6 +13,6 @@ export const createSource = (config: Config["source"]): BaseSource => {
 	const _exhaustive: never = name;
 
 	throw new SourceError(
-		`Unknown source adapter: ${(_exhaustive as { name: string }).name}\nPlease check ${configFileName} file.`,
+		`Unknown source adapter: ${(_exhaustive as { name: string }).name}\nPlease check configuration file.`,
 	);
 };

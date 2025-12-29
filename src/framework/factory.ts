@@ -1,4 +1,4 @@
-import { type Config, configFileName } from "../config/config";
+import type { Config } from "../config/config";
 import { FrameworkError } from "../core/errors";
 import type { BaseFramework } from "./base/base.framework";
 import { FormatjsFramework } from "./formatjs/formatjs.framework";
@@ -20,6 +20,6 @@ export const createFramework = (
 	const _exhaustive: never = name;
 
 	throw new FrameworkError(
-		`Unknown framework: ${(_exhaustive as { name: string }).name}\nPlease check ${configFileName} file.`,
+		`Unknown framework: ${(_exhaustive as { name: string }).name}\nPlease check configuration file.`,
 	);
 };

@@ -1,5 +1,4 @@
 import type { Config } from "../config";
-import { configFileName } from "../config/config";
 import { DatabaseError } from "../core/errors";
 import { resolveConfigPath } from "../shared/paths";
 import type { BaseDatabase } from "./base.database";
@@ -25,6 +24,6 @@ export const createDatabase = async (
 	const _exhaustive: never = adapter;
 
 	throw new DatabaseError(
-		`Unknown database adapter: ${(_exhaustive as { name: string }).name}\nPlease check ${configFileName} file.`,
+		`Unknown database adapter: ${(_exhaustive as { name: string }).name}\nPlease check configuration file.`,
 	);
 };
