@@ -36,11 +36,11 @@ try {
 	if (!Value.Check(configSchema, configFile)) {
 		const errors = [...Value.Errors(configSchema, configFile)];
 
-		throw new ConfigError(
-			`Invalid config structure:
-			${errors.map((e) => `\n- ${e.path}: ${e.message}`).join("")}
-			`,
-		);
+		const errorsMessage = errors
+			.map((e) => `- ${e.path}: ${e.message}`)
+			.join("\n");
+
+		throw new ConfigError(`Invalid config structure:\n${errorsMessage}`);
 	}
 } catch (error) {
 	handleCliError(error);
