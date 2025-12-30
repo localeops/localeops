@@ -1,3 +1,33 @@
+## [0.7.0](https://github.com/localeops/localeops/compare/v0.6.0...v0.7.0) (2025-12-30)
+
+### Features
+
+* **docs:** add React i18next example with AI translation workflow ([2c770ed](https://github.com/localeops/localeops/commit/2c770ed4f99f54b03c456986eaf7adef7804fd4d))
+
+### Bug Fixes
+
+* fix workflow env name to match config file reference ([6b59f8d](https://github.com/localeops/localeops/commit/6b59f8da8b0f4c7dcab1cf064459aaec0ef24bd0))
+
+### Chores
+
+* **deps-dev:** bump the development-dependencies group with 4 updates ([797bdf0](https://github.com/localeops/localeops/commit/797bdf02907fe28b8c78393ea5debcacc2b09430))
+
+### Documentation
+
+* **ci:** add bun runtime to docs github action ([8b644d4](https://github.com/localeops/localeops/commit/8b644d4c084f79c5b92e6217ebe63ce7fb1aff70))
+* **docs:** add github example AI workflow ([fb6fb13](https://github.com/localeops/localeops/commit/fb6fb13fdef65c63709600d7faa9214dd37a3dbd))
+* **docs:** add quick start section in readme file ([2fba7b6](https://github.com/localeops/localeops/commit/2fba7b6c0ab7fc0dc6bad7dec13ddf7c505729be))
+* improve positioning and value proposition ([37d342c](https://github.com/localeops/localeops/commit/37d342ccbf266a26499c10afddd31e8084086d5b))
+
+### Continuous Integration
+
+* **deps:** bump actions/checkout from 5.0.1 to 6.0.1 ([8cb4e30](https://github.com/localeops/localeops/commit/8cb4e309ec5d4d1ae09b669710c5a7764c695208))
+
+### Code Refactoring
+
+* create-unified-error-handling ([72385e4](https://github.com/localeops/localeops/commit/72385e44f4210267fd072d92908b19d63b870cf2))
+* improve error messages readability ([503b3d3](https://github.com/localeops/localeops/commit/503b3d324075f0a836ab38f29ded93159df01b5b))
+
 ## [0.6.0](https://github.com/localeops/localeops/compare/v0.5.0...v0.6.0) (2025-12-26)
 
 ### ⚠ BREAKING CHANGES
