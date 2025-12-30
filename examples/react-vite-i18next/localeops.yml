@@ -15,7 +15,7 @@ source:
   name: github
   base: main # Base branch for comparisons
   repo: ${GITHUB_REPOSITORY} # Automatically set in GitHub Actions
-  token: ${GITHUB_TOKEN} # Automatically set in GitHub Actions
+  token: ${GITHUB_TOKEN} # Mapped to secrets.GITHUB_TOKEN in the workflow file
 
 # Target languages to translate into
 locales:

@@ -49,8 +49,8 @@ jobs:
 
       - name: extract and translate
         env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}              # GitHub token for LocaleOps
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}  # Claude API key
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub token for LocaleOps
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }} # Claude API key
         run: |
           set -e
 
