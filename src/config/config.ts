@@ -8,7 +8,7 @@ import { resolveConfigPath } from "../shared/paths";
 import { configSchema } from "./config.schema";
 import { interpolateEnvVars } from "./config.utils";
 
-export const configFileName = "localeops.yml";
+const configFileName = "localeops.yml";
 
 const configFilePath = resolveConfigPath(configFileName);
 
@@ -26,6 +26,8 @@ try {
 
 	try {
 		configFile = YAML.parse(interpolatedConfigContent);
+
+		configFile = Value.Default(configSchema, configFile);
 	} catch (error) {
 		throw new ConfigError(
 			`Config file contains invalid YAML syntax.\nEnsure the file is correctly formatted YAML.`,

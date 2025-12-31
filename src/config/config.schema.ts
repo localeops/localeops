@@ -10,9 +10,7 @@ export const configSchema = Type.Object({
 		adapter: Type.Union([
 			Type.Object({
 				name: Type.Literal("file"),
-				dirPath: Type.Optional(
-					Type.String({ default: ".localeops/snapshots" }),
-				),
+				dirPath: Type.String({ default: ".localeops/snapshots" }),
 			}),
 			Type.Object({
 				name: Type.Literal("custom"),
@@ -26,7 +24,7 @@ export const configSchema = Type.Object({
 			base: Type.String(),
 			repo: Type.String({ pattern: ".+/.+" }),
 			token: Type.String(),
-			apiUrl: Type.Optional(Type.String({ default: "https://api.github.com" })),
+			apiUrl: Type.String({ default: "https://api.github.com" }),
 		}),
 	]),
 	locales: Type.Array(Type.String()),
