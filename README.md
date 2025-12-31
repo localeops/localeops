@@ -40,7 +40,7 @@ Create a `localeops.yml` config file:
 ```yaml
 framework:
   name: i18next
-  locale: en
+  sourceLocale: en
   directory: ./locales
 
 database:
@@ -50,10 +50,10 @@ database:
 source:
   name: github
   base: main
-  repo: your-org/your-repo
+  repo: ${GITHUB_REPOSITORY}
   token: ${GITHUB_TOKEN}
 
-locales:
+targetLocales:
   - es
   - fr
 ```

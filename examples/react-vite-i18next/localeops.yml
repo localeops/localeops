@@ -1,7 +1,7 @@
 # LocaleOps configuration for i18next
 framework:
   name: i18next
-  locale: en # Source language
+  sourceLocale: en # Source language
   directory: ./src/i18n/locales # Translation files location
 
 # Store translation metadata in files
@@ -18,5 +18,5 @@ source:
   token: ${GITHUB_TOKEN} # Mapped to secrets.GITHUB_TOKEN in the workflow file
 
 # Target languages to translate into
-locales:
+targetLocales:
   - es

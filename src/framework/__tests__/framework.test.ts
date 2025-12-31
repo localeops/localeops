@@ -11,8 +11,8 @@ const fixturesDir = path.join(import.meta.dir, "fixtures");
 const frameworks = [
 	{
 		name: "formatjs" as const,
-		locale: "en",
-		targets: ["fr"],
+		sourceLocale: "en",
+		targetLocales: ["fr"],
 		directory: path.join(fixturesDir, "formatjs"),
 		expectedFiles: [
 			"common.json",
@@ -22,8 +22,8 @@ const frameworks = [
 	},
 	{
 		name: "i18next" as const,
-		locale: "en",
-		targets: ["fr"],
+		sourceLocale: "en",
+		targetLocales: ["fr"],
 		directory: path.join(fixturesDir, "i18next"),
 		expectedFiles: [
 			"common.json",
@@ -35,9 +35,9 @@ const frameworks = [
 
 describe.each(frameworks)("$name Framework", ({
 	name,
-	targets,
+	targetLocales,
 	directory,
-	locale,
+	sourceLocale,
 	expectedFiles,
 }) => {
 	let framework: BaseFramework<unknown>;
@@ -45,7 +45,7 @@ describe.each(frameworks)("$name Framework", ({
 	beforeEach(() => {
 		framework = createFramework({
 			name,
-			locale,
+			sourceLocale,
 			directory,
 		});
 	});
@@ -119,7 +119,7 @@ describe.each(frameworks)("$name Framework", ({
 			return `[${locale}]${value}`;
 		};
 
-		for (const locale of targets) {
+		for (const locale of targetLocales) {
 			const oldSnapshot: Snapshot<unknown> = {};
 
 			const newSnapshot = framework.snapshot();
