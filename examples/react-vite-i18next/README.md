@@ -16,6 +16,13 @@ npm install
 npm run dev
 ```
 
+## Allow GitHub Actions to create and approve pull requests
+
+- Go to Settings → Actions → General in your repository.
+- Under "Workflow permissions", enable "Allow GitHub Actions to approve pull requests"
+
+Done! LocaleOps can now automatically create pull requests with translation updates.
+
 ## Enable AI Translations
 
 Add your Anthropic API key as a GitHub secret:
