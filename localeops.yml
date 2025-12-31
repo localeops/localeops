@@ -18,7 +18,7 @@
 # Target Locales
 # =============================================================================
 
-locales:
+targetLocales:
   - es
   - fr
   - de
@@ -78,5 +78,5 @@ framework:
   #   directory: string  # Directory containing all locale files.
   #
   name: i18next
-  locale: en
+  sourceLocale: en
   directory: public/locales

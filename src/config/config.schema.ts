@@ -2,7 +2,7 @@ import { Type } from "@sinclair/typebox/type";
 
 export const configSchema = Type.Object({
 	framework: Type.Object({
-		locale: Type.String(),
+		sourceLocale: Type.String(),
 		directory: Type.String(),
 		name: Type.Union([Type.Literal("i18next"), Type.Literal("formatjs")]),
 	}),
@@ -27,5 +27,5 @@ export const configSchema = Type.Object({
 			apiUrl: Type.String({ default: "https://api.github.com" }),
 		}),
 	]),
-	locales: Type.Array(Type.String()),
+	targetLocales: Type.Array(Type.String()),
 });

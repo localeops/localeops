@@ -30,7 +30,7 @@ export class CLI {
 				async () => {
 					try {
 						const extractCommand = new ExtractCommand(orchestrator);
-						const diffs = await extractCommand.execute(config.locales);
+						const diffs = await extractCommand.execute(config.targetLocales);
 						// Output results to stdout for consumption by translation services
 						console.log(JSON.stringify(diffs, null, 2));
 					} catch (err) {

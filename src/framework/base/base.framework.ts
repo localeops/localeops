@@ -25,7 +25,7 @@ export abstract class BaseFramework<Resource> {
 	directory: string;
 
 	constructor(config: Config["framework"]) {
-		this.locale = config.locale;
+		this.locale = config.sourceLocale;
 		this.directory = config.directory;
 	}
 
