@@ -1,3 +1,13 @@
+## [0.8.0](https://github.com/localeops/localeops/compare/v0.7.1...v0.8.0) (2026-01-04)
+
+### Features
+
+* **cli:** add translations initial sync command ([300adc5](https://github.com/localeops/localeops/commit/300adc521e199bfd2c7249b12414645e280dc319))
+
+### Documentation
+
+* **cli:** update documentation with sync command ([663e489](https://github.com/localeops/localeops/commit/663e489a98937529bba574664c46a99231d1767d))
+
 ## [0.7.1](https://github.com/localeops/localeops/compare/v0.7.0...v0.7.1) (2026-01-04)
 
 ### Bug Fixes
