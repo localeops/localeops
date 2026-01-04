@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { Value } from "@sinclair/typebox/value";
 import { SnapshotSchema } from "../framework/base/base.schema";
-import type { SnapshotDelta } from "../framework/base/base.types";
+import type { Snapshot, SnapshotDelta } from "../framework/base/base.types";
 import { logger } from "../shared/logger";
 import { getTranslationBranchName } from "../shared/utils";
 import type { LocaleOpsContext } from "./context";
@@ -40,6 +40,47 @@ export class LocaleOpsOrchestrator {
 		logger.debug("Snapshot diff", diff);
 
 		return diff;
+	}
+
+	async sync(locale: string): Promise<void> {
+		const { framework, database } = this.ctx;
+
+		const targetSnapshot: Snapshot<unknown> = {};
+
+		const targetLocaleDiff = framework.diffSnapshots({
+			newSnapshot: framework.snapshot(locale),
+			oldSnapshot: targetSnapshot,
+		});
+
+		const targetLocaleAddedDiff = targetLocaleDiff.filter((d) => {
+			return d.type === "added";
+		});
+
+		const sourceSnapshot = framework.snapshot();
+
+		for (const delta of targetLocaleAddedDiff) {
+			if (sourceSnapshot[delta.filePath]) {
+				const value = framework.resolve({
+					resource: sourceSnapshot[delta.filePath],
+					resourcePath: delta.resourcePath,
+				});
+
+				delta.value = value;
+
+				const resource = framework.patch({
+					resource: targetSnapshot[delta.filePath],
+					updates: [delta],
+				});
+
+				targetSnapshot[delta.filePath] = resource;
+			}
+		}
+
+		await database.set({
+			key: locale,
+			content: JSON.stringify(targetSnapshot),
+			commit: false,
+		});
 	}
 
 	async apply(allTranslations: Record<string, Translation[]>): Promise<void> {
@@ -183,7 +224,11 @@ export class LocaleOpsOrchestrator {
 		logger.debug("Updated snapshot: ", snapshotParsed);
 
 		// Save updated source snapshot back to progress tracker
-		await database.set(locale, JSON.stringify(snapshotParsed));
+		await database.set({
+			key: locale,
+			content: JSON.stringify(snapshotParsed),
+			commit: true,
+		});
 
 		const translationsBranch = getTranslationBranchName(locale);
 
