@@ -1,3 +1,17 @@
+## [0.7.1](https://github.com/localeops/localeops/compare/v0.7.0...v0.7.1) (2026-01-04)
+
+### Bug Fixes
+
+* **config:** fix database dirPath schema definition ([89f7f98](https://github.com/localeops/localeops/commit/89f7f98d2829ec77a08ee3337314d2d37049232a))
+
+### Documentation
+
+* **docs:** add missing github settings section in readme ([2915fd4](https://github.com/localeops/localeops/commit/2915fd4f9b9f78bbb6f47aae8eedb1a3825d5e21))
+
+### Code Refactoring
+
+* **config:** improve config options naming ([d33b597](https://github.com/localeops/localeops/commit/d33b597394fe2c3d8fb0dbabd243adca573efc08))
+
 ## [0.7.0](https://github.com/localeops/localeops/compare/v0.6.0...v0.7.0) (2025-12-30)
 
 ### Features
