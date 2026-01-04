@@ -40,8 +40,8 @@ export abstract class BaseFramework<Resource> {
 	 *
 	 * @throws Error if the source locale directory does not exist or files cannot be read
 	 */
-	snapshot(): Snapshot<Resource> {
-		const sourceLocaleDirPath = `${this.directory}/${this.locale}`;
+	snapshot(locale?: string): Snapshot<Resource> {
+		const sourceLocaleDirPath = `${this.directory}/${locale ?? this.locale}`;
 
 		const snapshot: Snapshot<Resource> = {};
 

@@ -21,7 +21,17 @@ main branch update
 
 ## Core Commands
 
-LocaleOps provides two primary commands that work together:
+
+LocaleOps provides three primary commands that work together:
+
+### `localeops sync`
+
+Creates initial snapshots for all configured target locales 
+
+- Reads target locales translation files
+- Finds respecting values in source locale files
+- Creates snapshots with those values
+
 
 ### `localeops extract`
 

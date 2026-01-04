@@ -6,6 +6,7 @@ import { handleCliError } from "../core/error-handler";
 import { LocaleOpsOrchestrator } from "../core/orchestrator";
 import { ApplyCommand } from "./commands/apply.command";
 import { ExtractCommand } from "./commands/extract.command";
+import { SyncCommand } from "./commands/sync.command";
 
 export class CLI {
 	private orchestratorPromise: Promise<LocaleOpsOrchestrator>;
@@ -53,6 +54,19 @@ export class CLI {
 					try {
 						const applyCommand = new ApplyCommand(orchestrator);
 						await applyCommand.execute(argv["translations-json"]);
+					} catch (err) {
+						handleCliError(err);
+					}
+				},
+			)
+			.command(
+				"sync",
+				"Make snapshots for configured target locales",
+				{},
+				async () => {
+					try {
+						const syncCommand = new SyncCommand(orchestrator);
+						await syncCommand.execute(config.targetLocales);
 					} catch (err) {
 						handleCliError(err);
 					}
