@@ -1,0 +1,22 @@
+.app {
+	padding: 2rem;
+	margin: 0 auto;
+	max-width: 1280px;
+	text-align: center;
+}
+
+button {
+	padding: 0.5rem 1rem;
+	font-size: 1rem;
+	cursor: pointer;
+	border: 2px solid #646cff;
+	background: #646cff;
+	color: white;
+	border-radius: 4px;
+	transition: all 0.2s;
+}
+
+button:hover {
+	background: #535bf2;
+	border-color: #535bf2;
+}

@@ -1,0 +1,22 @@
+# LocaleOps configuration for FormatJS
+framework:
+  name: formatjs
+  sourceLocale: en # Source language
+  directory: ./src/i18n/locales # Translation files location
+
+# Store translation metadata in files
+database:
+  adapter:
+    name: file
+
+# GitHub repository settings
+# Note: These environment variables are automatically provided by GitHub Actions
+source:
+  name: github
+  base: main # Base branch for comparisons
+  repo: ${GITHUB_REPOSITORY} # Automatically set in GitHub Actions
+  token: ${GITHUB_TOKEN} # Mapped to secrets.GITHUB_TOKEN in the workflow file
+
+# Target languages to translate into
+targetLocales:
+  - es

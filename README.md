@@ -27,7 +27,7 @@ LocaleOps prevents wasted translation work by tracking what changed in your sour
 
 **The solution:** LocaleOps snapshots your source language after each translation, then diffs against it to detect exactly what changed. No vendor lock-in, no external database - everything stays in Git.
 
-**[📚 Read the full documentation →](https://localeops.com)**
+**[Read the full documentation →](https://localeops.com)**
 
 ## Quick Start
 
@@ -84,8 +84,8 @@ localeops sync
 
 ## Examples
 
-- [React + Vite + i18next](examples/react-vite-i18next) - Complete starter with AI translation
-- [FormatJS Example](examples/formatjs)
+- [React + Vite + i18next](examples/react-vite-i18next)
+- [React + Vite + FormatJS](examples/react-vite-formatjs)
 
 ## Community
 
