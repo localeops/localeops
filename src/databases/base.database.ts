@@ -16,6 +16,15 @@ export abstract class BaseDatabase {
 	/**
 	 * Sets content for a specific key
 	 * Replaces existing content entirely
+	 * @param commit Whether to commit changes to the source control
 	 */
-	abstract set(key: string, content: string): Promise<void>;
+	abstract set({
+		key,
+		content,
+		commit,
+	}: {
+		key: string;
+		content: string;
+		commit: boolean;
+	}): Promise<void>;
 }

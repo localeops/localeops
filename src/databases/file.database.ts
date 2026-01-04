@@ -32,17 +32,27 @@ export class FileDatabase extends BaseDatabase {
 		return null;
 	}
 
-	async set(key: string, content: string): Promise<void> {
+	async set({
+		key,
+		content,
+		commit,
+	}: {
+		key: string;
+		content: string;
+		commit: boolean;
+	}): Promise<void> {
 		await fs.mkdir(this.dirPath, { recursive: true });
 
 		const filePath = this.getFilePath(key);
 
 		await fs.writeFile(filePath, content, "utf8");
 
-		const source = createSource(config.source);
+		if (commit) {
+			const source = createSource(config.source);
 
-		const commitMessage = `chore(i18n): update snapshot for locale "${key}"`;
+			const commitMessage = `chore(i18n): update snapshot for locale "${key}"`;
 
-		source.commitFile({ path: filePath, message: commitMessage });
+			source.commitFile({ path: filePath, message: commitMessage });
+		}
 	}
 }
