@@ -68,6 +68,9 @@ localeops extract
 
 # Apply translations and create PR
 localeops apply <translations-json>
+
+# Make initial snapshots for all configured target locales
+localeops sync
 ```
 
 ## Key Features
