@@ -23,7 +23,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'src/i18n/locales/en.json'  # Only trigger when English (source) locale changes
+      - 'src/i18n/locales/en/**'  # Only trigger when English (source) locale changes
 
 # Prevent multiple translation workflows from running simultaneously
 concurrency:
