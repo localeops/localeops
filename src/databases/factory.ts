@@ -1,11 +1,11 @@
-import type { Config } from "../config";
+import type { DatabaseConfig } from "../config/config";
 import { DatabaseError } from "../core/errors";
 import { resolveConfigPath } from "../shared/paths";
 import type { BaseDatabase } from "./base.database";
 import { FileDatabase } from "./file.database";
 
 export const createDatabase = async (
-	databaseConfig: Config["database"],
+	databaseConfig: DatabaseConfig,
 ): Promise<BaseDatabase> => {
 	const adapter = databaseConfig.adapter;
 

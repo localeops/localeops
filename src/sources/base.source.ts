@@ -1,11 +1,11 @@
-import type { Config } from "../config";
+import type { SourceConfig } from "../config/config";
 import { logger } from "../shared/logger";
 import { runCommand } from "../shared/utils";
 
 export abstract class BaseSource {
 	baseBranch: string;
 
-	constructor(config: Config["source"]) {
+	constructor(config: SourceConfig) {
 		this.baseBranch = config.base;
 	}
 

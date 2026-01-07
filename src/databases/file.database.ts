@@ -1,8 +1,7 @@
 import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { config } from "../config";
-import { createSource } from "../sources";
+import type { BaseSource } from "../sources";
 import { BaseDatabase } from "./base.database";
 
 export class FileDatabase extends BaseDatabase {
@@ -35,11 +34,11 @@ export class FileDatabase extends BaseDatabase {
 	async set({
 		key,
 		content,
-		commit,
+		source,
 	}: {
 		key: string;
 		content: string;
-		commit: boolean;
+		source?: BaseSource;
 	}): Promise<void> {
 		await fs.mkdir(this.dirPath, { recursive: true });
 
@@ -47,9 +46,7 @@ export class FileDatabase extends BaseDatabase {
 
 		await fs.writeFile(filePath, content, "utf8");
 
-		if (commit) {
-			const source = createSource(config.source);
-
+		if (source) {
 			const commitMessage = `chore(i18n): update snapshot for locale "${key}"`;
 
 			source.commitFile({ path: filePath, message: commitMessage });

@@ -1,3 +1,5 @@
+import type { BaseSource } from "../sources";
+
 /**
  * Base class for database adapters that provide persistent string key-value storage
  */
@@ -21,10 +23,10 @@ export abstract class BaseDatabase {
 	abstract set({
 		key,
 		content,
-		commit,
+		source,
 	}: {
 		key: string;
 		content: string;
-		commit: boolean;
+		source?: BaseSource;
 	}): Promise<void>;
 }

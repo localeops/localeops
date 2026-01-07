@@ -1,11 +1,11 @@
-import type { Config } from "../config/config";
+import type { FrameworkConfig } from "../config/config";
 import { FrameworkError } from "../core/errors";
 import type { BaseFramework } from "./base/base.framework";
 import { FormatjsFramework } from "./formatjs/formatjs.framework";
 import { I18nextFramework } from "./i18next/i18next.framework";
 
 export const createFramework = (
-	config: Config["framework"],
+	config: FrameworkConfig,
 ): BaseFramework<unknown> => {
 	const name = config.name;
 
