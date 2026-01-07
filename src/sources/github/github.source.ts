@@ -1,12 +1,12 @@
 import { Value } from "@sinclair/typebox/value";
-import type { Config } from "../../config";
+import type { SourceConfig } from "../../config/config";
 import { SourceError } from "../../core/errors";
 import { logger } from "../../shared/logger";
 import { BaseSource } from "../base.source";
 import { GitHubPullRequestListSchema } from "./github.schema";
 import type { GitHubPullRequest } from "./github.types";
 
-type GitHubSourceConfig = Extract<Config["source"], { name: "github" }>;
+type GitHubSourceConfig = Extract<SourceConfig, { name: "github" }>;
 
 export class GitHubSource extends BaseSource {
 	repo: string;

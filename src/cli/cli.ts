@@ -1,28 +1,18 @@
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { config } from "../config";
-import { LocaleOpsContext } from "../core/context";
+import {
+	initDatabase,
+	initFramework,
+	initSource,
+	initTargetLocales,
+} from "../config/config";
 import { handleCliError } from "../core/error-handler";
-import { LocaleOpsOrchestrator } from "../core/orchestrator";
 import { ApplyCommand } from "./commands/apply.command";
 import { ExtractCommand } from "./commands/extract.command";
 import { SyncCommand } from "./commands/sync.command";
 
 export class CLI {
-	private orchestratorPromise: Promise<LocaleOpsOrchestrator>;
-
-	constructor() {
-		this.orchestratorPromise = this.initOrchestrator();
-	}
-
-	private async initOrchestrator(): Promise<LocaleOpsOrchestrator> {
-		const ctx = await LocaleOpsContext.create(config);
-		return new LocaleOpsOrchestrator(ctx);
-	}
-
 	async run(): Promise<void> {
-		const orchestrator = await this.orchestratorPromise;
-
 		await yargs(hideBin(process.argv))
 			.command(
 				"extract",
@@ -30,8 +20,22 @@ export class CLI {
 				{},
 				async () => {
 					try {
-						const extractCommand = new ExtractCommand(orchestrator);
-						const diffs = await extractCommand.execute(config.targetLocales);
+						const source = initSource();
+
+						const framework = initFramework();
+
+						const database = await initDatabase();
+
+						const targetLocales = initTargetLocales();
+
+						const extractCommand = new ExtractCommand({
+							source,
+							database,
+							framework,
+						});
+
+						const diffs = await extractCommand.execute(targetLocales);
+
 						// Output results to stdout for consumption by translation services
 						console.log(JSON.stringify(diffs, null, 2));
 					} catch (err) {
@@ -52,7 +56,18 @@ export class CLI {
 				},
 				async (argv) => {
 					try {
-						const applyCommand = new ApplyCommand(orchestrator);
+						const source = initSource();
+
+						const framework = initFramework();
+
+						const database = await initDatabase();
+
+						const applyCommand = new ApplyCommand({
+							source,
+							database,
+							framework,
+						});
+
 						await applyCommand.execute(argv["translations-json"]);
 					} catch (err) {
 						handleCliError(err);
@@ -65,8 +80,18 @@ export class CLI {
 				{},
 				async () => {
 					try {
-						const syncCommand = new SyncCommand(orchestrator);
-						await syncCommand.execute(config.targetLocales);
+						const framework = initFramework();
+
+						const database = await initDatabase();
+
+						const targetLocales = initTargetLocales();
+
+						const syncCommand = new SyncCommand({
+							database,
+							framework,
+						});
+
+						await syncCommand.execute(targetLocales);
 					} catch (err) {
 						handleCliError(err);
 					}

@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { Config } from "../../config";
+import type { FrameworkConfig } from "../../config/config";
 import { FrameworkError } from "../../core/errors";
 import { logger } from "../../shared/logger";
 import type {
@@ -24,7 +24,7 @@ export abstract class BaseFramework<Resource> {
 	/** Name of all source files directory (e.g. locales)*/
 	directory: string;
 
-	constructor(config: Config["framework"]) {
+	constructor(config: FrameworkConfig) {
 		this.locale = config.sourceLocale;
 		this.directory = config.directory;
 	}
