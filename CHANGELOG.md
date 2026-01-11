@@ -1,3 +1,25 @@
+## [0.8.1](https://github.com/localeops/localeops/compare/v0.8.0...v0.8.1) (2026-01-11)
+
+### Bug Fixes
+
+* **config:** fix unrelated to a command config validation ([524af95](https://github.com/localeops/localeops/commit/524af95554bbb9530c2ad61a85c2fab7c27b5358))
+
+### Chores
+
+* **deps-dev:** bump the development-dependencies group with 2 updates ([6f36e29](https://github.com/localeops/localeops/commit/6f36e299abd3c57ad8731aada1ce92917f1b199b))
+
+### Documentation
+
+* **examples:** add react-vite-formatjs example ([0e150fc](https://github.com/localeops/localeops/commit/0e150fc1f06c8f44a1f98b93ae14f6df16fa54e8))
+
+### Continuous Integration
+
+* **deps:** bump oven-sh/setup-bun from 2.0.2 to 2.1.0 ([cf18c1c](https://github.com/localeops/localeops/commit/cf18c1c189a4b9dafb7b51ee5c0101e3c6b6e9c2))
+
+### Code Refactoring
+
+* changed translation files structure ([8628841](https://github.com/localeops/localeops/commit/862884144f11ee8481947c679373c327b8d7a0b2))
+
 ## [0.8.0](https://github.com/localeops/localeops/compare/v0.7.1...v0.8.0) (2026-01-04)
 
 ### Features
