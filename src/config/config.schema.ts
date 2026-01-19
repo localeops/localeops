@@ -27,6 +27,12 @@ export const sourceSchema = Type.Union([
 		token: Type.String(),
 		apiUrl: Type.String({ default: "https://api.github.com" }),
 	}),
+	Type.Object({
+		name: Type.Literal("bitbucket"),
+		base: Type.String(),
+		repo: Type.String({ pattern: ".+/.+" }),
+		token: Type.String(),
+	}),
 ]);
 
 export const targetLocalesSchema = Type.Array(Type.String());
