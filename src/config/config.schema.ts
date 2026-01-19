@@ -23,9 +23,15 @@ export const sourceSchema = Type.Union([
 	Type.Object({
 		name: Type.Literal("github"),
 		base: Type.String(),
-		repo: Type.String({ pattern: ".+/.+" }),
+		repo: Type.String({ pattern: "^[^/]+/[^/]+$" }),
 		token: Type.String(),
 		apiUrl: Type.String({ default: "https://api.github.com" }),
+	}),
+	Type.Object({
+		name: Type.Literal("bitbucket"),
+		base: Type.String(),
+		repo: Type.String({ pattern: "^[^/]+/[^/]+$" }),
+		token: Type.String(),
 	}),
 ]);
 
