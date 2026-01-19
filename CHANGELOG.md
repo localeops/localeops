@@ -1,3 +1,24 @@
+## [0.9.0](https://github.com/localeops/localeops/compare/v0.8.1...v0.9.0) (2026-01-19)
+
+### Features
+
+* **sources:** add bitbucket source ([cb8f1a6](https://github.com/localeops/localeops/commit/cb8f1a6e82e7d5ddaab653242cffb5cd3cc6dbac))
+
+### Chores
+
+* **deps-dev:** bump the development-dependencies group with 2 updates ([d0a693a](https://github.com/localeops/localeops/commit/d0a693a1bce0457d5dfb7a9892cff7d5d1a6d9ca))
+* **deps-dev:** bump the development-dependencies group with 2 updates ([b45c4f5](https://github.com/localeops/localeops/commit/b45c4f5c9bd6b53fabfc46e9dd0ad6c9d7a2842c))
+* **deps:** bump devalue from 5.6.1 to 5.6.2 in /docs ([f4f50bb](https://github.com/localeops/localeops/commit/f4f50bb5477ba119ede9936902876bba839c0350))
+* **deps:** bump diff and astro in /docs ([20a86b9](https://github.com/localeops/localeops/commit/20a86b98cd75b29b22a63592d5bbcef4d42d1c55))
+* **deps:** bump h3 from 1.15.4 to 1.15.5 in /docs ([3d64980](https://github.com/localeops/localeops/commit/3d6498051107f6d776a29e1f292431eb21586e64))
+
+### Continuous Integration
+
+* **deps:** bump actions/cache from 5.0.1 to 5.0.2 ([2bd1bfd](https://github.com/localeops/localeops/commit/2bd1bfda3517ff92c4f8a76dbe3ade75ea0441db))
+* **deps:** bump actions/setup-node from 6.1.0 to 6.2.0 ([a7abc06](https://github.com/localeops/localeops/commit/a7abc0605c33c2652472c9a2842fc552521abf43))
+* **deps:** bump oven-sh/setup-bun from 2.1.0 to 2.1.2 ([cce1aa5](https://github.com/localeops/localeops/commit/cce1aa55d56bec9b7f6c16d7ec9ce0fb5c221150))
+* **deps:** bump withastro/action from 5.0.2 to 5.1.0 ([648cebf](https://github.com/localeops/localeops/commit/648cebf642e5d152210dc56fd8867bedb6a0678a))
+
 ## [0.8.1](https://github.com/localeops/localeops/compare/v0.8.0...v0.8.1) (2026-01-11)
 
 ### Bug Fixes
