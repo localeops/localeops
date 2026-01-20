@@ -38,6 +38,7 @@ export const sourceSchema = Type.Union([
 		base: Type.String(),
 		repo: Type.String({ pattern: "^[^/]+/[^/]+$" }),
 		token: Type.String(),
+		apiUrl: Type.String({ default: "https://gitlab.com/api/v4" }),
 	}),
 ]);
 
