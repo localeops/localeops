@@ -14,7 +14,7 @@ export class GitLabSource extends BaseSource {
 		super(config);
 		this.repo = config.repo;
 		this.token = config.token;
-		this.apiUrl = "https://gitlab.com/api/v4";
+		this.apiUrl = config.apiUrl;
 	}
 
 	private get authHeaders() {
