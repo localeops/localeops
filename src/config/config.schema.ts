@@ -33,6 +33,12 @@ export const sourceSchema = Type.Union([
 		repo: Type.String({ pattern: "^[^/]+/[^/]+$" }),
 		token: Type.String(),
 	}),
+	Type.Object({
+		name: Type.Literal("gitlab"),
+		base: Type.String(),
+		repo: Type.String({ pattern: "^[^/]+/[^/]+$" }),
+		token: Type.String(),
+	}),
 ]);
 
 export const targetLocalesSchema = Type.Array(Type.String());
