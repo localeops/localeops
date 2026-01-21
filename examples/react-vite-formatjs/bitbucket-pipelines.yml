@@ -1,0 +1,110 @@
+# =============================================================================
+# LocaleOps AI Translation Pipeline for BitBucket
+# =============================================================================
+#
+# This pipeline automatically extracts untranslated strings and translates them
+# using Claude AI, then applies the translations back to your repository.
+#
+# Workflow:
+# 1. Triggered when English locale files change on main branch
+# 2. Extracts new/changed strings using LocaleOps
+# 3. Sends strings to Claude API for translation
+# 4. Applies translated strings and creates a PR
+#
+# Requirements:
+# - ANTHROPIC_API_KEY: Must be set in repository variables (secured)
+# - BITBUCKET_TOKEN: Repository Access Token with write permissions (secured)
+#
+# Setup Instructions:
+# 1. Create a Repository Access Token:
+#    - Go to Repository Settings > Security > Access tokens
+#    - Click "Create Repository Access Token"
+#    - Give it permissions: Repositories (Write), Pull requests (Write)
+#    - Copy the generated token
+# 2. Add repository variables:
+#    - Go to Repository Settings > Pipelines > Repository variables
+#    - Add ANTHROPIC_API_KEY as a secured variable
+#    - Add BITBUCKET_TOKEN as a secured variable (paste the access token)
+# 3. Ensure Pipelines is enabled for your repository
+#
+# =============================================================================
+
+image: node:18
+
+pipelines:
+  branches:
+    main:
+      - step:
+          name: AI Translation
+          # Prevent concurrent runs, queue and fifo order
+          concurrency-group: localeops-translation
+          # Only run if English locale files were changed
+          condition:
+            changesets:
+              includePaths:
+                - "src/i18n/locales/en/**"
+          script:
+            # Install jq for JSON processing
+            - apt-get update && apt-get install -y jq
+
+            # Configure git for commits with access token
+            - git config user.name "Pipelines Bot"
+            - git config user.email "pipelines@bitbucket.org"
+
+            # Step 1: Extract untranslated strings using LocaleOps
+            - out=$(npx @localeops/localeops extract)
+            - echo "[DEBUG] Extraction output:" $out
+
+            # Step 2: Transform extracted data into flat array for translation
+            # Collect all items needing translation (added or changed strings)
+            # Output format: [{locale, filePath, resourcePath, text}, ...]
+            - |
+              to_translate=$(echo "$out" | jq '[to_entries[] | .key as $loc | .value[] | select(.type == "added" or .type == "changed") | {locale: $loc, filePath, resourcePath, text: (if .type == "added" then .value else .newValue end)}]')
+
+            # Exit early if nothing needs translation
+            - |
+              if [ "$(echo "$to_translate" | jq 'length')" -eq 0 ]; then
+                echo "Nothing to translate"
+                exit 0
+              fi
+
+            # Step 3: Send strings to Claude API for translation
+            - |
+              response=$(curl -s https://api.anthropic.com/v1/messages \
+                -H "Content-Type: application/json" \
+                -H "x-api-key: $ANTHROPIC_API_KEY" \
+                -H "anthropic-version: 2023-06-01" \
+                -d "$(jq -n --arg items "$to_translate" '{
+                  model: "claude-sonnet-4-20250514",
+                  max_tokens: 8192,
+                  messages: [{role: "user", content: "Translate each item to its target locale. Keep placeholders like {name}, {{count}}, %s intact.\n\nReturn JSON array: [{\"locale\": \"...\", \"filePath\": \"...\", \"resourcePath\": \"...\", \"value\": \"<translation>\", \"from\": \"<original>\"}]\n\nItems:\n\($items)"}]
+                }')")
+
+            - echo "[DEBUG] API Response:" $response
+
+            # Step 4: Extract translated text from Claude's response
+            # Remove markdown code blocks if present
+            - |
+              translated=$(echo "$response" | jq -r '.content[0].text' | sed 's/```json//g; s/```//g')
+
+            - echo "[DEBUG] Extracted translations:" $translated
+
+            # Step 5: Reorganize translations by locale for LocaleOps apply command
+            # Transform from array to object: {locale: [{filePath, resourcePath, value, from}]}
+            - |
+              translations_by_locale=$(echo "$translated" | jq 'group_by(.locale) | map({ (.[0].locale): map({filePath, resourcePath, value, from}) }) | add')
+
+            - echo "[DEBUG] Grouped by locale:" $translations_by_locale
+
+            # Step 6: Apply translations and create PR
+            # LocaleOps will use the configured git remote with access token
+            - npx @localeops/localeops apply "$translations_by_locale"
+
+          # Artifacts to preserve (optional)
+          artifacts:
+            - "src/i18n/locales/**"
+
+definitions:
+  # Optional: Add caching to speed up subsequent runs
+  caches:
+    npm: ~/.npm
