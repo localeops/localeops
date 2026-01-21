@@ -55,6 +55,12 @@ source:
   #   token: string        # GitHub API token for authentication. Use environment variable (e.g., ${TOKEN}).
   #   apiUrl: string       # (optional) Custom GitHub API URL for GitHub Enterprise.
   #
+  # bitbucket source:
+  #   name: bitbucket
+  #   base: string         # Branch to track for changes in source locale (e.g., 'main', 'master').
+  #   repo: string         # Bitbucket repository in 'workspace-slug/repo-slug' format.
+  #   token: string        # Bitbucket API token for authentication. Use environment variable (e.g., ${TOKEN}).
+  #
   name: github
   base: main
   repo: YOUR_REPO_NAME_HERE

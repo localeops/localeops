@@ -16,20 +16,19 @@ npm install
 npm run dev
 ```
 
-## Allow GitHub Actions to create and approve pull requests
+## Setup Instructions
 
-- Go to Settings → Actions → General in your repository.
-- Under "Workflow permissions", enable "Allow GitHub Actions to approve pull requests"
+Before using LocaleOps with CI/CD automation:
 
-Done! LocaleOps can now automatically create pull requests with translation updates.
+1. **Uncomment VCS source configuration** in [localeops.yml](localeops.yml):
+   - Find the ready-to-use VCS-specific source section (commented out)
+   - Uncomment the section for your VCS provider (GitHub, Bitbucket, GitLab, etc.)
 
-## Enable AI Translations
+2. **Follow setup instructions** in your VCS-specific workflow file:
+   - **GitHub Actions**: See [.github/workflows/localeops.ai.yml](.github/workflows/localeops.ai.yml)
+   - **Bitbucket Pipelines**: See [bitbucket-pipelines.yml](bitbucket-pipelines.yml)
 
-Add your Anthropic API key as a GitHub secret:
-- Go to Settings → Secrets and variables → Actions
-- Add `ANTHROPIC_API_KEY`
-
-Done! Now when you update [src/i18n/locales/en/translation.json](src/i18n/locales/en/translation.json), GitHub Actions will automatically translate to other languages.
+> **Note:** This example includes CI pipeline files for multiple VCS providers. If you're using a specific VCS, you can delete the unused CI pipeline files for other providers.
 
 ## What's Included
 

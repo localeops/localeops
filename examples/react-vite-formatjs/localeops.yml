@@ -9,13 +9,20 @@ database:
   adapter:
     name: file
 
-# GitHub repository settings
-# Note: These environment variables are automatically provided by GitHub Actions
+# Repository settings
+# Note: These environment variables are automatically provided by the VCS's runner environment
+
 source:
   name: github
   base: main # Base branch for comparisons
   repo: ${GITHUB_REPOSITORY} # Automatically set in GitHub Actions
   token: ${GITHUB_TOKEN} # Mapped to secrets.GITHUB_TOKEN in the workflow file
+
+# source:
+#   name: bitbucket
+#   base: main # Base branch for comparisons
+#   repo: ${BITBUCKET_REPO_FULL_NAME} # Automatically set in Bitbucket Pipelines
+#   token: ${BITBUCKET_TOKEN} # Configured in repository variables
 
 # Target languages to translate into
 targetLocales:
