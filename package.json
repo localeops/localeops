@@ -57,7 +57,7 @@
 		"conventional-changelog-conventionalcommits": "9.1.0",
 		"cz-customizable": "7.5.1",
 		"lefthook": "2.0.15",
-		"lodash": "4.17.21",
+		"lodash": "4.17.23",
 		"semantic-release": "25.0.2",
 		"typescript": "5.9.3",
 		"yargs": "18.0.0"
