@@ -1,3 +1,16 @@
+## [0.10.0](https://github.com/localeops/localeops/compare/v0.9.0...v0.10.0) (2026-01-22)
+
+### Features
+
+* **sources:** add custom api url config for GitLab Self-Managed ([16df45f](https://github.com/localeops/localeops/commit/16df45f5c694442c20c543c645b221b03e5d4a4e))
+* **sources:** add example bitbucket pipeline configuration file ([74178ea](https://github.com/localeops/localeops/commit/74178ea4cc43c8a5f3f6e6ba3c142c398654ffae))
+* **sources:** add gitlab source ([b42ac13](https://github.com/localeops/localeops/commit/b42ac1387752cc72efd646bf7a62781bdb624f28))
+
+### Documentation
+
+* **docs:** update example bitbucket pipeline node version ([87ac39b](https://github.com/localeops/localeops/commit/87ac39b9210a142574417e38d5b289c30fd5d81c))
+* **sources:** fix source provider name typo ([ba80c6d](https://github.com/localeops/localeops/commit/ba80c6d9c7e99c1d65da5df49f9561dbffa7764f))
+
 ## [0.9.0](https://github.com/localeops/localeops/compare/v0.8.1...v0.9.0) (2026-01-19)
 
 ### Features
