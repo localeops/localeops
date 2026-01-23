@@ -24,6 +24,12 @@ source:
 #   repo: ${BITBUCKET_REPO_FULL_NAME} # Automatically set in Bitbucket Pipelines
 #   token: ${BITBUCKET_TOKEN} # Configured in repository variables
 
+# source:
+#   name: gitlab
+#   base: main # Base branch for comparisons
+#   repo: YOUR_PROJECT_PATH # Set in {namespace}/{project} format
+#   token: ${GITLAB_TOKEN} # Configured in GitLab CI/CD variables
+
 # Target languages to translate into
 targetLocales:
   - es

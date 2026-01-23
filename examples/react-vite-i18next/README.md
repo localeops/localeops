@@ -27,6 +27,7 @@ Before using LocaleOps with CI/CD automation:
 2. **Follow setup instructions** in your VCS-specific workflow file:
    - **GitHub Actions**: See [.github/workflows/localeops.ai.yml](.github/workflows/localeops.ai.yml)
    - **Bitbucket Pipelines**: See [bitbucket-pipelines.yml](bitbucket-pipelines.yml)
+   - **GitLab Pipelines**: See [.gitlab-ci.yml](.gitlab-ci.yml)
 
 > **Note:** This example includes CI pipeline files for multiple VCS providers. If you're using a specific VCS, you can delete the unused CI pipeline files for other providers.
 
