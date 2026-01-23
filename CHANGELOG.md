@@ -1,3 +1,15 @@
+## [0.11.0](https://github.com/localeops/localeops/compare/v0.10.0...v0.11.0) (2026-01-23)
+
+### Features
+
+* **sources:** add example gitlab pipeline configuration file ([a4eec81](https://github.com/localeops/localeops/commit/a4eec81207300931e16b62a4210bbdad3e70ee27))
+
+### Chores
+
+* **deps-dev:** bump lodash from 4.17.21 to 4.17.23 ([59d2105](https://github.com/localeops/localeops/commit/59d2105208bded260aca1e85a126d63ae542f4e8))
+* **deps-dev:** bump lodash-es from 4.17.21 to 4.17.23 ([6e5bbf4](https://github.com/localeops/localeops/commit/6e5bbf453abf7501d1e0ceac308b2394ee8aed7d))
+* **deps:** bump tar and npm ([e2cd978](https://github.com/localeops/localeops/commit/e2cd978cd3c3de143d6fd02197276ff33777974a))
+
 ## [0.10.0](https://github.com/localeops/localeops/compare/v0.9.0...v0.10.0) (2026-01-22)
 
 ### Features
