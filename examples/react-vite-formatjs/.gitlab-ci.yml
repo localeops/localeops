@@ -1,0 +1,129 @@
+# =============================================================================
+# LocaleOps AI Translation Pipeline for GitLab
+# =============================================================================
+#
+# This pipeline automatically extracts untranslated strings and translates them
+# using Claude AI, then applies the translations back to your repository.
+#
+# Workflow:
+# 1. Triggered when English locale files change on main branch
+# 2. Extracts new/changed strings using LocaleOps
+# 3. Sends strings to Claude API for translation
+# 4. Applies translated strings and creates a Merge Request
+#
+# Requirements:
+# - ANTHROPIC_API_KEY: Must be set in CI/CD variables (masked)
+# - GITLAB_TOKEN: Project Access Token with write permissions (masked)
+#
+# Setup Instructions:
+# 1. Create a Project Access Token:
+#    - Go to Settings > Access Tokens
+#    - Click "Add new token"
+#    - Role: Maintainer
+#    - Scopes: write_repository, api
+#    - Copy the generated token
+# 2. Add CI/CD variables:
+#    - Go to Settings > CI/CD > Variables
+#    - Add ANTHROPIC_API_KEY as a masked variable
+#    - Add GITLAB_TOKEN as a masked variable (paste the access token)
+# 3. Ensure CI/CD pipelines are enabled for your repository
+# 4. Disable auto-cancel redundant pipelines:
+#    - Go to Settings > CI/CD > General pipelines
+#    - UNCHECK "Auto-cancel redundant pipelines"
+#    - This ensures all translation jobs run in order, so no string changes are missed
+# 5. Set source.repo in localeops.yml to your project path (e.g., "namespace/project")
+#
+# =============================================================================
+
+image: node:24
+
+# Define caching for npm to speed up subsequent runs
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm/
+
+# Only run on main branch when locale files change
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - src/i18n/locales/en/**/*
+
+stages:
+  - translate
+
+ai_translation:
+  stage: translate
+  # Prevent concurrent translation jobs
+  resource_group: localeops-translation
+  interruptible: false
+
+  before_script:
+    # Install jq for JSON processing
+    - apt-get update && apt-get install -y jq
+
+    # Configure git for commits
+    - git config user.name "GitLab CI Bot"
+    - git config user.email "gitlab-ci@${CI_PROJECT_PATH}"
+    - git remote set-url origin https://oauth2:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+
+    # Set npm cache directory
+    - npm config set cache ${CI_PROJECT_DIR}/.npm --global
+
+  script:
+    # Step 1: Extract untranslated strings using LocaleOps
+    - export GITLAB_TOKEN=$GITLAB_TOKEN
+    - out=$(npx @localeops/localeops extract)
+    - echo "[DEBUG] Extraction output:" $out
+
+    # Step 2: Transform extracted data into flat array for translation
+    # Collect all items needing translation (added or changed strings)
+    # Output format: [{locale, filePath, resourcePath, text}, ...]
+    - |
+      to_translate=$(echo "$out" | jq '[to_entries[] | .key as $loc | .value[] | select(.type == "added" or .type == "changed") | {locale: $loc, filePath, resourcePath, text: (if .type == "added" then .value else .newValue end)}]')
+
+    # Exit early if nothing needs translation
+    - |
+      if [ "$(echo "$to_translate" | jq 'length')" -eq 0 ]; then
+        echo "Nothing to translate"
+        exit 0
+      fi
+
+    # Step 3: Send strings to Claude API for translation
+    - |
+      response=$(curl -s https://api.anthropic.com/v1/messages \
+        -H "Content-Type: application/json" \
+        -H "x-api-key: $ANTHROPIC_API_KEY" \
+        -H "anthropic-version: 2023-06-01" \
+        -d "$(jq -n --arg items "$to_translate" '{
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8192,
+          messages: [{role: "user", content: "Translate each item to its target locale. Keep placeholders like {name}, {{count}}, %s intact.\n\nReturn JSON array: [{\"locale\": \"...\", \"filePath\": \"...\", \"resourcePath\": \"...\", \"value\": \"<translation>\", \"from\": \"<original>\"}]\n\nItems:\n\($items)"}]
+        }')")
+
+    - echo "[DEBUG] API Response:" $response
+
+    # Step 4: Extract translated text from Claude's response
+    # Remove markdown code blocks if present
+    - |
+      translated=$(echo "$response" | jq -r '.content[0].text' | sed 's/```json//g; s/```//g')
+
+    - echo "[DEBUG] Extracted translations:" $translated
+
+    # Step 5: Reorganize translations by locale for LocaleOps apply command
+    # Transform from array to object: {locale: [{filePath, resourcePath, value, from}]}
+    - |
+      translations_by_locale=$(echo "$translated" | jq 'group_by(.locale) | map({ (.[0].locale): map({filePath, resourcePath, value, from}) }) | add')
+
+    - echo "[DEBUG] Grouped by locale:" $translations_by_locale
+
+    # Step 6: Apply translations and create Merge Request
+    # LocaleOps will use the configured git remote with job token
+    - npx @localeops/localeops apply "$translations_by_locale"
+
+  # Only run when changes are pushed to main
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - src/i18n/locales/en/**/*
