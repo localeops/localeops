@@ -1,41 +1,47 @@
-# =============================================================================
-# LocaleOps AI Translation Pipeline for GitLab
-# =============================================================================
-#
-# This pipeline automatically extracts untranslated strings and translates them
-# using Claude AI, then applies the translations back to your repository.
-#
-# Workflow:
-# 1. Triggered when English locale files change on main branch
-# 2. Extracts new/changed strings using LocaleOps
-# 3. Sends strings to Claude API for translation
-# 4. Applies translated strings and creates a Merge Request
-#
-# Requirements:
-# - ANTHROPIC_API_KEY: Must be set in CI/CD variables (masked)
-# - GITLAB_TOKEN: Project Access Token with write permissions (masked)
-#
-# Setup Instructions:
-# ```
-# 1. Create a Project Access Token:
-#    - Go to Settings > Access Tokens
-#    - Click "Add new token"
-#    - Role: Maintainer
-#    - Scopes: write_repository, api
-#    - Copy the generated token
-# 2. Add CI/CD variables:
-#    - Go to Settings > CI/CD > Variables
-#    - Add ANTHROPIC_API_KEY as a masked variable
-#    - Add GITLAB_TOKEN as a masked variable (paste the access token)
-# 3. Ensure CI/CD pipelines are enabled for your repository
-# 4. Disable auto-cancel redundant pipelines:
-#    - Go to Settings > CI/CD > General pipelines
-#    - UNCHECK "Auto-cancel redundant pipelines"
-#    - This ensures all translation jobs run in order, so no string changes are missed
-# 5. Set source.repo in localeops.yml to your project path (e.g., "namespace/project")
-#```
-# =============================================================================
+---
+title: GitLab CI
+description: Ready-to-use GitLab CI pipelines for LocaleOps
+---
 
+{/* AUTO-GENERATED FROM gitlab - DO NOT EDIT */}
+
+Copy these pipeline files and customize as needed.
+
+## AI Translation Pipeline for GitLab
+
+This pipeline automatically extracts untranslated strings and translates them using Claude AI, then applies the translations back to your repository.
+
+**Workflow:**
+1. Triggered when English locale files change on main branch
+2. Extracts new/changed strings using LocaleOps
+3. Sends strings to Claude API for translation
+4. Applies translated strings and creates a Merge Request
+
+**Requirements:**
+- ANTHROPIC_API_KEY: Must be set in CI/CD variables (masked)
+- GITLAB_TOKEN: Project Access Token with write permissions (masked)
+
+**Setup Instructions:**
+```
+1. Create a Project Access Token:
+   - Go to Settings > Access Tokens
+   - Click "Add new token"
+   - Role: Maintainer
+   - Scopes: write_repository, api
+   - Copy the generated token
+2. Add CI/CD variables:
+   - Go to Settings > CI/CD > Variables
+   - Add ANTHROPIC_API_KEY as a masked variable
+   - Add GITLAB_TOKEN as a masked variable (paste the access token)
+3. Ensure CI/CD pipelines are enabled for your repository
+4. Disable auto-cancel redundant pipelines:
+   - Go to Settings > CI/CD > General pipelines
+   - UNCHECK "Auto-cancel redundant pipelines"
+   - This ensures all translation jobs run in order, so no string changes are missed
+5. Set source.repo in localeops.yml to your project path (e.g., "namespace/project")
+```
+
+```yaml title=".gitlab-ci.yml"
 image: node:24
 
 # Define caching for npm to speed up subsequent runs
@@ -128,3 +134,4 @@ ai_translation:
     - if: '$CI_COMMIT_BRANCH == "main"'
       changes:
         - src/i18n/locales/en/**/*
+```

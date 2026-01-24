@@ -1,36 +1,41 @@
-# =============================================================================
-# LocaleOps AI Translation Pipeline for Bitbucket
-# =============================================================================
-#
-# This pipeline automatically extracts untranslated strings and translates them
-# using Claude AI, then applies the translations back to your repository.
-#
-# Workflow:
-# 1. Triggered when English locale files change on main branch
-# 2. Extracts new/changed strings using LocaleOps
-# 3. Sends strings to Claude API for translation
-# 4. Applies translated strings and creates a PR
-#
-# Requirements:
-# - ANTHROPIC_API_KEY: Must be set in repository variables (secured)
-# - BITBUCKET_TOKEN: Repository Access Token with write permissions (secured)
-#
-# Setup Instructions:
-# ```
-# 1. Create a Repository Access Token:
-#    - Go to Repository Settings > Security > Access tokens
-#    - Click "Create Repository Access Token"
-#    - Give it permissions: Repositories (Write), Pull requests (Write)
-#    - Copy the generated token
-# 2. Add repository variables:
-#    - Go to Repository Settings > Pipelines > Repository variables
-#    - Add ANTHROPIC_API_KEY as a secured variable
-#    - Add BITBUCKET_TOKEN as a secured variable (paste the access token)
-# 3. Ensure Pipelines is enabled for your repository
-#```
-#
-# =============================================================================
+---
+title: Bitbucket Pipelines
+description: Ready-to-use Bitbucket Pipelines for LocaleOps
+---
 
+{/* AUTO-GENERATED FROM bitbucket - DO NOT EDIT */}
+
+Copy these pipeline files and customize as needed.
+
+## AI Translation Pipeline for Bitbucket
+
+This pipeline automatically extracts untranslated strings and translates them using Claude AI, then applies the translations back to your repository.
+
+**Workflow:**
+1. Triggered when English locale files change on main branch
+2. Extracts new/changed strings using LocaleOps
+3. Sends strings to Claude API for translation
+4. Applies translated strings and creates a PR
+
+**Requirements:**
+- ANTHROPIC_API_KEY: Must be set in repository variables (secured)
+- BITBUCKET_TOKEN: Repository Access Token with write permissions (secured)
+
+**Setup Instructions:**
+```
+1. Create a Repository Access Token:
+   - Go to Repository Settings > Security > Access tokens
+   - Click "Create Repository Access Token"
+   - Give it permissions: Repositories (Write), Pull requests (Write)
+   - Copy the generated token
+2. Add repository variables:
+   - Go to Repository Settings > Pipelines > Repository variables
+   - Add ANTHROPIC_API_KEY as a secured variable
+   - Add BITBUCKET_TOKEN as a secured variable (paste the access token)
+3. Ensure Pipelines is enabled for your repository
+```
+
+```yaml title="bitbucket-pipelines.yml"
 image: node:24
 
 pipelines:
@@ -110,3 +115,4 @@ definitions:
   # Optional: Add caching to speed up subsequent runs
   caches:
     npm: ~/.npm
+```
