@@ -3,9 +3,9 @@ title: GitHub Actions
 description: Ready-to-use GitHub Actions workflows for LocaleOps
 ---
 
-{/* AUTO-GENERATED FROM examples/actions/github/ - DO NOT EDIT */}
+{/* AUTO-GENERATED FROM github - DO NOT EDIT */}
 
-Copy these workflows into your `.github/workflows/` directory and customize as needed.
+Copy these pipeline files and customize as needed.
 
 ## AI Translation Workflow
 
@@ -21,14 +21,26 @@ This workflow automatically extracts untranslated strings and translates them us
 - GITHUB_TOKEN: Automatically provided by GitHub Actions
 - ANTHROPIC_API_KEY: Must be set in repository secrets
 
-```yaml title=".github/workflows/localeops.ai.yml"
+**Setup Instructions:**
+```
+1. Allow GitHub Actions to create and approve pull requests
+- Go to Settings → Actions → General in your repository.
+- Under "Workflow permissions", enable "Allow GitHub Actions to approve pull requests"
+
+2. Enable AI Translations
+Add your Anthropic API key as a GitHub secret:
+- Go to Settings → Secrets and variables → Actions
+- Add `ANTHROPIC_API_KEY`
+```
+
+```yaml title="localeops.ai.yml"
 name: AI translation
 
 on:
   push:
     branches: [main]
     paths:
-      - 'public/locales/en/**'  # Only trigger when English (source) locale changes
+      - "src/i18n/locales/en/**" # Only trigger when English (source) locale changes
 
 # Prevent multiple translation workflows from running simultaneously
 concurrency:
@@ -39,8 +51,8 @@ jobs:
   translate:
     runs-on: ubuntu-latest
     permissions:
-      contents: write        # Required to push commits
-      pull-requests: write   # Required to create pull requests
+      contents: write # Required to push commits
+      pull-requests: write # Required to create pull requests
 
     steps:
       - uses: actions/checkout@v4
@@ -54,8 +66,8 @@ jobs:
 
       - name: extract and translate
         env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}              # GitHub token for LocaleOps
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}  # Claude API key
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub token for LocaleOps
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }} # Claude API key
         run: |
           set -e
 
@@ -123,7 +135,7 @@ curl -X POST \
 **Requirements:**
 - GITHUB_TOKEN: Automatically provided by GitHub Actions
 
-```yaml title=".github/workflows/localeops.apply.yml"
+```yaml title="localeops.apply.yml"
 name: apply translations
 
 on:
@@ -214,7 +226,7 @@ curl -X POST \
 **Requirements:**
 - GITHUB_TOKEN: Automatically provided by GitHub Actions
 
-```yaml title=".github/workflows/localeops.extract.yml"
+```yaml title="localeops.extract.yml"
 name: extract strings
 
 on:

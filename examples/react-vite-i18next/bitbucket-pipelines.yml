@@ -16,6 +16,7 @@
 # - BITBUCKET_TOKEN: Repository Access Token with write permissions (secured)
 #
 # Setup Instructions:
+# ```
 # 1. Create a Repository Access Token:
 #    - Go to Repository Settings > Security > Access tokens
 #    - Click "Create Repository Access Token"
@@ -26,6 +27,7 @@
 #    - Add ANTHROPIC_API_KEY as a secured variable
 #    - Add BITBUCKET_TOKEN as a secured variable (paste the access token)
 # 3. Ensure Pipelines is enabled for your repository
+#```
 #
 # =============================================================================
 

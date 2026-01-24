@@ -3,8 +3,8 @@
 /**
  * Generate GitHub Actions examples documentation
  *
- * Parses workflow files from examples/actions/github/ and generates
- * src/content/docs/examples/github-actions.mdx
+ * Parses workflow files from examples/actions/source/ and generates
+ * .mdx files in src/content/docs/examples
  *
  * Expected header format in workflow files:
  * # =============================================================================
@@ -178,15 +178,20 @@ function formatSections(sections: Section[]): string {
 		.join("\n\n");
 }
 
-function generateMDX(examples: Example[]): string {
+function generateMDX(
+	examples: Example[],
+	docTitle: string,
+	docDescription: string,
+	sourceDir: string,
+): string {
 	const header = `---
-title: GitHub Actions
-description: Ready-to-use GitHub Actions workflows for LocaleOps
+title: ${docTitle}
+description: ${docDescription}
 ---
 
-{/* AUTO-GENERATED FROM examples/actions/github/ - DO NOT EDIT */}
+{/* AUTO-GENERATED FROM ${sourceDir} - DO NOT EDIT */}
 
-Copy these workflows into your \`.github/workflows/\` directory and customize as needed.
+Copy these pipeline files and customize as needed.
 
 `;
 
@@ -197,53 +202,83 @@ Copy these workflows into your \`.github/workflows/\` directory and customize as
 				const body = [escapeMdx(description), formatSections(sections)]
 					.filter(Boolean)
 					.join("\n\n");
-				return `## ${title}\n\n${body}\n\n\`\`\`yaml title=".github/workflows/${filename}"\n${code}\n\`\`\`\n`;
+				return `## ${title}\n\n${body}\n\n\`\`\`yaml title="${filename}"\n${code}\n\`\`\`\n`;
 			})
 			.join("\n---\n\n")
 	);
 }
 
+const DOCUMENTS = [
+	{
+		directory: "github",
+		title: "GitHub Actions",
+		description: "Ready-to-use GitHub Actions workflows for LocaleOps",
+	},
+	{
+		directory: "gitlab",
+		title: "GitLab CI",
+		description: "Ready-to-use GitLab CI pipelines for LocaleOps",
+	},
+	{
+		directory: "bitbucket",
+		title: "Bitbucket Pipelines",
+		description: "Ready-to-use Bitbucket Pipelines for LocaleOps",
+	},
+];
+
 async function main() {
-	const [
-		examplesDir = "../examples/actions/github",
-		outputPath = "src/content/docs/examples/github-actions.mdx",
-	] = process.argv.slice(2);
-	const dir = join(process.cwd(), examplesDir);
+	const actionsDir = join(process.cwd(), "../examples/actions");
 
-	console.log("📂 Scanning:", dir);
+	for await (const document of DOCUMENTS) {
+		const dir = join(actionsDir, document.directory);
+		const outputPath = `src/content/docs/examples/${document.directory}-ci.mdx`;
 
-	let files: string[];
-	try {
-		files = (await readdir(dir)).filter((f) => /\.ya?ml$/.test(f)).sort();
-	} catch {
-		console.error(
-			`❌ Could not read: ${dir}\n\nUsage: bun generate-github-actions.ts [examples-dir] [output-path]`,
+		console.log("📂 Scanning:", dir);
+
+		let files: string[];
+		try {
+			files = (await readdir(dir)).filter((f) => /\.ya?ml$/.test(f)).sort();
+		} catch {
+			console.error(
+				`❌ Could not read: ${dir}\n\nUsage: bun generate-github-actions.ts [examples-dir] [output-path] [doc-title] [code-path]`,
+			);
+			process.exit(1);
+		}
+
+		console.log(`📄 Found ${files.length} pipeline files\n`);
+
+		const examples: Example[] = await Promise.all(
+			files.map(async (filename) => {
+				const content = await readFile(join(dir, filename), "utf-8");
+				const { title, description, sections, codeStart } =
+					parseHeader(content);
+				const code = content.split("\n").slice(codeStart).join("\n").trim();
+
+				console.log(`✅ ${filename} → ${title || "(no title)"}`);
+				return {
+					filename,
+					title: title || filename.replace(/\.ya?ml$/, ""),
+					description,
+					sections,
+					code,
+				};
+			}),
 		);
-		process.exit(1);
+
+		examples.sort((a, b) => a.title.localeCompare(b.title));
+
+		await writeFile(
+			join(process.cwd(), outputPath),
+			generateMDX(
+				examples,
+				document.title,
+				document.description,
+				document.directory,
+			),
+		);
+
+		console.log(`\n✨ Generated: ${outputPath}`);
 	}
-
-	console.log(`📄 Found ${files.length} workflows\n`);
-
-	const examples: Example[] = await Promise.all(
-		files.map(async (filename) => {
-			const content = await readFile(join(dir, filename), "utf-8");
-			const { title, description, sections, codeStart } = parseHeader(content);
-			const code = content.split("\n").slice(codeStart).join("\n").trim();
-
-			console.log(`✅ ${filename} → ${title || "(no title)"}`);
-			return {
-				filename,
-				title: title || filename.replace(/\.ya?ml$/, ""),
-				description,
-				sections,
-				code,
-			};
-		}),
-	);
-
-	examples.sort((a, b) => a.title.localeCompare(b.title));
-	await writeFile(join(process.cwd(), outputPath), generateMDX(examples));
-	console.log(`\n✨ Generated: ${outputPath}`);
 }
 
 main().catch(console.error);

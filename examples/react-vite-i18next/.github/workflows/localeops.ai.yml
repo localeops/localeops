@@ -16,22 +16,16 @@
 # - ANTHROPIC_API_KEY: Must be set in repository secrets
 #
 # Setup Instructions:
-#
-# ## Allow GitHub Actions to create and approve pull requests
-#
+# ```
+# 1. Allow GitHub Actions to create and approve pull requests
 # - Go to Settings → Actions → General in your repository.
 # - Under "Workflow permissions", enable "Allow GitHub Actions to approve pull requests"
 #
-# Done! LocaleOps can now automatically create pull requests with translation updates.
-#
-# ## Enable AI Translations
-#
+# 2. Enable AI Translations
 # Add your Anthropic API key as a GitHub secret:
 # - Go to Settings → Secrets and variables → Actions
 # - Add `ANTHROPIC_API_KEY`
-#
-# Done! Now when you update [src/i18n/locales/en/translation.json](src/i18n/locales/en/translation.json), GitHub Actions will automatically translate to other languages.
-#
+#```
 # =============================================================================
 
 name: AI translation

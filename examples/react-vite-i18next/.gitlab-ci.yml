@@ -16,6 +16,7 @@
 # - GITLAB_TOKEN: Project Access Token with write permissions (masked)
 #
 # Setup Instructions:
+# ```
 # 1. Create a Project Access Token:
 #    - Go to Settings > Access Tokens
 #    - Click "Add new token"
@@ -32,7 +33,7 @@
 #    - UNCHECK "Auto-cancel redundant pipelines"
 #    - This ensures all translation jobs run in order, so no string changes are missed
 # 5. Set source.repo in localeops.yml to your project path (e.g., "namespace/project")
-#
+#```
 # =============================================================================
 
 image: node:24
