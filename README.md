@@ -64,7 +64,7 @@
   ```bash
   localeops sync
   ```
-  > **Note:** The `sync` command always treats all existing target locale translations as up-to-date. If you have stale translations, remove them before running this command to ensure accurate future change detection.
+  > **Note:** The `sync` command always treats all existing target locale translations as up-to-date. Here, "stale" translations are entries where the source string has changed meaning or wording, but the translation was never updated. Before your first sync, review recent source-string changes (for example, by checking your Git diff or PR history) and either update or remove the corresponding translations you know are no longer correct. If you're unsure, it's safer to clear obviously outdated translations so LocaleOps can detect and track fresh changes from that point onward
 
 5. **Integrate into your workflow:**
   - Use `localeops extract` to find new/changed strings after source edits.
