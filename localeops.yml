@@ -12,13 +12,13 @@
 # - This config file supports environment variable interpolation using ${VAR_NAME} syntax
 # - Set required environment variables before running LocaleOps:
 #     export TOKEN=your_token_here
-# - In CI/CD, configure secrets in your pipeline settings
+# - In CI/CD, configure environment variables in your pipeline settings
 
 # =============================================================================
 # Target Locales
 # =============================================================================
 
-targetLocales:
+targetLocales: # List of all languages to translate into
   - es
   - fr
   - de
@@ -73,7 +73,7 @@ source:
   token: ${TOKEN}
 
 # =============================================================================
-# Version Control System Configuration
+# Framework Configuration
 # =============================================================================
 
 framework:
