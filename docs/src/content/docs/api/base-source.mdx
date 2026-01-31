@@ -1,0 +1,119 @@
+---
+title: BaseSource Class
+---
+
+{/* AUTO-GENERATED - DO NOT EDIT */}
+
+## Classes
+
+### `abstract` BaseSource
+
+Defined in: [sources/base.source.ts:5](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/sources/base.source.ts#L5)
+
+#### Constructors
+
+##### Constructor
+
+```ts
+new BaseSource(config): BaseSource;
+```
+
+Defined in: [sources/base.source.ts:8](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/sources/base.source.ts#L8)
+
+###### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `config` | \| \{ `apiUrl`: `string`; `base`: `string`; `name`: `"github"`; `repo`: `string`; `token`: `string`; \} \| \{ `base`: `string`; `name`: `"bitbucket"`; `repo`: `string`; `token`: `string`; \} \| \{ `apiUrl`: `string`; `base`: `string`; `name`: `"gitlab"`; `repo`: `string`; `token`: `string`; \} |
+
+###### Returns
+
+[`BaseSource`](/api/base-source#basesource)
+
+#### Properties
+
+| Property | Type | Defined in |
+| ------ | ------ | ------ |
+| <a id="basebranch"></a> `baseBranch` | `string` | [sources/base.source.ts:6](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/sources/base.source.ts#L6) |
+
+#### Methods
+
+##### checkout()
+
+```ts
+checkout(branch): void;
+```
+
+Defined in: [sources/base.source.ts:12](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/sources/base.source.ts#L12)
+
+###### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `branch` | `string` |
+
+###### Returns
+
+`void`
+
+##### commitFile()
+
+```ts
+commitFile(__namedParameters): void;
+```
+
+Defined in: [sources/base.source.ts:40](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/sources/base.source.ts#L40)
+
+###### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `__namedParameters` | \{ `message`: `string`; `path`: `string`; \} |
+| `__namedParameters.message` | `string` |
+| `__namedParameters.path` | `string` |
+
+###### Returns
+
+`void`
+
+##### ensurePullRequest()
+
+```ts
+abstract ensurePullRequest(__namedParameters): Promise<void>;
+```
+
+Defined in: [sources/base.source.ts:55](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/sources/base.source.ts#L55)
+
+Ensures a pull request exists
+Creates the pull request if it doesn't exist or updates it if it does
+
+###### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `__namedParameters` | \{ `branch`: `string`; `description`: `string`; `title`: `string`; \} |
+| `__namedParameters.branch` | `string` |
+| `__namedParameters.description` | `string` |
+| `__namedParameters.title` | `string` |
+
+###### Returns
+
+`Promise`\<`void`\>
+
+##### push()
+
+```ts
+push(branch): void;
+```
+
+Defined in: [sources/base.source.ts:46](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/sources/base.source.ts#L46)
+
+###### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `branch` | `string` |
+
+###### Returns
+
+`void`
