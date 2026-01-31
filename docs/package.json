@@ -5,8 +5,9 @@
 	"scripts": {
 		"dev": "astro dev",
 		"start": "astro dev",
-		"build": "bun run generate:github-actions && astro build",
+		"build": "bun run generate:github-actions && bun run generate:class-docs && astro build",
 		"generate:github-actions": "bun run scripts/generate-github-actions.ts",
+		"generate:class-docs": "npx typedoc && bun run scripts/generate-class-docs.ts",
 		"preview": "astro preview",
 		"astro": "astro"
 	},
@@ -14,5 +15,8 @@
 		"@astrojs/starlight": "^0.37.1",
 		"astro": "^5.16.11",
 		"sharp": "^0.34.2"
+	},
+	"devDependencies": {
+		"typedoc-plugin-markdown": "^4.9.0"
 	}
 }

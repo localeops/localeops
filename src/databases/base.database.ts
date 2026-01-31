@@ -16,9 +16,11 @@ export abstract class BaseDatabase {
 	abstract get(key: string): Promise<string | null>;
 
 	/**
-	 * Sets content for a specific key
-	 * Replaces existing content entirely
-	 * @param commit Whether to commit changes to the source control
+	 * Sets content for a specific key, entirely replacing any existing data.
+	 * @param options
+	 * @param options.key - Unique identifier for the content.
+	 * @param options.content - The new content to store.
+	 * @param options.source - (Optional) Provide source instance to commit the change.
 	 */
 	abstract set({
 		key,

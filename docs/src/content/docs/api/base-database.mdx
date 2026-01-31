@@ -1,0 +1,85 @@
+---
+title: BaseDatabase Class
+---
+
+{/* AUTO-GENERATED - DO NOT EDIT */}
+
+## Classes
+
+### `abstract` BaseDatabase
+
+Defined in: [databases/base.database.ts:6](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/databases/base.database.ts#L6)
+
+Base class for database adapters that provide persistent string key-value storage
+
+#### Constructors
+
+##### Constructor
+
+```ts
+new BaseDatabase(): BaseDatabase;
+```
+
+###### Returns
+
+[`BaseDatabase`](/api/base-database#basedatabase)
+
+#### Methods
+
+##### get()
+
+```ts
+abstract get(key): Promise<string | null>;
+```
+
+Defined in: [databases/base.database.ts:16](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/databases/base.database.ts#L16)
+
+Gets content for a specific key or null if key not found
+
+###### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `key` | `string` |
+
+###### Returns
+
+`Promise`\<`string` \| `null`\>
+
+##### initialize()
+
+```ts
+abstract initialize(): Promise<void>;
+```
+
+Defined in: [databases/base.database.ts:11](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/databases/base.database.ts#L11)
+
+Initializes the database
+Creates necessary files, tables, or connections
+
+###### Returns
+
+`Promise`\<`void`\>
+
+##### set()
+
+```ts
+abstract set(options): Promise<void>;
+```
+
+Defined in: [databases/base.database.ts:25](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/databases/base.database.ts#L25)
+
+Sets content for a specific key, entirely replacing any existing data.
+
+###### Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `options` | \{ `content`: `string`; `key`: `string`; `source?`: [`BaseSource`](/api/base-source#basesource); \} |  |
+| `options.content` | `string` | The new content to store. |
+| `options.key` | `string` | Unique identifier for the content. |
+| `options.source?` | [`BaseSource`](/api/base-source#basesource) | (Optional) Provide source instance to commit the change. |
+
+###### Returns
+
+`Promise`\<`void`\>

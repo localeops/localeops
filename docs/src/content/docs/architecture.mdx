@@ -14,7 +14,7 @@ main branch update
       │
       ├──▶ receive translated output
       │
-      ├──▶ localeops apply (update locale files + snapshot)
+      ├──▶ localeops apply (update locale files and locale snapshot)
       │
       └──▶ PR with updated translations
 ```
@@ -27,22 +27,25 @@ LocaleOps provides three primary commands that work together:
 ### `localeops sync`
 
 Creates initial snapshots for all configured target locales 
-
-- Reads target locales translation files
+м
+- Reads translation files for target locales
 - Finds respecting values in source locale files
-- Creates snapshots with those values
+- Creates locale snapshots with those values
 
 
 ### `localeops extract`
 
 Analyzes your locale files and creates a translation delta:
 
-- Compares current locale files against the last snapshot
+For each configured target locale:
+
+- Makes source locale files snapshot
+- Compares source locale snapshot to latest target locale snapshot
 - Detects new strings that need translation
 - Identifies modified strings that require re-translation
 - Outputs structured JSON containing the translation delta
 
-The output JSON is sent to your translation provider (AI, agency, or human translators).
+The output JSON can be sent to your translation provider (AI, agency, or human translators).
 
 ### `localeops apply`
 
@@ -50,7 +53,7 @@ Takes completed translations and integrates them back into your codebase:
 
 - Reads translation JSON from your provider
 - Updates locale files with new translations
-- Creates a snapshot of the current state
+- Creates a new snapshot of the current state
 - Creates a pull request with changes
 
 ## Design Principles
@@ -69,7 +72,7 @@ Because LocaleOps is open source and format-agnostic, you can customize how tran
 
 ### No Infrastructure Required
 
-LocaleOps runs as a CLI tool - no servers, databases, or services needed:
+LocaleOps runs as a CLI tool in CI/CI - no servers, databases, or services needed:
 
 - Runs in CI/CD (GitHub Actions, GitLab CI, etc.)
 - Uses Git for snapshot storage
@@ -112,7 +115,7 @@ LocaleOps is built with extensibility in mind through abstract base classes:
 Extend `BaseFramework` to add support for new i18n libraries:
 
 - **Built-in:** i18next, FormatJS
-- **Custom:** Implement `deserialize()`, `serialize()`, and `diff()` methods
+- **Custom:** Implement `deserialize()`, `serialize()`, `diff()`, `patch()`, `resolve()` methods
 
 Each framework adapter handles its specific file format and translation structure.
 
@@ -128,7 +131,6 @@ Extend `BaseDatabase` for custom snapshot storage:
 
 Extend `BaseSource` for different Git workflows:
 
-- **Built-in:** GitHub integration
-- **Custom:** GitLab, Bitbucket, or custom Git workflows
+- **Built-in:** GitHub, GitLab, Bitbucket integration
 
 The base classes provide a clean abstraction layer, making LocaleOps adaptable to your specific stack and workflow requirements.
