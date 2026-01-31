@@ -1,0 +1,276 @@
+---
+title: BaseFramework Class
+---
+
+{/* AUTO-GENERATED - DO NOT EDIT */}
+
+## Classes
+
+### `abstract` BaseFramework
+
+Defined in: [framework/base/base.framework.ts:20](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/framework/base/base.framework.ts#L20)
+
+Abstract base class for framework-specific translation file management.
+
+#### Type Parameters
+
+| Type Parameter | Description |
+| ------ | ------ |
+| `Resource` | The framework-specific data structure representing translation file contents. Returned by `deserialize` method for translation file content. |
+
+#### Constructors
+
+##### Constructor
+
+```ts
+new BaseFramework<Resource>(config): BaseFramework<Resource>;
+```
+
+Defined in: [framework/base/base.framework.ts:27](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/framework/base/base.framework.ts#L27)
+
+###### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `config` | \{ `directory`: `string`; `name`: `"i18next"` \| `"formatjs"`; `sourceLocale`: `string`; \} |
+| `config.directory` | `string` |
+| `config.name` | `"i18next"` \| `"formatjs"` |
+| `config.sourceLocale` | `string` |
+
+###### Returns
+
+[`BaseFramework`](/api/base-framework#baseframework)\<`Resource`\>
+
+#### Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| <a id="directory"></a> `directory` | `string` | Name of all source files directory (e.g. locales) | [framework/base/base.framework.ts:25](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/framework/base/base.framework.ts#L25) |
+| <a id="locale"></a> `locale` | `string` | Name of source locale directory (e.g. en) | [framework/base/base.framework.ts:22](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/framework/base/base.framework.ts#L22) |
+
+#### Methods
+
+##### deserialize()
+
+```ts
+abstract deserialize(raw): Resource;
+```
+
+Defined in: [framework/base/base.framework.ts:172](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/framework/base/base.framework.ts#L172)
+
+Parses raw translation file content into a framework-specific Resource object.
+
+Implementations should parse the string and validate it against
+the framework's resource schema, throwing an error if the format is invalid.
+
+###### Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `raw` | `string` | Translation file content as a string |
+
+###### Returns
+
+`Resource`
+
+Parsed and validated Resource object
+
+###### Throws
+
+Error if the content cannot be parsed or fails schema validation
+
+##### diff()
+
+```ts
+abstract diff(oldResource): ResourceDelta[];
+```
+
+Defined in: [framework/base/base.framework.ts:194](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/framework/base/base.framework.ts#L194)
+
+Computes translation differences between two Resource objects.
+
+When oldResource is undefined, all keys in newResource should be marked as "added".
+
+###### Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `oldResource` | \{ `newResource`: `Resource`; `oldResource?`: `Resource`; \} | The previous Resource state (undefined for newly created resources) |
+| `oldResource.newResource` | `Resource` | - |
+| `oldResource.oldResource?` | `Resource` | - |
+
+###### Returns
+
+`ResourceDelta`[]
+
+Array of ResourceDelta objects, each describing an added, changed, or removed
+translation key with its path and value(s)
+
+##### diffSnapshots()
+
+```ts
+diffSnapshots(__namedParameters): SnapshotDelta[];
+```
+
+Defined in: [framework/base/base.framework.ts:82](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/framework/base/base.framework.ts#L82)
+
+Compares two snapshots to identify translation key-level changes across all files.
+
+For each file present in the new snapshot, compares it against the old snapshot (if present)
+to detect added, changed, or removed translation keys
+
+###### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `__namedParameters` | \{ `newSnapshot`: `Snapshot`\<`Resource`\>; `oldSnapshot`: `Snapshot`\<`Resource`\>; \} |
+| `__namedParameters.newSnapshot` | `Snapshot`\<`Resource`\> |
+| `__namedParameters.oldSnapshot` | `Snapshot`\<`Resource`\> |
+
+###### Returns
+
+`SnapshotDelta`[]
+
+Array of SnapshotDelta objects, each containing a file path and a ResourceDelta
+describing a specific translation change
+
+##### patch()
+
+```ts
+abstract patch(resource): Resource;
+```
+
+Defined in: [framework/base/base.framework.ts:214](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/framework/base/base.framework.ts#L214)
+
+Applies translation updates to a Resource object.
+
+Implementations should iterate through the updates array and apply each value at
+its specified resourcePath
+
+When resource is undefined, creates a new Resource and applies all updates to it.
+
+###### Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `resource` | \{ `resource?`: `Resource`; `updates`: `object`[]; \} | The existing Resource to modify (undefined to create a new one) |
+| `resource.resource?` | `Resource` | - |
+| `resource.updates` | `object`[] | - |
+
+###### Returns
+
+`Resource`
+
+The modified or newly created Resource object
+
+##### resolve()
+
+```ts
+abstract resolve(resource): string;
+```
+
+Defined in: [framework/base/base.framework.ts:233](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/framework/base/base.framework.ts#L233)
+
+Retrieves the translation string value at a specific path within a Resource.
+
+Implementations should traverse the Resource using the provided path array and
+return the string value found at that location.
+
+###### Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `resource` | \{ `resource`: `Resource`; `resourcePath`: (`string` \| `number`)[]; \} | The Resource object to query |
+| `resource.resource` | `Resource` | - |
+| `resource.resourcePath` | (`string` \| `number`)[] | - |
+
+###### Returns
+
+`string`
+
+The translation string value at the specified path
+
+###### Throws
+
+Error if the resourcePath does not exist in the resource
+
+##### resolveFilePath()
+
+```ts
+resolveFilePath(filePath): string;
+```
+
+Defined in: [framework/base/base.framework.ts:158](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/framework/base/base.framework.ts#L158)
+
+Resolves a file path relative to source locale directory to its absolute filesystem location for a given locale.
+
+Combines the configured locales directory, target locale, and relative file path
+into an absolute path.
+
+###### Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `filePath` | \{ `filePath`: `string`; `locale`: `string`; \} | Relative path within the source locale directory (e.g., "common/buttons.json") |
+| `filePath.filePath` | `string` | - |
+| `filePath.locale` | `string` | - |
+
+###### Returns
+
+`string`
+
+Absolute filesystem path to the file (e.g., "/locales/fr/common/buttons.json")
+
+##### serialize()
+
+```ts
+abstract serialize(resource): string;
+```
+
+Defined in: [framework/base/base.framework.ts:182](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/framework/base/base.framework.ts#L182)
+
+Serializes a Resource object into formatted string content ready for file output.
+
+Implementations should convert the Resource into a properly formatted string.
+
+###### Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `resource` | `Resource` | The Resource object to serialize |
+
+###### Returns
+
+`string`
+
+Formatted string content that can be written to a file
+
+##### snapshot()
+
+```ts
+snapshot(locale?): Snapshot<Resource>;
+```
+
+Defined in: [framework/base/base.framework.ts:43](https://github.com/localeops/localeops/blob/11428fe880ab1509bee9a2ef47b6579082f09533/src/framework/base/base.framework.ts#L43)
+
+Captures the current state of all translation files in the source locale directory.
+
+Recursively traverses the directory at `{directory}/{locale}`, reads and deserializes
+each file, and returns a snapshot mapping relative file paths to their parsed contents.
+
+###### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `locale?` | `string` |
+
+###### Returns
+
+`Snapshot`\<`Resource`\>
+
+Snapshot mapping file paths (relative to the source locale directory) to their deserialized Resource objects.
+For example, if a file exists at `{directory}/{locale}/common/buttons.json`, the key will be `common/buttons.json`.
+
+###### Throws
+
+Error if the source locale directory does not exist or files cannot be read
