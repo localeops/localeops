@@ -1,0 +1,22 @@
+{
+	"out": ".typedoc",
+	"entryPoints": [
+		"../src/sources/base.source.ts",
+		"../src/databases/base.database.ts",
+		"../src/framework/base/base.framework.ts"
+	],
+	"readme": "none",
+	"plugin": ["typedoc-plugin-markdown"],
+	"router": "module",
+	"fileExtension": ".md",
+	"flattenOutputFiles": true,
+	"hidePageHeader": true,
+	"hideBreadcrumbs": true,
+	"hidePageTitle": true,
+	"excludeExternals": true,
+	"parametersFormat": "table",
+	"classPropertiesFormat": "table",
+	"interfacePropertiesFormat": "table",
+	"useCodeBlocks": true,
+	"publicPath": "/api/"
+}
