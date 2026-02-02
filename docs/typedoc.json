@@ -5,6 +5,8 @@
 		"../src/databases/base.database.ts",
 		"../src/framework/base/base.framework.ts"
 	],
+	"tsconfig": "../tsconfig.json",
+	"skipErrorChecking": true,
 	"readme": "none",
 	"plugin": ["typedoc-plugin-markdown"],
 	"router": "module",
