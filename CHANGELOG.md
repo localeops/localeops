@@ -1,3 +1,28 @@
+## [0.11.1](https://github.com/localeops/localeops/compare/v0.11.0...v0.11.1) (2026-02-02)
+
+### Bug Fixes
+
+* **docs:** skip TypeScript error checking in typedoc ([88d998b](https://github.com/localeops/localeops/commit/88d998b5eb28b8c54929bb97c0cdc03a1dc0eea4))
+
+### Chores
+
+* **deps-dev:** bump the development-dependencies group across 1 directory with 3 updates ([11428fe](https://github.com/localeops/localeops/commit/11428fe880ab1509bee9a2ef47b6579082f09533))
+* **deps-dev:** bump the development-dependencies group with 2 updates ([1095f0c](https://github.com/localeops/localeops/commit/1095f0c45db7401e1bdbe146ca723fde1970bbb3))
+* **docs:** add documentation generation for bitbucket and gitlab pipelines ([4074602](https://github.com/localeops/localeops/commit/407460281cc31623b9481d437d61786d40af4db0))
+
+### Documentation
+
+* **docs:** add setup guide readme section for new and existing projects ([1928ee0](https://github.com/localeops/localeops/commit/1928ee0557d111d86ba5f3ebee95dfeca405c77b))
+* **docs:** fix typo in architecture documentation ([56ac5ca](https://github.com/localeops/localeops/commit/56ac5ca03301e29efded336e96a9fee1d308a3fa))
+* **docs:** generate base class documentation ([a97d967](https://github.com/localeops/localeops/commit/a97d96711f73489ed889fe99f51c3ee980216fa6))
+* **docs:** improve setup guide's sync command usage notes ([a8fd7dc](https://github.com/localeops/localeops/commit/a8fd7dc74788c90140d42d27238db356bf2aed5b))
+
+### Continuous Integration
+
+* **deps:** bump actions/attest-build-provenance from 3.1.0 to 3.2.0 ([d16e134](https://github.com/localeops/localeops/commit/d16e134a8590406f8778b7f0536870acd4b1fe65))
+* **deps:** bump actions/cache from 5.0.2 to 5.0.3 ([02a9499](https://github.com/localeops/localeops/commit/02a949951ac3bfe437bb5f87170953b2e660a5d4))
+* **deps:** bump actions/checkout from 6.0.1 to 6.0.2 ([e48d66a](https://github.com/localeops/localeops/commit/e48d66a926ee10a16028340c61d817fc711a6a37))
+
 ## [0.11.0](https://github.com/localeops/localeops/compare/v0.10.0...v0.11.0) (2026-01-23)
 
 ### Features
