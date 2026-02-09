@@ -45,7 +45,7 @@
 	},
 	"type": "module",
 	"devDependencies": {
-		"@biomejs/biome": "2.3.13",
+		"@biomejs/biome": "2.3.14",
 		"@semantic-release/changelog": "6.0.3",
 		"@semantic-release/exec": "7.1.0",
 		"@semantic-release/git": "10.0.1",
@@ -56,7 +56,7 @@
 		"commitizen": "4.3.1",
 		"conventional-changelog-conventionalcommits": "9.1.0",
 		"cz-customizable": "7.5.1",
-		"lefthook": "2.0.16",
+		"lefthook": "2.1.0",
 		"lodash": "4.17.23",
 		"semantic-release": "25.0.3",
 		"typescript": "5.9.3",
